@@ -64,8 +64,8 @@ export function TextField({
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
-        <Label htmlFor={label} className="mb-2 text-sm">
+      <div className="mb-1 flex items-center justify-between">
+        <Label htmlFor={label} className="text-sm">
           {label}
         </Label>
         {secondaryLabel && (

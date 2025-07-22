@@ -3,7 +3,7 @@ import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
 import { env } from '@/env'
 
 export const http = axios.create({
-  baseURL: env.VITE_APP_TITLE,
+  baseURL: env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

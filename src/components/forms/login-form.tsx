@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
 import z from 'zod'
-import { redirect } from '@tanstack/react-router'
 import { useAppForm } from '@/hooks/form'
 import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
 

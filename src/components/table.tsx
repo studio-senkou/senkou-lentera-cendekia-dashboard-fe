@@ -20,7 +20,7 @@ import {
   TableFooter,
 } from './ui/table'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 export interface TableProps<T> {
   columns: ColumnDef<T, any>[]
@@ -40,8 +40,10 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 export function Table<T>({ columns, data, caption }: TableProps<T>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
+  const safeData = useMemo(() => data || [], [data])
+
   const table = useReactTable({
-    data,
+    data: safeData,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -92,23 +94,31 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows.map((row, index) => {
-          return (
-            <TableRow
-              key={row.id}
-              className="border-b transition-colors hover:bg-gray-100"
-            >
-              <TableCell key={row.id} className="p-4">
-                {index + 1}
-              </TableCell>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        {table.getRowModel().rows.length > 0 ? (
+          table.getRowModel().rows.map((row, index) => {
+            return (
+              <TableRow
+                key={row.id}
+                className="border-b transition-colors hover:bg-gray-100"
+              >
+                <TableCell key={row.id} className="p-4">
+                  {index + 1}
                 </TableCell>
-              ))}
-            </TableRow>
-          )
-        })}
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )
+          })
+        ) : (
+          <TableRow>
+            <TableCell colSpan={columns.length + 1} className="text-center p-8">
+              No data available
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
 
       <TableFooter>
