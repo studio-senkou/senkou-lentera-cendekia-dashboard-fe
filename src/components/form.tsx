@@ -1,6 +1,6 @@
 import { useStore } from '@tanstack/react-form'
 
-import { useFieldContext, useFormContext } from '../hooks/demo.form-context'
+import { useFieldContext, useFormContext } from '../hooks/form-context'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,8 @@ import * as ShadcnSelect from '@/components/ui/select'
 import { Slider as ShadcnSlider } from '@/components/ui/slider'
 import { Switch as ShadcnSwitch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 export function SubscribeButton({ label }: { label: string }) {
   const form = useFormContext()
@@ -33,7 +35,7 @@ function ErrorMessages({
       {errors.map((error) => (
         <div
           key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 font-bold"
+          className="text-red-500 mt-1 text-sm"
         >
           {typeof error === 'string' ? error : error.message}
         </div>
@@ -42,26 +44,45 @@ function ErrorMessages({
   )
 }
 
-export function TextField({
-  label,
-  placeholder,
-}: {
+interface TextFieldProps {
+  name: string
   label: string
   placeholder?: string
-}) {
+  type?: string
+  secondaryLabel?: ReactNode
+}
+
+export function TextField({
+  type = 'text',
+  label,
+  placeholder,
+  name,
+  secondaryLabel,
+}: TextFieldProps) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
-        {label}
-      </Label>
+      <div className="mb-2 flex items-center justify-between">
+        <Label htmlFor={label} className="mb-2 text-sm">
+          {label}
+        </Label>
+        {secondaryLabel && (
+          <span className="text-sm text-muted-foreground">
+            {secondaryLabel}
+          </span>
+        )}
+      </div>
       <Input
+        id={label}
+        type={type}
+        name={name}
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
+        className={cn(errors.length > 0 && 'border-red-500')}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -80,7 +101,7 @@ export function TextArea({
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <Label htmlFor={label} className="mb-2 text-sm">
         {label}
       </Label>
       <ShadcnTextarea
@@ -139,7 +160,7 @@ export function Slider({ label }: { label: string }) {
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+      <Label htmlFor={label} className="mb-2 text-sm">
         {label}
       </Label>
       <ShadcnSlider

@@ -9,159 +9,143 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
-import { Route as DemoTableRouteImport } from './routes/demo.table'
-import { Route as DemoStoreRouteImport } from './routes/demo.store'
-import { Route as DemoFormSimpleRouteImport } from './routes/demo.form.simple'
-import { Route as DemoFormAddressRouteImport } from './routes/demo.form.address'
+import { Route as UauthenticatedLayoutRouteImport } from './routes/_uauthenticatedLayout'
+import { Route as AuthenticatedLayoutRouteImport } from './routes/_authenticatedLayout'
+import { Route as AuthenticatedLayoutIndexRouteImport } from './routes/_authenticatedLayout/index'
+import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './routes/_uauthenticatedLayout/login/index'
+import { Route as AuthenticatedLayoutUsersIndexRouteImport } from './routes/_authenticatedLayout/users/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const UauthenticatedLayoutRoute = UauthenticatedLayoutRouteImport.update({
+  id: '/_uauthenticatedLayout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
+const AuthenticatedLayoutRoute = AuthenticatedLayoutRouteImport.update({
+  id: '/_authenticatedLayout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: '/demo/form/simple',
-  path: '/demo/form/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: '/demo/form/address',
-  path: '/demo/form/address',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedLayoutIndexRoute =
+  AuthenticatedLayoutIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const UauthenticatedLayoutLoginIndexRoute =
+  UauthenticatedLayoutLoginIndexRouteImport.update({
+    id: '/login/',
+    path: '/login/',
+    getParentRoute: () => UauthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedLayoutUsersIndexRoute =
+  AuthenticatedLayoutUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/': typeof AuthenticatedLayoutIndexRoute
+  '/users': typeof AuthenticatedLayoutUsersIndexRoute
+  '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/': typeof AuthenticatedLayoutIndexRoute
+  '/users': typeof AuthenticatedLayoutUsersIndexRoute
+  '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
+  '/_authenticatedLayout': typeof AuthenticatedLayoutRouteWithChildren
+  '/_uauthenticatedLayout': typeof UauthenticatedLayoutRouteWithChildren
+  '/_authenticatedLayout/': typeof AuthenticatedLayoutIndexRoute
+  '/_authenticatedLayout/users/': typeof AuthenticatedLayoutUsersIndexRoute
+  '/_uauthenticatedLayout/login/': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/demo/form/address'
-    | '/demo/form/simple'
+  fullPaths: '/' | '/users' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/demo/form/address'
-    | '/demo/form/simple'
+  to: '/' | '/users' | '/login'
   id:
     | '__root__'
-    | '/'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/demo/form/address'
-    | '/demo/form/simple'
+    | '/_authenticatedLayout'
+    | '/_uauthenticatedLayout'
+    | '/_authenticatedLayout/'
+    | '/_authenticatedLayout/users/'
+    | '/_uauthenticatedLayout/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  DemoFormAddressRoute: typeof DemoFormAddressRoute
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
+  AuthenticatedLayoutRoute: typeof AuthenticatedLayoutRouteWithChildren
+  UauthenticatedLayoutRoute: typeof UauthenticatedLayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_uauthenticatedLayout': {
+      id: '/_uauthenticatedLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof UauthenticatedLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticatedLayout': {
+      id: '/_authenticatedLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticatedLayout/': {
+      id: '/_authenticatedLayout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedLayoutIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_uauthenticatedLayout/login/': {
+      id: '/_uauthenticatedLayout/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof UauthenticatedLayoutLoginIndexRouteImport
+      parentRoute: typeof UauthenticatedLayoutRoute
     }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/simple': {
-      id: '/demo/form/simple'
-      path: '/demo/form/simple'
-      fullPath: '/demo/form/simple'
-      preLoaderRoute: typeof DemoFormSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/address': {
-      id: '/demo/form/address'
-      path: '/demo/form/address'
-      fullPath: '/demo/form/address'
-      preLoaderRoute: typeof DemoFormAddressRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticatedLayout/users/': {
+      id: '/_authenticatedLayout/users/'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedLayoutUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
     }
   }
 }
 
+interface AuthenticatedLayoutRouteChildren {
+  AuthenticatedLayoutIndexRoute: typeof AuthenticatedLayoutIndexRoute
+  AuthenticatedLayoutUsersIndexRoute: typeof AuthenticatedLayoutUsersIndexRoute
+}
+
+const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticatedLayoutIndexRoute: AuthenticatedLayoutIndexRoute,
+  AuthenticatedLayoutUsersIndexRoute: AuthenticatedLayoutUsersIndexRoute,
+}
+
+const AuthenticatedLayoutRouteWithChildren =
+  AuthenticatedLayoutRoute._addFileChildren(AuthenticatedLayoutRouteChildren)
+
+interface UauthenticatedLayoutRouteChildren {
+  UauthenticatedLayoutLoginIndexRoute: typeof UauthenticatedLayoutLoginIndexRoute
+}
+
+const UauthenticatedLayoutRouteChildren: UauthenticatedLayoutRouteChildren = {
+  UauthenticatedLayoutLoginIndexRoute: UauthenticatedLayoutLoginIndexRoute,
+}
+
+const UauthenticatedLayoutRouteWithChildren =
+  UauthenticatedLayoutRoute._addFileChildren(UauthenticatedLayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  DemoFormAddressRoute: DemoFormAddressRoute,
-  DemoFormSimpleRoute: DemoFormSimpleRoute,
+  AuthenticatedLayoutRoute: AuthenticatedLayoutRouteWithChildren,
+  UauthenticatedLayoutRoute: UauthenticatedLayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
