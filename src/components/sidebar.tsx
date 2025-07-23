@@ -55,6 +55,11 @@ const data = {
       url: '/users',
       icon: User,
     },
+    {
+      title: 'Sesi Pertemuan',
+      url: '/meeting-sessions',
+      icon: UserCircle,
+    },
   ],
   documents: [
     {

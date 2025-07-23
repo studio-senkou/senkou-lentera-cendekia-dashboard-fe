@@ -17,7 +17,7 @@ interface UpdateSessionData {
 
 interface SessionActions {
   authenticate: (email: string, password: string) => Promise<void>
-  renewSession: () => void
+  renewSession: () => Promise<UpdateSessionData>
   updateSession: (data: UpdateSessionData) => void
   setAccessToken: (token: string) => void
   setRefreshToken: (token: string) => void
@@ -53,8 +53,12 @@ export const useSessionStore = create<SessionState & SessionActions>()(
           token: refreshToken,
         })
 
+        console.log('Session renewed:', response.data.data)
+
         updateSession(response.data.data)
+        return response.data.data;
       } catch (error) {
+        toast.error('Failed to renew session')
         throw new Error('Failed to renew session')
       }
     },

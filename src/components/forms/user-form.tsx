@@ -7,6 +7,7 @@ import z from 'zod'
 
 interface RegisterUserFormProps {
   className?: string
+  onSuccess?: () => void
 }
 
 export interface RegisterUserFormRef {
@@ -24,7 +25,7 @@ const registerSchema = z.object({
 export const RegisterUserForm = forwardRef<
   RegisterUserFormRef,
   RegisterUserFormProps
->(({ className }, ref) => {
+>(({ className, onSuccess }, ref) => {
   const queryClient = useQueryClient()
 
   const form = useAppForm({
@@ -43,6 +44,9 @@ export const RegisterUserForm = forwardRef<
         })
 
         queryClient.refetchQueries({ queryKey: ['users'] })
+
+        form.reset()
+        onSuccess?.()
       } catch (error) {
         console.error('Error submitting form:', error)
       }

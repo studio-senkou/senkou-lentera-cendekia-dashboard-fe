@@ -25,3 +25,23 @@ export const getAllUsers = async () => {
     toast.error('Failed to get users')
   }
 }
+
+export const getUserDropdown = async () => {
+  try {
+    const response = await http.get('/users/students/dropdown')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to get user dropdown')
+    return []
+  }
+}
+
+export const getMentorDropdown = async () => {
+  try {
+    const response = await http.get('/users/mentors/dropdown')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to get mentor dropdown')
+    return []
+  }
+}

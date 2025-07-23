@@ -9,6 +9,7 @@ import {
   SheetTrigger,
 } from '../ui/sheet'
 import { Button } from '../ui/button'
+import { useState } from 'react'
 
 interface FormSheetProps {
   id?: string
@@ -19,6 +20,7 @@ interface FormSheetProps {
   title: string
   description?: string
   onSubmitForm?: () => Promise<void> | void
+  onSuccess?: () => void
 }
 
 export function FormSheet({
@@ -30,9 +32,22 @@ export function FormSheet({
   title,
   description,
   onSubmitForm = () => {},
+  onSuccess,
 }: FormSheetProps) {
+  const [open, setOpen] = useState(false)
+
+  const handleSubmit = async () => {
+    try {
+      await onSubmitForm()
+      setOpen(false)
+      onSuccess?.()
+    } catch (error) {
+      console.error('Form submission failed:', error)
+    }
+  }
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild disabled={disabled}>
         {trigger}
       </SheetTrigger>
@@ -43,7 +58,7 @@ export function FormSheet({
         </SheetHeader>
         {children}
         <SheetFooter>
-          <Button type="button" onClick={onSubmitForm} disabled={disabled}>
+          <Button type="button" onClick={handleSubmit} disabled={disabled}>
             Submit
           </Button>
         </SheetFooter>

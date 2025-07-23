@@ -64,7 +64,7 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
-            <TableHead className="p-4">No.</TableHead>
+            <TableHead className="p-2 w-24">No.</TableHead>
             {headerGroup.headers.map((header) => (
               <TableHead key={header.id} colSpan={header.colSpan}>
                 {header.isPlaceholder ? null : (
