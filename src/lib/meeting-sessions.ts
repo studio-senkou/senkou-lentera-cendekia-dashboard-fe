@@ -9,6 +9,12 @@ export interface CreateMeetingSessionRequest {
   duration: number
   topic: string
   type: string
+  description?: string
+}
+
+export interface UpdateMeetingSessionRequest {
+  id: string
+  data: Partial<Omit<CreateMeetingSessionRequest, 'student_id' | 'mentor_id'>>
 }
 
 export const createMeetingSession = async (
@@ -26,8 +32,51 @@ export const createMeetingSession = async (
 export const getMeetingSessions = async () => {
   try {
     const response = await http.get('/meeting-sessions')
-    return response.data
+    return response.data.data.sessions
   } catch (error) {
     toast.error('Failed to get meeting sessions')
+  }
+}
+
+export const updateMeetingSession = async ({
+  id,
+  data,
+}: UpdateMeetingSessionRequest) => {
+  try {
+    const response = await http.patch(`/meeting-sessions/${id}`, data)
+    toast.success('Sesi pertemuan berhasil diperbarui')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to update meeting session')
+  }
+}
+
+export const completeMeetingSession = async (id: string) => {
+  try {
+    const response = await http.patch(`/meeting-sessions/${id}/complete`)
+    toast.success('Sesi pertemuan berhasil diselesaikan')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to complete meeting session')
+  }
+}
+
+export const cancelMeetingSession = async (id: string) => {
+  try {
+    const response = await http.patch(`/meeting-sessions/${id}/cancel`)
+    toast.success('Sesi pertemuan berhasil dibatalkan')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to cancel meeting session')
+  }
+}
+
+export const deleteMeetingSession = async (id: string) => {
+  try {
+    const response = await http.delete(`/meeting-sessions/${id}`)
+    toast.success('Sesi pertemuan berhasil dihapus')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to delete meeting session')
   }
 }

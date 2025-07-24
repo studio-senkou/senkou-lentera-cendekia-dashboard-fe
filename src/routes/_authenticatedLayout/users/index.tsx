@@ -31,8 +31,16 @@ function RouteComponent() {
       })) ?? [],
   })
 
-  const handleSubmitForm = () => {
-    formRef.current?.submit()
+  const handleSubmitForm = async () => {
+    if (!formRef.current) {
+      throw new Error('Form ref is not available')
+    }
+
+    try {
+      await formRef.current.submit()
+    } catch (error) {
+      throw error
+    }
   }
 
   return (

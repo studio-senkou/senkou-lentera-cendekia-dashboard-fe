@@ -11,7 +11,7 @@ interface RegisterUserFormProps {
 }
 
 export interface RegisterUserFormRef {
-  submit: () => void
+  submit: () => Promise<void>
 }
 
 const registerSchema = z.object({
@@ -20,6 +20,7 @@ const registerSchema = z.object({
     .string()
     .email('Alamat email tidak valid')
     .min(1, 'Email diperlukan'),
+  role: z.enum(['user', 'mentor']),
 })
 
 export const RegisterUserForm = forwardRef<
@@ -32,32 +33,39 @@ export const RegisterUserForm = forwardRef<
     defaultValues: {
       name: '',
       email: '',
+      role: 'user',
     },
     validators: {
       onSubmit: registerSchema,
     },
-    onSubmit: async (values) => {
+    onSubmit: async ({ value }) => {
       try {
         await registerUser({
-          name: values.value.name,
-          email: values.value.email,
+          name: value.name,
+          email: value.email,
+          role: value.role as 'user' | 'mentor',
         })
 
-        queryClient.refetchQueries({ queryKey: ['users'] })
-
+        await queryClient.refetchQueries({ queryKey: ['users'] })
         form.reset()
         onSuccess?.()
       } catch (error) {
-        console.error('Error submitting form:', error)
+        throw error
       }
     },
   })
 
   useImperativeHandle(ref, () => ({
-    submit: () => {
-      form.handleSubmit()
+    submit: async () => {
+      try {
+        await form.handleSubmit()
+      } catch (error) {
+        throw error
+      }
     },
   }))
+
+  const { AppField } = form
 
   return (
     <form
@@ -70,28 +78,26 @@ export const RegisterUserForm = forwardRef<
       }}
     >
       <div className="grid gap-3">
-        <form.AppField name="name">
-          {(field) => <field.TextField name="name" label="Nama" />}
-        </form.AppField>
-        <form.AppField name="email">
-          {(field) => (
-            <field.TextField type="email" name="email" label="Email" />
+        <AppField name="name">
+          {({ TextField }) => <TextField name="name" label="Nama" required />}
+        </AppField>
+        <AppField name="email">
+          {({ TextField }) => (
+            <TextField type="email" name="email" label="Email" required />
           )}
-        </form.AppField>
-        {/* <form.AppField name="password">
-          {(field) => (
-            <field.TextField name="password" label="Password" type="password" />
-          )}
-        </form.AppField>
-        <form.AppField name="confirmPassword">
-          {(field) => (
-            <field.TextField
-              name="confirmPassword"
-              label="Konfirmasi Password"
-              type="password"
+        </AppField>
+        <AppField name="role">
+          {({ Select }) => (
+            <Select
+              label="Peran"
+              required
+              values={[
+                { value: 'user', label: 'Murid' },
+                { value: 'mentor', label: 'Mentor' },
+              ]}
             />
           )}
-        </form.AppField> */}
+        </AppField>
       </div>
     </form>
   )

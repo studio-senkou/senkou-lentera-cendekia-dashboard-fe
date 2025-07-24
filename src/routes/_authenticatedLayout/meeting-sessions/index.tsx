@@ -3,12 +3,23 @@ import {
   MeetingSessionForm,
   type MeetingSessionFormRef,
 } from '@/components/forms/meeting-sessions.form'
+import {
+  UpdateMeetingSessionForm,
+  type UpdateMeetingSessionFormRef,
+} from '@/components/forms/update-meeting-session-form'
 import { Table } from '@/components/table'
 import { Button } from '@/components/ui/button'
-import { getMeetingSessions } from '@/lib/meeting-sessions'
-import { useQuery } from '@tanstack/react-query'
+import {
+  cancelMeetingSession,
+  completeMeetingSession,
+  deleteMeetingSession,
+  getMeetingSessions,
+} from '@/lib/meeting-sessions'
+import type { MeetingSession } from '@/types/response'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useRef } from 'react'
+import { Check, Edit2, Loader2, Trash2, X } from 'lucide-react'
+import { Fragment, useRef, useState } from 'react'
 
 export const Route = createFileRoute('/_authenticatedLayout/meeting-sessions/')(
   {
@@ -18,15 +29,82 @@ export const Route = createFileRoute('/_authenticatedLayout/meeting-sessions/')(
 
 function RouteComponent() {
   const formRef = useRef<MeetingSessionFormRef>(null)
+  const updateFormRef = useRef<UpdateMeetingSessionFormRef>(null)
 
-  const { data: meetingSessions } = useQuery({
+  const { data: meetingSessions, refetch: refetchMeetingSessions } = useQuery<
+    MeetingSession[]
+  >({
     queryKey: ['meeting-sessions'],
     queryFn: getMeetingSessions,
-    select: (data) => data.data.sessions ?? [],
+    select: (sessions) => sessions ?? [],
   })
 
-  const handleSubmitForm = () => {
-    formRef.current?.submit()
+  const [completedId, setCompletedId] = useState<string | null>(null)
+  const { mutate: completeSession, isPending: completingSession } = useMutation(
+    {
+      mutationFn: completeMeetingSession,
+      onMutate: (id: string) => {
+        setCompletedId(id)
+      },
+      onSettled: () => {
+        setCompletedId(null)
+      },
+      onSuccess: async () => {
+        await refetchMeetingSessions()
+      },
+    },
+  )
+
+  const [cancelledId, setCancelledId] = useState<string | null>(null)
+  const { mutate: cancelSession, isPending: cancellingSession } = useMutation({
+    mutationFn: cancelMeetingSession,
+    onMutate: (id: string) => {
+      setCancelledId(id)
+    },
+    onSettled: () => {
+      setCancelledId(null)
+    },
+    onSuccess: async () => {
+      await refetchMeetingSessions()
+    },
+  })
+
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { mutate: deleteSession, isPending: deletingSession } = useMutation({
+    mutationFn: deleteMeetingSession,
+    onMutate: (id: string) => {
+      setDeletingId(id)
+    },
+    onSettled: () => {
+      setDeletingId(null)
+    },
+    onSuccess: async () => {
+      await refetchMeetingSessions()
+    },
+  })
+
+  const handleSubmitForm = async () => {
+    if (!formRef.current) {
+      throw new Error('Form ref is not available')
+    }
+
+    try {
+      await formRef.current.submit()
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const handleUpdateFormSubmit = async () => {
+    if (!updateFormRef.current) {
+      throw new Error('Update form ref is not available')
+    }
+
+    try {
+      await updateFormRef.current.submit()
+    } catch (error) {
+      throw error
+    }
   }
 
   return (
@@ -77,16 +155,78 @@ function RouteComponent() {
           {
             header: 'Aksi',
             cell: (info) => (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  // Handle action button click
-                  console.log('Action clicked for session:', info.row.original)
-                }}
-              >
-                Aksi
-              </Button>
+              <Fragment>
+                <Button
+                  variant="success"
+                  size="icon"
+                  onClick={() => completeSession(info.row.original.id)}
+                  disabled={
+                    (completingSession &&
+                      info.row.original.id === completedId) ||
+                    info.row.original.session_status == 'completed' ||
+                    info.row.original.session_status == 'cancelled'
+                  }
+                  className="mr-2"
+                  aria-label="Selesaikan Sesi Pertemuan"
+                >
+                  {completingSession && info.row.original.id === completedId ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Check className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  disabled={
+                    (cancellingSession &&
+                      info.row.original.id === cancelledId) ||
+                    info.row.original.session_status == 'completed' ||
+                    info.row.original.session_status == 'cancelled'
+                  }
+                  className="mr-2"
+                  aria-label="Batalkan Sesi Pertemuan"
+                  onClick={() => cancelSession(info.row.original.id)}
+                >
+                  {cancellingSession && info.row.original.id === cancelledId ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <X className="h-4 w-4" />
+                  )}
+                </Button>
+                <FormSheet
+                  trigger={
+                    <Button variant="warning" size="icon">
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  }
+                  title="Perbarui Sesi Pertemuan"
+                  description="Tindakan ini akan memperbarui sesi pertemuan yang dipilih. Silakan isi formulir di bawah ini untuk melanjutkan."
+                  onSubmitForm={handleUpdateFormSubmit}
+                  disabled={false}
+                >
+                  <UpdateMeetingSessionForm
+                    session={info.row.original}
+                    ref={updateFormRef}
+                  />
+                </FormSheet>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => deleteSession(info.row.original.id)}
+                  disabled={
+                    deletingSession && info.row.original.id === deletingId
+                  }
+                  className="ml-2"
+                  aria-label="Hapus Sesi Pertemuan"
+                >
+                  {deletingSession && info.row.original.id === deletingId ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </Fragment>
             ),
           },
         ]}

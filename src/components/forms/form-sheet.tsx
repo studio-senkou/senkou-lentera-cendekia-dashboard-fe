@@ -10,6 +10,7 @@ import {
 } from '../ui/sheet'
 import { Button } from '../ui/button'
 import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 interface FormSheetProps {
   id?: string
@@ -35,19 +36,41 @@ export function FormSheet({
   onSuccess,
 }: FormSheetProps) {
   const [open, setOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
   const handleSubmit = async () => {
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
+    setHasError(false)
+
     try {
       await onSubmitForm()
       setOpen(false)
       onSuccess?.()
     } catch (error) {
-      console.error('Form submission failed:', error)
+      setHasError(true)
+      if (error instanceof Error) {
+        console.error('Form submission error:', error.message)
+      }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isSubmitting && !newOpen) return
+
+    if (newOpen) {
+      setHasError(false)
+    }
+
+    setOpen(newOpen)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild disabled={disabled}>
         {trigger}
       </SheetTrigger>
@@ -58,8 +81,23 @@ export function FormSheet({
         </SheetHeader>
         {children}
         <SheetFooter>
-          <Button type="button" onClick={handleSubmit} disabled={disabled}>
-            Submit
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={disabled || isSubmitting}
+            className="min-w-[100px]"
+            variant={hasError ? 'destructive' : 'default'}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Memproses...
+              </>
+            ) : hasError ? (
+              'Coba Lagi'
+            ) : (
+              'Submit'
+            )}
           </Button>
         </SheetFooter>
       </SheetContent>

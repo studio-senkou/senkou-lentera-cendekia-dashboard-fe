@@ -2,7 +2,7 @@ import { useAppForm } from '@/hooks/form'
 import { createMeetingSession } from '@/lib/meeting-sessions'
 import { getMentorDropdown, getUserDropdown } from '@/lib/users'
 import { cn } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { forwardRef, useImperativeHandle } from 'react'
 import z from 'zod'
 
@@ -12,7 +12,7 @@ interface MeetingSessionFormProps {
 }
 
 export interface MeetingSessionFormRef {
-  submit: () => void
+  submit: () => Promise<void>
 }
 
 const meetingSessionSchema = z.object({
@@ -25,12 +25,15 @@ const meetingSessionSchema = z.object({
   time: z.string().min(1, 'Session time is required!'),
   duration: z.number().min(1, 'Session duration must be at least 1 minute!'),
   type: z.string().min(1, 'Session type is required!'),
+  description: z.string().min(0, 'Description is required!'),
 })
 
 export const MeetingSessionForm = forwardRef<
   MeetingSessionFormRef,
   MeetingSessionFormProps
 >(({ className, onSuccess }, ref) => {
+  const queryClient = useQueryClient()
+
   const form = useAppForm({
     defaultValues: {
       student_id: '',
@@ -40,6 +43,7 @@ export const MeetingSessionForm = forwardRef<
       time: '',
       duration: 60, // Default to 60 minutes
       type: 'Sesi Online',
+      description: '',
     },
     validators: {
       onSubmit: meetingSessionSchema,
@@ -52,6 +56,9 @@ export const MeetingSessionForm = forwardRef<
           mentor_id: parseInt(values.value.mentor_id),
         }
         await createMeetingSession(submitValues)
+
+        await queryClient.refetchQueries({ queryKey: ['meeting-sessions'] })
+
         form.reset()
         onSuccess?.()
       } catch (error) {
@@ -61,8 +68,12 @@ export const MeetingSessionForm = forwardRef<
   })
 
   useImperativeHandle(ref, () => ({
-    submit: () => {
-      form.handleSubmit()
+    submit: async () => {
+      try {
+        await form.handleSubmit()
+      } catch (error) {
+        throw error
+      }
     },
   }))
 
@@ -100,6 +111,7 @@ export const MeetingSessionForm = forwardRef<
             return (
               <Select
                 label="Peserta"
+                required
                 placeholder="Pilih peserta sesi"
                 values={
                   Array.isArray(usersDropdown)
@@ -118,6 +130,7 @@ export const MeetingSessionForm = forwardRef<
             return (
               <Select
                 label="Mentor"
+                required
                 placeholder="Pilih mentor sesi"
                 values={
                   Array.isArray(mentorDropdown)
@@ -136,16 +149,21 @@ export const MeetingSessionForm = forwardRef<
             <TextField
               type="text"
               label="Topik"
+              required
               name="session_topic"
               placeholder="Masukkan topik sesi pertemuan"
             />
           )}
         </AppField>
         <AppField name="date">
-          {({ DatePicker }) => <DatePicker label="Tanggal Sesi" name="date" />}
+          {({ DatePicker }) => (
+            <DatePicker label="Tanggal Sesi" required name="date" />
+          )}
         </AppField>
         <AppField name="time">
-          {({ TimePicker }) => <TimePicker label="Waktu Sesi" name="time" />}
+          {({ TimePicker }) => (
+            <TimePicker label="Waktu Sesi" required name="time" />
+          )}
         </AppField>
         <AppField name="duration">
           {({ TextField }) => (
@@ -153,12 +171,18 @@ export const MeetingSessionForm = forwardRef<
               type="number"
               label="Durasi Sesi"
               name="duration"
+              required
               placeholder="Masukkan durasi sesi pertemuan"
             />
           )}
         </AppField>
         <AppField name="type">
-          {({ TextField }) => <TextField label="Tipe Sesi" name="type" />}
+          {({ TextField }) => (
+            <TextField label="Tipe Sesi" required name="type" />
+          )}
+        </AppField>
+        <AppField name="description">
+          {({ TextArea }) => <TextArea label="Deskripsi" />}
         </AppField>
       </div>
     </form>
