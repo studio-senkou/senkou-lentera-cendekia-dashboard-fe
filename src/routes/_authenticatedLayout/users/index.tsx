@@ -7,7 +7,6 @@ import {
 import { Table } from '@/components/table'
 import { Button } from '@/components/ui/button'
 import { forceActivateUser, getAllUsers } from '@/lib/users'
-import type { User } from '@/types/response'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
