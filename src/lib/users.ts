@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 import { http } from './axios'
+import type { User } from '@/types/response'
 
 interface RegisterUserRequest {
   name: string
@@ -19,12 +20,27 @@ export const registerUser = async (data: RegisterUserRequest) => {
   }
 }
 
-export const getAllUsers = async () => {
+export const forceActivateUser = async (userID: number) => {
+  try {
+    const response = await http.post(`/users/${userID}/force-activate`)
+
+    toast.success('Successfully activate user')
+    return response.data.data
+  } catch (error) {
+    toast.error('Failed to activate user status')
+  }
+}
+
+export const getAllUsers = async (): Promise<User[]> => {
   try {
     const response = await http.get('/users')
-    return response.data
+    return response.data.data.users.map((user: User) => ({
+      ...user,
+      role: user.role === 'mentor' ? 'Mentor' : 'Murid',
+    }))
   } catch (error) {
     toast.error('Failed to get users')
+    return []
   }
 }
 

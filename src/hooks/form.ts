@@ -2,6 +2,7 @@ import { createFormHook } from '@tanstack/react-form'
 
 import {
   DatePicker,
+  FileInput,
   Select,
   SubscribeButton,
   TextArea,
@@ -17,6 +18,7 @@ export const { useAppForm } = createFormHook({
     TextArea,
     TimePicker,
     DatePicker,
+    FileInput,
   },
   formComponents: {
     SubscribeButton,

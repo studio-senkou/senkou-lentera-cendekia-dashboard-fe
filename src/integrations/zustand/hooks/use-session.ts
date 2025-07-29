@@ -30,7 +30,7 @@ export const useSessionStore = create<SessionState & SessionActions>()(
     refreshToken: Cookies.get('refresh_token') || null,
     authenticate: async (email, password) => {
       try {
-        const response = await http.post('/auth/login', {
+        const response = await http.post('/auth/login/admin', {
           email,
           password,
         })
@@ -53,11 +53,11 @@ export const useSessionStore = create<SessionState & SessionActions>()(
           token: refreshToken,
         })
 
-        console.log('Session renewed:', response.data.data)
-
         updateSession(response.data.data)
-        return response.data.data;
+        return response.data.data
       } catch (error) {
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
         toast.error('Failed to renew session')
         throw new Error('Failed to renew session')
       }

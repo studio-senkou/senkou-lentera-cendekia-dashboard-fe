@@ -39,11 +39,11 @@ function RouteComponent() {
     select: (sessions) => sessions ?? [],
   })
 
-  const [completedId, setCompletedId] = useState<string | null>(null)
+  const [completedId, setCompletedId] = useState<number | null>(null)
   const { mutate: completeSession, isPending: completingSession } = useMutation(
     {
       mutationFn: completeMeetingSession,
-      onMutate: (id: string) => {
+      onMutate: (id: number) => {
         setCompletedId(id)
       },
       onSettled: () => {
@@ -55,10 +55,10 @@ function RouteComponent() {
     },
   )
 
-  const [cancelledId, setCancelledId] = useState<string | null>(null)
+  const [cancelledId, setCancelledId] = useState<number | null>(null)
   const { mutate: cancelSession, isPending: cancellingSession } = useMutation({
     mutationFn: cancelMeetingSession,
-    onMutate: (id: string) => {
+    onMutate: (id: number) => {
       setCancelledId(id)
     },
     onSettled: () => {
@@ -69,10 +69,10 @@ function RouteComponent() {
     },
   })
 
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const { mutate: deleteSession, isPending: deletingSession } = useMutation({
     mutationFn: deleteMeetingSession,
-    onMutate: (id: string) => {
+    onMutate: (id: number) => {
       setDeletingId(id)
     },
     onSettled: () => {

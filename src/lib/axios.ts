@@ -32,7 +32,7 @@ http.interceptors.response.use(
     return response
   },
   async (error) => {
-    const { refreshToken, renewSession } = useSessionStore.getState()
+    const { refreshToken, renewSession, clearSession } = useSessionStore.getState()
 
     if (error.response?.status === 401) {
       let retries = retryCountMap.get(error.config) || 0
@@ -51,6 +51,7 @@ http.interceptors.response.use(
           return await http.request(error.config)
         } catch (renewError) {
           toast.error('Failed to renew session. Please log in again.')
+          clearSession()
           window.location.href = '/login'
           return await Promise.reject(renewError)
         }

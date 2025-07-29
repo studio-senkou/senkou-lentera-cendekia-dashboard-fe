@@ -43,7 +43,7 @@ export const updateMeetingSession = async ({
   data,
 }: UpdateMeetingSessionRequest) => {
   try {
-    const response = await http.patch(`/meeting-sessions/${id}`, data)
+    const response = await http.put(`/meeting-sessions/${id}`, data)
     toast.success('Sesi pertemuan berhasil diperbarui')
     return response.data
   } catch (error) {
@@ -51,7 +51,7 @@ export const updateMeetingSession = async ({
   }
 }
 
-export const completeMeetingSession = async (id: string) => {
+export const completeMeetingSession = async (id: number) => {
   try {
     const response = await http.patch(`/meeting-sessions/${id}/complete`)
     toast.success('Sesi pertemuan berhasil diselesaikan')
@@ -61,7 +61,7 @@ export const completeMeetingSession = async (id: string) => {
   }
 }
 
-export const cancelMeetingSession = async (id: string) => {
+export const cancelMeetingSession = async (id: number) => {
   try {
     const response = await http.patch(`/meeting-sessions/${id}/cancel`)
     toast.success('Sesi pertemuan berhasil dibatalkan')
@@ -71,7 +71,7 @@ export const cancelMeetingSession = async (id: string) => {
   }
 }
 
-export const deleteMeetingSession = async (id: string) => {
+export const deleteMeetingSession = async (id: number) => {
   try {
     const response = await http.delete(`/meeting-sessions/${id}`)
     toast.success('Sesi pertemuan berhasil dihapus')

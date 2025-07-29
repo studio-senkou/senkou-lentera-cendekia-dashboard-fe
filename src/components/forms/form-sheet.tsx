@@ -74,13 +74,16 @@ export function FormSheet({
       <SheetTrigger asChild disabled={disabled}>
         {trigger}
       </SheetTrigger>
-      <SheetContent id={id} className={cn('max-w-2xl', className)}>
-        <SheetHeader>
+      <SheetContent
+        id={id}
+        className={cn('max-w-2xl flex flex-col', className)}
+      >
+        <SheetHeader className="flex-shrink-0">
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
-        {children}
-        <SheetFooter>
+        <div className="flex-1 overflow-y-auto px-1 pb-4">{children}</div>
+        <SheetFooter className="flex-shrink-0 border-t bg-background pt-4">
           <Button
             type="button"
             onClick={handleSubmit}

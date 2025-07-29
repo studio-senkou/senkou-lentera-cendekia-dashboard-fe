@@ -1,3 +1,4 @@
+import { Check, Loader2 } from 'lucide-react'
 import { FormSheet } from '@/components/forms/form-sheet'
 import {
   RegisterUserForm,
@@ -5,11 +6,11 @@ import {
 } from '@/components/forms/user-form'
 import { Table } from '@/components/table'
 import { Button } from '@/components/ui/button'
-import { getAllUsers } from '@/lib/users'
+import { forceActivateUser, getAllUsers } from '@/lib/users'
 import type { User } from '@/types/response'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export const Route = createFileRoute('/_authenticatedLayout/users/')({
   component: RouteComponent,
@@ -18,17 +19,13 @@ export const Route = createFileRoute('/_authenticatedLayout/users/')({
 function RouteComponent() {
   const formRef = useRef<RegisterUserFormRef>(null)
 
-  const { data: users, isLoading } = useQuery({
+  const {
+    data: users,
+    isLoading,
+    refetch: refetchUserList,
+  } = useQuery({
     queryKey: ['users'],
     queryFn: getAllUsers,
-    select: (data) =>
-      data.data.users.map((user: User) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        created_at: user.created_at,
-        role: user.role === 'mentor' ? 'Mentor' : 'Murid',
-      })) ?? [],
   })
 
   const handleSubmitForm = async () => {
@@ -42,6 +39,20 @@ function RouteComponent() {
       throw error
     }
   }
+
+  const [activatedUserID, setActivatedUserID] = useState<number | null>(null)
+  const { mutate: activateUser, isPending: activatingUser } = useMutation({
+    mutationFn: (userID: number) => forceActivateUser(userID),
+    onMutate: (id: number) => {
+      setActivatedUserID(id)
+    },
+    onSettled: () => {
+      setActivatedUserID(null)
+    },
+    onSuccess: async () => {
+      await refetchUserList()
+    },
+  })
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -84,6 +95,29 @@ function RouteComponent() {
                 day: '2-digit',
               })
             },
+          },
+          {
+            header: 'Aksi',
+            cell: ({ row }) => (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="success"
+                  size="icon"
+                  onClick={() => activateUser(row.original.id)}
+                  disabled={
+                    !!row.original.email_verified_at && !!row.original.is_active
+                  }
+                  className="mr-2"
+                  aria-label="Selesaikan Sesi Pertemuan"
+                >
+                  {activatingUser && row.original.id === activatedUserID ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Check className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            ),
           },
         ]}
         data={users || []}

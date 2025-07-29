@@ -6,6 +6,7 @@ import {
   File,
   Folder,
   LogOut,
+  PanelsTopLeft,
   Paperclip,
   Share,
   Trash,
@@ -60,6 +61,11 @@ const data = {
       url: '/meeting-sessions',
       icon: UserCircle,
     },
+    {
+      title: 'Pengaturan Profile Website',
+      url: '/page-settings',
+      icon: PanelsTopLeft,
+    },
   ],
   documents: [
     {
@@ -102,7 +108,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navigations} />
-        <NavDocuments items={data.documents} />
+        {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
