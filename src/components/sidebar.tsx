@@ -51,7 +51,7 @@ const data = {
   user: {
     name: name ?? '',
     email: email ?? '',
-    role: role as 'User' | 'Mentor' | 'Admin',
+    role: role ?? '',
     avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name ?? '')}`,
   },
   navigations: [
@@ -59,16 +59,25 @@ const data = {
       title: 'Pengguna',
       url: '/users',
       icon: User,
+      roles: ['admin'],
     },
     {
       title: 'Sesi Pertemuan',
       url: '/meeting-sessions',
       icon: UserCircle,
+      roles: ['admin'],
     },
     {
       title: 'Pengaturan Profile Website',
       url: '/page-settings',
       icon: PanelsTopLeft,
+      roles: ['admin'],
+    },
+    {
+      title: 'Artikel',
+      url: '/articles',
+      icon: UserCircle,
+      roles: ['admin', 'mentor'],
     },
   ],
   // documents: [
@@ -134,6 +143,7 @@ function NavMain({
     title: string
     url: string
     icon?: LucideIcon
+    roles: string[]
   }[]
 }) {
   const { pathname } = useLocation()
@@ -162,19 +172,24 @@ function NavMain({
         </SidebarMenu> */}
         <SidebarGroupLabel>Menu</SidebarGroupLabel>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem
-              key={item.title}
-              className={cn(pathname === item.url && 'bg-neutral-100')}
-            >
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <Link to={item.url} preload={false} role="link">
-                  {item.icon && createElement(item.icon)}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items
+            .filter((item) =>
+              item.roles.includes((role as string).toLowerCase()),
+            )
+            // .sort((a, b) => a.title.localeCompare(b.title)) // Sort alphabetically
+            .map((item) => (
+              <SidebarMenuItem
+                key={item.title}
+                className={cn(pathname === item.url && 'bg-neutral-100')}
+              >
+                <SidebarMenuButton asChild tooltip={item.title}>
+                  <Link to={item.url} preload={false} role="link">
+                    {item.icon && createElement(item.icon)}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
@@ -282,7 +297,7 @@ export function NavUser({
   user: {
     name: string
     email: string
-    role: 'User' | 'Mentor' | 'Admin'
+    role: string
     avatar: string
   }
 }) {

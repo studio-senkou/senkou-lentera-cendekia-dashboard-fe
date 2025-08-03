@@ -16,6 +16,7 @@ import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './routes/_ua
 import { Route as AuthenticatedLayoutUsersIndexRouteImport } from './routes/_authenticatedLayout/users/index'
 import { Route as AuthenticatedLayoutPageSettingsIndexRouteImport } from './routes/_authenticatedLayout/page-settings/index'
 import { Route as AuthenticatedLayoutMeetingSessionsIndexRouteImport } from './routes/_authenticatedLayout/meeting-sessions/index'
+import { Route as AuthenticatedLayoutArticlesIndexRouteImport } from './routes/_authenticatedLayout/articles/index'
 
 const UauthenticatedLayoutRoute = UauthenticatedLayoutRouteImport.update({
   id: '/_uauthenticatedLayout',
@@ -55,9 +56,16 @@ const AuthenticatedLayoutMeetingSessionsIndexRoute =
     path: '/meeting-sessions/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutArticlesIndexRoute =
+  AuthenticatedLayoutArticlesIndexRouteImport.update({
+    id: '/articles/',
+    path: '/articles/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedLayoutIndexRoute
+  '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/users': typeof AuthenticatedLayoutUsersIndexRoute
@@ -65,6 +73,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedLayoutIndexRoute
+  '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/users': typeof AuthenticatedLayoutUsersIndexRoute
@@ -75,6 +84,7 @@ export interface FileRoutesById {
   '/_authenticatedLayout': typeof AuthenticatedLayoutRouteWithChildren
   '/_uauthenticatedLayout': typeof UauthenticatedLayoutRouteWithChildren
   '/_authenticatedLayout/': typeof AuthenticatedLayoutIndexRoute
+  '/_authenticatedLayout/articles/': typeof AuthenticatedLayoutArticlesIndexRoute
   '/_authenticatedLayout/meeting-sessions/': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/_authenticatedLayout/page-settings/': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/_authenticatedLayout/users/': typeof AuthenticatedLayoutUsersIndexRoute
@@ -82,14 +92,27 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/meeting-sessions' | '/page-settings' | '/users' | '/login'
+  fullPaths:
+    | '/'
+    | '/articles'
+    | '/meeting-sessions'
+    | '/page-settings'
+    | '/users'
+    | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/meeting-sessions' | '/page-settings' | '/users' | '/login'
+  to:
+    | '/'
+    | '/articles'
+    | '/meeting-sessions'
+    | '/page-settings'
+    | '/users'
+    | '/login'
   id:
     | '__root__'
     | '/_authenticatedLayout'
     | '/_uauthenticatedLayout'
     | '/_authenticatedLayout/'
+    | '/_authenticatedLayout/articles/'
     | '/_authenticatedLayout/meeting-sessions/'
     | '/_authenticatedLayout/page-settings/'
     | '/_authenticatedLayout/users/'
@@ -152,11 +175,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutMeetingSessionsIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/articles/': {
+      id: '/_authenticatedLayout/articles/'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof AuthenticatedLayoutArticlesIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
   }
 }
 
 interface AuthenticatedLayoutRouteChildren {
   AuthenticatedLayoutIndexRoute: typeof AuthenticatedLayoutIndexRoute
+  AuthenticatedLayoutArticlesIndexRoute: typeof AuthenticatedLayoutArticlesIndexRoute
   AuthenticatedLayoutMeetingSessionsIndexRoute: typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   AuthenticatedLayoutPageSettingsIndexRoute: typeof AuthenticatedLayoutPageSettingsIndexRoute
   AuthenticatedLayoutUsersIndexRoute: typeof AuthenticatedLayoutUsersIndexRoute
@@ -164,6 +195,7 @@ interface AuthenticatedLayoutRouteChildren {
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
   AuthenticatedLayoutIndexRoute: AuthenticatedLayoutIndexRoute,
+  AuthenticatedLayoutArticlesIndexRoute: AuthenticatedLayoutArticlesIndexRoute,
   AuthenticatedLayoutMeetingSessionsIndexRoute:
     AuthenticatedLayoutMeetingSessionsIndexRoute,
   AuthenticatedLayoutPageSettingsIndexRoute:
