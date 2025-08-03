@@ -9,6 +9,7 @@ import {
 } from '@/components/forms/update-meeting-session-form'
 import { Table } from '@/components/table'
 import { Button } from '@/components/ui/button'
+import { useHeaderStore } from '@/integrations/zustand/hooks/use-header'
 import {
   cancelMeetingSession,
   completeMeetingSession,
@@ -23,6 +24,10 @@ import { Fragment, useRef, useState } from 'react'
 
 export const Route = createFileRoute('/_authenticatedLayout/meeting-sessions/')(
   {
+    loader: () => {
+      const setTitle = useHeaderStore.getState().setTitle
+      setTitle('Sesi Pertemuan')
+    },
     component: RouteComponent,
   },
 )
@@ -109,8 +114,8 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">List Sesi Pertemuan</h1>
+      <div className="flex items-center justify-end">
+        {/* <h1 className="text-2xl font-medium">List Sesi Pertemuan</h1> */}
         <FormSheet
           trigger={<Button>Tambah Sesi Pertemuan</Button>}
           title="Buat Sesi Pertemuan Baru"

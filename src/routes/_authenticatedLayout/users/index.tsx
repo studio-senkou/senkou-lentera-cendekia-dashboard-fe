@@ -10,8 +10,13 @@ import { forceActivateUser, getAllUsers } from '@/lib/users'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
+import { useHeaderStore } from '@/integrations/zustand/hooks/use-header'
 
 export const Route = createFileRoute('/_authenticatedLayout/users/')({
+  loader: () => {
+    const setTitle = useHeaderStore.getState().setTitle
+    setTitle('Pengguna')
+  },
   component: RouteComponent,
 })
 
@@ -55,8 +60,8 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">List Pengguna</h1>
+      <div className="flex items-center justify-end">
+        {/* <h1 className="text-2xl font-medium">List Pengguna</h1> */}
         <FormSheet
           trigger={<Button>Tambah Pengguna</Button>}
           title="Buat Pengguna Baru"

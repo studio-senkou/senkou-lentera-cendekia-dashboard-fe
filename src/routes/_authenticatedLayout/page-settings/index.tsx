@@ -27,6 +27,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import { useHeaderStore } from '@/integrations/zustand/hooks/use-header'
 import {
   deleteStaticAsset,
   getAllStaticAssets,
@@ -43,6 +44,10 @@ import { Edit2, Loader2, Plus, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 export const Route = createFileRoute('/_authenticatedLayout/page-settings/')({
+  loader: () => {
+    const setTitle = useHeaderStore.getState().setTitle
+    setTitle('Pengaturan Profil Website')
+  },
   component: RouteComponent,
 })
 
@@ -127,9 +132,9 @@ function RouteComponent() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col space-y-4">
-        <h1 className="text-2xl font-medium">Pengaturan Profile Website</h1>
+        {/* <h1 className="text-2xl font-medium">Pengaturan Profile Website</h1> */}
 
-        <Carousel className="w-[400px] h-[250px] ml-12 mt-8">
+        <Carousel className="w-[400px] h-[250px] ml-12">
           <CarouselContent className="h-full">
             {!staticAssets || staticAssets.length === 0 ? (
               <CarouselItem className="flex items-center justify-center h-full">
