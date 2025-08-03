@@ -49,9 +49,9 @@ const { name, email, role } = useUserStore.getState()
 
 const data = {
   user: {
-    name,
-    email,
-    role,
+    name: name ?? '',
+    email: email ?? '',
+    role: role as 'User' | 'Mentor' | 'Admin',
     avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name ?? '')}`,
   },
   navigations: [
@@ -163,7 +163,7 @@ function NavMain({
               className={cn(pathname === item.url && 'bg-neutral-100')}
             >
               <SidebarMenuButton asChild tooltip={item.title}>
-                <Link to={item.url}>
+                <Link to={item.url} preload={false} role="link">
                   {item.icon && createElement(item.icon)}
                   <span>{item.title}</span>
                 </Link>
