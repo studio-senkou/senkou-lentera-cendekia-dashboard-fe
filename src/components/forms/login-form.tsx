@@ -3,6 +3,8 @@ import { Button } from '../ui/button'
 import z from 'zod'
 import { useAppForm } from '@/hooks/form'
 import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
+import { useUserStore } from '@/integrations/zustand/hooks/use-user'
+import { getUserDetails } from '@/lib/users'
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLFormElement> {
   className?: string
@@ -18,6 +20,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   ...props
 }) => {
   const authenticate = useSessionStore((state) => state.authenticate)
+  const updateUser = useUserStore((state) => state.setUser)
 
   const form = useAppForm({
     defaultValues: {
@@ -32,6 +35,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       try {
         await authenticate(email, password)
+
+        const user = await getUserDetails()
+
+        if (user) {
+          updateUser(user)
+        }
+
         window.location.assign('/')
       } catch (error) {
         console.error(error)

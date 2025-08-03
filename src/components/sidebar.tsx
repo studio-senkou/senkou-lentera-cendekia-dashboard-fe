@@ -1,13 +1,13 @@
 import {
-  Bell,
-  CreditCard,
-  Database,
+  // Bell,
+  // CreditCard,
+  // Database,
   DotSquare,
-  File,
+  // File,
   Folder,
   LogOut,
   PanelsTopLeft,
-  Paperclip,
+  // Paperclip,
   Share,
   Trash,
   User,
@@ -33,7 +33,7 @@ import { createElement, type ComponentProps } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
+  // DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -43,12 +43,16 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
 import { Link, useLocation } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
+import { useUserStore } from '@/integrations/zustand/hooks/use-user'
+
+const { name, email, role } = useUserStore.getState()
 
 const data = {
   user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
+    name,
+    email,
+    role,
+    avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name ?? '')}`,
   },
   navigations: [
     {
@@ -67,23 +71,23 @@ const data = {
       icon: PanelsTopLeft,
     },
   ],
-  documents: [
-    {
-      name: 'Data Library',
-      url: '#',
-      icon: Database,
-    },
-    {
-      name: 'Reports',
-      url: '#',
-      icon: Paperclip,
-    },
-    {
-      name: 'Word Assistant',
-      url: '#',
-      icon: File,
-    },
-  ],
+  // documents: [
+  //   {
+  //     name: 'Data Library',
+  //     url: '#',
+  //     icon: Database,
+  //   },
+  //   {
+  //     name: 'Reports',
+  //     url: '#',
+  //     icon: Paperclip,
+  //   },
+  //   {
+  //     name: 'Word Assistant',
+  //     url: '#',
+  //     icon: File,
+  //   },
+  // ],
 }
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
@@ -273,6 +277,7 @@ export function NavUser({
   user: {
     name: string
     email: string
+    role: 'User' | 'Mentor' | 'Admin'
     avatar: string
   }
 }) {
@@ -315,7 +320,9 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -326,7 +333,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <UserCircle />
                 Account
@@ -340,7 +347,7 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator /> */}
             <DropdownMenuItem onClick={handleClearSession}>
               <LogOut />
               Log out
