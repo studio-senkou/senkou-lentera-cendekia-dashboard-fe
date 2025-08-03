@@ -210,7 +210,7 @@ function RouteComponent() {
                 header: 'Testimoni',
                 accessorKey: 'testimony_text',
                 cell: ({ row }) => (
-                  <div className="max-w-xs truncate whitespace-pre-line">
+                  <div className="max-w-xs truncate whitespace-pre-line line-clamp-3">
                     {row.original.testimony_text}
                   </div>
                 ),
