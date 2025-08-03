@@ -8,6 +8,17 @@ import {
   type UpdateTestimonyFormRef,
 } from '@/components/forms/update-testimony-form'
 import { Table } from '@/components/table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Carousel,
@@ -16,7 +27,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import { getAllStaticAssets, storeNewAsset } from '@/lib/static_asset'
+import {
+  deleteStaticAsset,
+  getAllStaticAssets,
+  storeNewAsset,
+} from '@/lib/static_asset'
 import { deleteTestimony, getAllTestimonies } from '@/lib/testimony'
 import { cn } from '@/lib/utils'
 import type { StaticAsset, Testimony } from '@/types/response'
@@ -98,6 +113,17 @@ function RouteComponent() {
       },
     })
 
+  const { mutate: deleteStaticAssetData, isPending: deletingStaticAsset } =
+    useMutation({
+      mutationFn: (assetID: number) => deleteStaticAsset(assetID),
+      onSuccess: async () => {
+        await refetchStaticAssets()
+      },
+      onError: (error) => {
+        console.error('Failed to delete asset:', error)
+      },
+    })
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col space-y-4">
@@ -105,19 +131,32 @@ function RouteComponent() {
 
         <Carousel className="w-[400px] h-[250px] ml-12 mt-8">
           <CarouselContent className="h-full">
-            {staticAssets?.map((asset) => (
-              <CarouselItem
-                key={asset.id}
-                className="flex items-center justify-center h-full"
-              >
-                <img
-                  src={getAsset(asset.asset_url)}
-                  alt={asset.asset_name}
-                  className="object-contain w-[400px] h-[250px] rounded"
-                  style={{ maxWidth: '100%', maxHeight: '100%' }}
-                />
+            {!staticAssets || staticAssets.length === 0 ? (
+              <CarouselItem className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center justify-center w-full h-full bg-gray-100 rounded p-8">
+                  <div className="text-gray-500 font-medium">
+                    Belum ada gambar
+                  </div>
+                  <div className="text-gray-400 text-sm">
+                    Silakan upload gambar untuk ditampilkan di sini.
+                  </div>
+                </div>
               </CarouselItem>
-            ))}
+            ) : (
+              staticAssets.map((asset) => (
+                <CarouselItem
+                  key={asset.id}
+                  className="flex items-center justify-center h-full"
+                >
+                  <img
+                    src={getAsset(asset.asset_url)}
+                    alt={asset.asset_name}
+                    className="object-contain w-[400px] h-[250px] rounded"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
+                  />
+                </CarouselItem>
+              ))
+            )}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
@@ -152,13 +191,60 @@ function RouteComponent() {
           {staticAssets?.map((asset) => (
             <div
               key={asset.id}
-              className="flex-shrink-0 w-24 h-24 m-2 border rounded cursor-pointer"
+              className="flex-shrink-0 w-24 h-24 m-2 border rounded cursor-pointer relative flex items-center justify-center overflow-hidden"
             >
-              <img
-                src={getAsset(asset.asset_url)}
-                alt={asset.asset_name}
-                className="object-cover w-full h-full rounded"
-              />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="relative min-w-full h-full p-0 group"
+                  >
+                    <img
+                      src={getAsset(asset.asset_url)}
+                      alt={asset.asset_name}
+                      className="w-full h-full object-cover rounded transition-all group-hover:brightness-75"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <Trash2 className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <div className="flex flex-col items-center">
+                    <img
+                      src={getAsset(asset.asset_url)}
+                      alt={asset.asset_name}
+                      className="object-contain w-full h-64 rounded mb-4"
+                      style={{ maxHeight: '16rem', maxWidth: '100%' }}
+                    />
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you sure you want to delete this asset?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your asset and remove it from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        deleteStaticAssetData(asset.id)
+                      }}
+                    >
+                      {deletingStaticAsset && (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      )}
+                      Yes, Delete it
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           ))}
         </div>
@@ -227,7 +313,7 @@ function RouteComponent() {
               {
                 header: 'Aksi',
                 cell: ({ row }) => (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sticky right-0 bg-white z-10">
                     <FormSheet
                       trigger={
                         <Button variant="warning" size="icon" className="p-2">
