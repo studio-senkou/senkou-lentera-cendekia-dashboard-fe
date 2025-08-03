@@ -27,3 +27,17 @@ export const getAllStaticAssets = async () => {
     return []
   }
 }
+
+export const deleteStaticAsset = async (assetID: number) => {
+  try {
+    const response = await http.delete(`/static-assets/${assetID}`)
+    if (response.status === 200 && response.data.status === 'success') {
+      toast.success('Asset deleted successfully')
+      return true
+    }
+    return false
+  } catch (error) {
+    toast.error('Failed to delete asset')
+    return false
+  }
+}
