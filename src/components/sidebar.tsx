@@ -100,8 +100,13 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                {/* <IconInnerShadowTop className="!size-5" /> */}
+              <a href="#" className="flex items-center gap-2">
+                <img
+                  src="/logo.png"
+                  alt="Lentera Cendekia Logo"
+                  className="h-8 w-8 rounded-lg"
+                  loading="lazy"
+                />
                 <span className="text-base font-semibold">
                   Lentera Cendekia
                 </span>
