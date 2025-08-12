@@ -38,6 +38,7 @@ export const useSessionStore = create<SessionState & SessionActions>()(
         get().updateSession(response.data.data)
         toast.success('Login success')
       } catch (error) {
+        toast.error('Failed to logged in')
         throw new Error('Authentication failed')
       }
     },
@@ -97,7 +98,9 @@ export const useSessionStore = create<SessionState & SessionActions>()(
     clearSession: async () => {
       try {
         await http.delete('/auth/logout')
+        toast.success('Logged out successfully')
       } catch (error) {
+        toast.error('Failed to logged out')
         throw new Error('Failed to logged out')
       }
 
