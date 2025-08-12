@@ -174,7 +174,7 @@ function NavMain({
         <SidebarMenu>
           {items
             .filter((item) =>
-              item.roles.includes((role as string).toLowerCase()),
+              item.roles.includes((role as string)?.toLowerCase()),
             )
             // .sort((a, b) => a.title.localeCompare(b.title)) // Sort alphabetically
             .map((item) => (
