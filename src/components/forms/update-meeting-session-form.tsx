@@ -24,12 +24,14 @@ const updateMeetingSessionSchema = z.object({
     .refine(
       (val) => {
         const date = new Date(val)
-        return !isNaN(date.getTime()) && date > new Date()
+        return !isNaN(date.getTime()) && date >= new Date()
       },
       { message: 'Session date must be in the future' },
     ),
   time: z.string().min(1, 'Session time is required!'),
-  duration: z.number().min(1, 'Session duration must be at least 1 minute!'),
+  duration: z.coerce
+    .number()
+    .min(1, 'Session duration must be at least 1 minute!'),
   type: z.string().min(1, 'Session type is required!'),
   description: z.string().refine(
     (val) => {
@@ -52,15 +54,16 @@ export const UpdateMeetingSessionForm = forwardRef<
       date: session.session_date
         ? new Date(session.session_date).toISOString().slice(0, 10)
         : '',
-      time: session.session_time
-        ? new Date(session.session_time).toISOString().slice(11, 16)
-        : '',
+      time: session.session_time ?? '',
       duration: session.session_duration,
       type: session.session_type,
       description: session.session_description ?? '',
     },
     validators: {
       onSubmit: updateMeetingSessionSchema,
+    },
+    onSubmitInvalid: (errors) => {
+      throw new Error(`Form validation failed: ${JSON.stringify(errors)}`)
     },
     onSubmit: async ({ value }) => {
       try {
@@ -133,15 +136,7 @@ export const UpdateMeetingSessionForm = forwardRef<
           )}
         </AppField>
         <AppField name="duration">
-          {({ TextField }) => (
-            <TextField
-              type="number"
-              label="Durasi Sesi"
-              required
-              name="duration"
-              placeholder="Masukkan durasi sesi pertemuan"
-            />
-          )}
+          {({ NumberField }) => <NumberField label="Durasi Sesi" required />}
         </AppField>
         <AppField name="type">
           {({ TextField }) => (

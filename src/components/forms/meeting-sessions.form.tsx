@@ -19,7 +19,7 @@ const meetingSessionSchema = z.object({
   student_id: z.string().min(1, 'Please select a student!'),
   mentor_id: z.string().min(1, 'Please select a mentor!'),
   topic: z.string().min(1, 'Topic is required!'),
-  date: z.string().refine((date) => new Date(date) > new Date(), {
+  date: z.string().refine((date) => new Date(date) >= new Date(), {
     message: 'Session date must be in the future',
   }),
   time: z.string().min(1, 'Session time is required!'),
@@ -47,6 +47,9 @@ export const MeetingSessionForm = forwardRef<
     },
     validators: {
       onSubmit: meetingSessionSchema,
+    },
+    onSubmitInvalid: (errors) => {
+      throw new Error(`Form validation failed: ${JSON.stringify(errors)}`)
     },
     onSubmit: async (values) => {
       try {
@@ -166,15 +169,7 @@ export const MeetingSessionForm = forwardRef<
           )}
         </AppField>
         <AppField name="duration">
-          {({ TextField }) => (
-            <TextField
-              type="number"
-              label="Durasi Sesi"
-              name="duration"
-              required
-              placeholder="Masukkan durasi sesi pertemuan"
-            />
-          )}
+          {({ NumberField }) => <NumberField label="Durasi Sesi" required />}
         </AppField>
         <AppField name="type">
           {({ TextField }) => (

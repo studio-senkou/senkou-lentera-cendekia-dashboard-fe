@@ -90,26 +90,20 @@ function RouteComponent() {
 
   const handleSubmitForm = async () => {
     if (!formRef.current) {
-      throw new Error('Form ref is not available')
+      return // Don't throw, just return
     }
 
-    try {
-      await formRef.current.submit()
-    } catch (error) {
-      throw error
-    }
+    // Form handles its own success/error states
+    await formRef.current.submit()
   }
 
   const handleUpdateFormSubmit = async () => {
     if (!updateFormRef.current) {
-      throw new Error('Update form ref is not available')
+      return // Don't throw, just return
     }
 
-    try {
-      await updateFormRef.current.submit()
-    } catch (error) {
-      throw error
-    }
+    // Form handles its own success/error states
+    await updateFormRef.current.submit()
   }
 
   return (
@@ -123,7 +117,12 @@ function RouteComponent() {
           onSubmitForm={handleSubmitForm}
           disabled={false}
         >
-          <MeetingSessionForm ref={formRef} />
+          <MeetingSessionForm
+            ref={formRef}
+            onSuccess={async () => {
+              await refetchMeetingSessions()
+            }}
+          />
         </FormSheet>
       </div>
 
@@ -146,7 +145,6 @@ function RouteComponent() {
           {
             accessorKey: 'session_time',
             header: 'Waktu Sesi',
-            cell: (info) => new Date(info.getValue()).toLocaleTimeString(),
           },
           {
             accessorKey: 'session_topic',
@@ -213,6 +211,9 @@ function RouteComponent() {
                   <UpdateMeetingSessionForm
                     session={info.row.original}
                     ref={updateFormRef}
+                    onSuccess={async () => {
+                      await refetchMeetingSessions()
+                    }}
                   />
                 </FormSheet>
                 <Button

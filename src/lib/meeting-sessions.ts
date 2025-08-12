@@ -13,7 +13,7 @@ export interface CreateMeetingSessionRequest {
 }
 
 export interface UpdateMeetingSessionRequest {
-  id: string
+  id: number
   data: Partial<Omit<CreateMeetingSessionRequest, 'student_id' | 'mentor_id'>>
 }
 
