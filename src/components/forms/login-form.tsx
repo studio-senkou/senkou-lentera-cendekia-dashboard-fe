@@ -5,6 +5,8 @@ import { useAppForm } from '@/hooks/form'
 import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
 import { useUserStore } from '@/integrations/zustand/hooks/use-user'
 import { getUserDetails } from '@/lib/users'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLFormElement> {
   className?: string
@@ -19,6 +21,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   className,
   ...props
 }) => {
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+
   const authenticate = useSessionStore((state) => state.authenticate)
   const updateUser = useUserStore((state) => state.setUser)
 
@@ -28,9 +32,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       password: '',
     },
     validators: {
-      onBlur: schema,
+      onSubmit: schema,
     },
     onSubmit: async (values) => {
+      setIsSubmitting(true)
+
       const { email, password } = values.value
 
       try {
@@ -45,6 +51,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         window.location.assign('/')
       } catch (error) {
         console.error(error)
+      } finally {
+        setIsSubmitting(false)
       }
     },
   })
@@ -94,6 +102,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </form.AppField>
         </div>
         <Button type="submit" className="w-full">
+          {isSubmitting && <Loader2 className="animate-spin mr-4" />}
           Login
         </Button>
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">

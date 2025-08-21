@@ -41,7 +41,7 @@ import {
 } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useSessionStore } from '@/integrations/zustand/hooks/use-session'
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useUserStore } from '@/integrations/zustand/hooks/use-user'
 
@@ -301,11 +301,17 @@ export function NavUser({
     avatar: string
   }
 }) {
+  const navigate = useNavigate()
   const { isMobile } = useSidebar()
+
   const logout = useSessionStore((state) => state.clearSession)
 
   const handleClearSession = async () => {
     await logout()
+
+    navigate({
+      to: '/login',
+    })
   }
 
   return (

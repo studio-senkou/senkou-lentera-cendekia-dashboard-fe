@@ -125,6 +125,7 @@ function RouteComponent() {
           },
         ]}
         data={users || []}
+        isLoading={isLoading}
       />
     </div>
   )

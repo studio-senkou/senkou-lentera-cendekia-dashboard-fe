@@ -21,11 +21,14 @@ import {
 } from './ui/table'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import { useState, useMemo } from 'react'
+import { Skeleton } from './ui/skeleton'
 
 export interface TableProps<T> {
   columns: ColumnDef<T, any>[]
   data: T[]
   caption?: string
+  isLoading?: boolean
+  skeletonRows?: number
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -37,7 +40,13 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-export function Table<T>({ columns, data, caption }: TableProps<T>) {
+export function Table<T>({
+  columns,
+  data,
+  caption,
+  isLoading = false,
+  skeletonRows = 5,
+}: TableProps<T>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const safeData = useMemo(() => data || [], [data])
@@ -59,7 +68,7 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
   })
 
   return (
-    <TableComponent>
+    <TableComponent aria-busy={isLoading} aria-live="polite">
       {caption && <TableCaption>{caption}</TableCaption>}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -72,9 +81,11 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
                     <div
                       {...{
                         className: header.column.getCanSort()
-                          ? 'cursor-pointer select-none hover:text-blue-400 transition-colors'
+                          ? `select-none transition-colors ${isLoading ? 'text-muted-foreground' : 'cursor-pointer hover:text-blue-400'}`
                           : '',
-                        onClick: header.column.getToggleSortingHandler(),
+                        onClick: isLoading
+                          ? undefined
+                          : header.column.getToggleSortingHandler(),
                       }}
                     >
                       {flexRender(
@@ -94,7 +105,24 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows.length > 0 ? (
+        {isLoading ? (
+          Array.from({ length: skeletonRows }).map((_, rIdx) => (
+            <TableRow key={`skeleton-row-${rIdx}`} className="border-b">
+              <TableCell className="p-4">
+                <Skeleton className="h-4 w-6" />
+              </TableCell>
+              {Array.from({ length: columns.length }).map((__, cIdx) => {
+                const widths = ['w-20', 'w-28', 'w-24', 'w-32']
+                const w = widths[cIdx % widths.length]
+                return (
+                  <TableCell key={`skeleton-cell-${rIdx}-${cIdx}`}>
+                    <Skeleton className={`h-4 ${w}`} />
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          ))
+        ) : table.getRowModel().rows.length > 0 ? (
           table.getRowModel().rows.map((row, index) => {
             return (
               <TableRow
@@ -127,17 +155,29 @@ export function Table<T>({ columns, data, caption }: TableProps<T>) {
             <div className="flex items-center justify-between">
               <div>
                 {table.getCanPreviousPage() && (
-                  <button onClick={() => table.previousPage()} className="mr-2">
+                  <button
+                    onClick={() => table.previousPage()}
+                    className="mr-2"
+                    disabled={isLoading}
+                  >
                     Previous
                   </button>
                 )}
                 {table.getCanNextPage() && (
-                  <button onClick={() => table.nextPage()}>Next</button>
+                  <button onClick={() => table.nextPage()} disabled={isLoading}>
+                    Next
+                  </button>
                 )}
               </div>
               <div>
-                Page {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()}
+                {isLoading ? (
+                  'Loading…'
+                ) : (
+                  <>
+                    Page {table.getState().pagination.pageIndex + 1} of{' '}
+                    {table.getPageCount()}
+                  </>
+                )}
               </div>
             </div>
           </TableCell>

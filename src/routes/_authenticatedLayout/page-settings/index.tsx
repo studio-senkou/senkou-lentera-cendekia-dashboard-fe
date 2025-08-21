@@ -60,7 +60,11 @@ function RouteComponent() {
     staleTime: 1000 * 60 * 5,
   })
 
-  const { data: testimonies, refetch: refetchTestimonies } = useQuery({
+  const {
+    data: testimonies,
+    refetch: refetchTestimonies,
+    isLoading: loadingTestimonies,
+  } = useQuery({
     queryKey: ['testimonies'],
     queryFn: getAllTestimonies,
     staleTime: 1000 * 60 * 5,
@@ -358,6 +362,7 @@ function RouteComponent() {
               },
             ]}
             data={testimonies || []}
+            isLoading={loadingTestimonies}
           />
         </section>
       </div>

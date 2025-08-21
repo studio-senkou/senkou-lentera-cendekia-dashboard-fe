@@ -36,9 +36,11 @@ function RouteComponent() {
   const formRef = useRef<MeetingSessionFormRef>(null)
   const updateFormRef = useRef<UpdateMeetingSessionFormRef>(null)
 
-  const { data: meetingSessions, refetch: refetchMeetingSessions } = useQuery<
-    MeetingSession[]
-  >({
+  const {
+    data: meetingSessions,
+    refetch: refetchMeetingSessions,
+    isLoading,
+  } = useQuery<MeetingSession[]>({
     queryKey: ['meeting-sessions'],
     queryFn: getMeetingSessions,
     select: (sessions) => sessions ?? [],
@@ -237,6 +239,7 @@ function RouteComponent() {
           },
         ]}
         data={meetingSessions || []}
+        isLoading={isLoading}
       />
     </div>
   )
