@@ -29,9 +29,9 @@ export const createMeetingSession = async (
   }
 }
 
-export const getMeetingSessions = async () => {
+export const getMeetingSessions = async (filters = {}) => {
   try {
-    const response = await http.get('/meeting-sessions')
+    const response = await http.get('/meeting-sessions', { params: filters })
     return response.data.data.sessions
   } catch (error) {
     toast.error('Failed to get meeting sessions')

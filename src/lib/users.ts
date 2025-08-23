@@ -51,6 +51,18 @@ export const getUserDetails = async (): Promise<User | null> => {
   }
 }
 
+export const getUserCount = async (): Promise<{
+  mentor: number
+  student: number
+} | null> => {
+  try {
+    const response = await http.get('/active-user')
+    return response.data.data.users
+  } catch (error) {
+    return null
+  }
+}
+
 export const getAllUsers = async (): Promise<User[]> => {
   try {
     const response = await http.get('/users')

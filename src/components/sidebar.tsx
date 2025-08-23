@@ -56,6 +56,12 @@ const data = {
   },
   navigations: [
     {
+      title: 'Dashboard',
+      url: '/',
+      icon: PanelsTopLeft,
+      roles: ['admin', 'mentor'],
+    },
+    {
       title: 'Pengguna',
       url: '/users',
       icon: User,
