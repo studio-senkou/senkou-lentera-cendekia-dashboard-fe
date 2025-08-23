@@ -80,7 +80,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          <div className="bg-gray-200/50 p-5 rounded-lg">
+          <div className="bg-gray-200/50 p-2 lg:p-5 rounded-lg">
             <div className="bg-white rounded-lg">
               <Table
                 key="table-meeting-sessions-dashboard"
