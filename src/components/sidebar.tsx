@@ -153,6 +153,7 @@ function NavMain({
   }[]
 }) {
   const { pathname } = useLocation()
+  const { isMobile, setOpenMobile } = useSidebar()
 
   return (
     <SidebarGroup>
@@ -189,7 +190,14 @@ function NavMain({
                 className={cn(pathname === item.url && 'bg-neutral-100')}
               >
                 <SidebarMenuButton asChild tooltip={item.title}>
-                  <Link to={item.url} preload={false} role="link">
+                  <Link
+                    to={item.url}
+                    preload={false}
+                    role="link"
+                    onClick={() => {
+                      if (isMobile) setOpenMobile(false)
+                    }}
+                  >
                     {item.icon && createElement(item.icon)}
                     <span>{item.title}</span>
                   </Link>
@@ -308,13 +316,14 @@ export function NavUser({
   }
 }) {
   const navigate = useNavigate()
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
 
   const logout = useSessionStore((state) => state.clearSession)
 
   const handleClearSession = async () => {
     await logout()
 
+    if (isMobile) setOpenMobile(false)
     navigate({
       to: '/login',
     })
