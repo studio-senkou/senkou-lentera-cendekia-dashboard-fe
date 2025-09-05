@@ -110,10 +110,11 @@ export const RegisterUserForm = forwardRef<
         </AppField>
 
         <AppField name="classes">
-          {({ MultiComboboxField }) => (
-            <MultiComboboxField
+          {({ Combobox }) => (
+            <Combobox
               label="Kelas"
               placeholder="Pilih kelas"
+              searchPlaceholder="Pilih kelas"
               options={classesDropdown}
               required
             />

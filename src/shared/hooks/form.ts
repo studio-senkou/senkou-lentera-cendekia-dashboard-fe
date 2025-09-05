@@ -3,7 +3,7 @@ import { createFormHook } from '@tanstack/react-form'
 import { TextField } from '@/shared/ui/text-field'
 import { NumberField } from '@/shared/ui/number-field'
 import { Select } from '@/shared/ui/select-field'
-import { ComboboxField, MultiComboboxField } from '../ui/combobox-field'
+import { Combobox } from '../ui/combobox-field'
 import { TextArea } from '@/shared/ui/text-area'
 import { TimePicker } from '@/shared/ui/time-picker'
 import { DatePicker } from '@/shared/ui/date-picker'
@@ -17,8 +17,7 @@ export const { useAppForm } = createFormHook({
     TextField,
     NumberField,
     Select,
-    ComboboxField,
-    MultiComboboxField,
+    Combobox,
     TextArea,
     TimePicker,
     DatePicker,
