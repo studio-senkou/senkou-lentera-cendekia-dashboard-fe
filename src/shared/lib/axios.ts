@@ -1,7 +1,7 @@
 import axios from 'axios'
+import { toast } from 'sonner'
 import { useSessionStore } from '@/shared/hooks/use-session'
 import { env } from '@/app/env'
-import { toast } from 'sonner'
 
 export const http = axios.create({
   baseURL: env.VITE_API_BASE_URL,

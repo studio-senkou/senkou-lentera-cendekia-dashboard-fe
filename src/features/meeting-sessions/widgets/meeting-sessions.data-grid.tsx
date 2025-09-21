@@ -1,16 +1,16 @@
-import type { MeetingSession } from '@/shared/types/response'
-import { useEditor } from '@/widgets/data-grid/hooks/use-editor'
-import { DataGrid } from '@/widgets/data-grid'
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'
-import { getMentorDropdown } from '@/entities/users'
+import { Cloud } from 'lucide-react'
+import { toast } from 'sonner'
+import type { MeetingSession } from '@/shared/types/response'
 import type { ColumnOrColumnGroup } from 'react-data-grid'
 import type { DataGridChangedRow } from '@/widgets/data-grid/types'
+import { useEditor } from '@/widgets/data-grid/hooks/use-editor'
+import { DataGrid } from '@/widgets/data-grid'
+import { getMentorDropdown, getUserDropdown } from '@/entities/users'
 import { Button } from '@/shared/ui/button'
-import { Cloud } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
-import { toast } from 'sonner'
 import {
   bulkCreateMeetingSessions,
   bulkUpdateMeetingSessions,
@@ -30,9 +30,19 @@ export function MeetingSessionsDataGrid({
     [],
   )
 
+  const { data: studentOptions } = useQuery({
+    queryKey: ['students', 'dropdown'],
+    queryFn: getUserDropdown,
+    select: (students) =>
+      students.map((student) => ({
+        value: student.id,
+        label: student.name,
+      })),
+  })
+
   const { data: mentorOptions } = useQuery({
     queryKey: ['mentors', 'dropdown'],
-    queryFn: () => getMentorDropdown(),
+    queryFn: getMentorDropdown,
     select: (mentors) =>
       mentors.map((mentor) => ({
         value: mentor.id,
@@ -40,8 +50,8 @@ export function MeetingSessionsDataGrid({
       })),
   })
 
-  const handleRowsChange = async (
-    rows: MeetingSession[],
+  const handleRowsChange = (
+    rows: Array<MeetingSession>,
     _: Array<DataGridChangedRow<MeetingSession>>,
   ) => {
     setUnsyncedChanges(rows)
@@ -61,7 +71,7 @@ export function MeetingSessionsDataGrid({
       const newData = unsyncedChanges
         .filter((row) => !row.id)
         .map((row) => ({
-          student_id: studentId!,
+          student_id: !studentId ? Number(row.student_id) : studentId,
           mentor_id: Number(row.mentor_id),
           date: row.session_date,
           time: row.session_time,
@@ -86,6 +96,25 @@ export function MeetingSessionsDataGrid({
 
   const columns = useMemo(() => {
     return [
+      !studentId && {
+        key: 'student_id',
+        name: 'Nama Siswa',
+        renderEditCell: (props) =>
+          editor.renderSelectEditor(props, {
+            options:
+              studentOptions?.filter(
+                (option) => String(option.value) !== props.row.student_id,
+              ) ?? [],
+          }),
+        renderCell: ({ row }) => {
+          const student = studentOptions?.find((option) => {
+            return String(option.value) === String(row.student_id)
+          })
+          return (
+            <div className="min-w-[200px]">{student ? student.label : ''}</div>
+          )
+        },
+      },
       {
         key: 'mentor_id',
         name: 'Nama Mentor',
@@ -122,7 +151,7 @@ export function MeetingSessionsDataGrid({
         renderEditCell: editor.renderDateEditor,
         renderCell: ({ row }) => (
           <span>
-            {row?.session_date ? format(row.session_date, 'dd MMMM yyyy') : ''}
+            {row.session_date ? format(row.session_date, 'dd MMMM yyyy') : ''}
           </span>
         ),
       },
@@ -131,7 +160,7 @@ export function MeetingSessionsDataGrid({
         name: 'Waktu Sesi',
         renderEditCell: editor.renderTimeEditor,
         renderCell: ({ row }) => (
-          <span>{row?.session_time ? row.session_time.slice(0, 5) : ''}</span>
+          <span>{row.session_time ? row.session_time.slice(0, 5) : ''}</span>
         ),
       },
       {
@@ -145,11 +174,11 @@ export function MeetingSessionsDataGrid({
         renderEditCell: editor.renderTextEditor,
         renderCell: ({ row }) => (
           <div className="min-w-[300px] max-w-none whitespace-normal break-words leading-relaxed py-2">
-            {row?.note}
+            {row.note}
           </div>
         ),
       },
-    ] as ColumnOrColumnGroup<NoInfer<MeetingSession>>[]
+    ] as Array<ColumnOrColumnGroup<NoInfer<MeetingSession>>>
   }, [editor, mentorOptions])
 
   return (

@@ -1,4 +1,5 @@
-import { cn } from '@/shared/lib/utils'
+import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -9,8 +10,7 @@ import {
   SheetTrigger,
 } from '../ui/sheet'
 import { Button } from '../ui/button'
-import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { cn } from '@/shared/lib/utils'
 
 interface FormSheetProps {
   id?: string
@@ -22,6 +22,8 @@ interface FormSheetProps {
   description?: string
   onSubmitForm?: () => Promise<void> | void
   onSuccess?: () => void
+  preventClose?: boolean
+  onBeforeClose?: () => boolean
 }
 
 export function FormSheet({
@@ -34,6 +36,8 @@ export function FormSheet({
   description,
   onSubmitForm = () => {},
   onSuccess,
+  preventClose = false,
+  onBeforeClose,
 }: FormSheetProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -60,11 +64,16 @@ export function FormSheet({
   }
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (isSubmitting && !newOpen) return
-
     if (newOpen) {
       setHasError(false)
+      setOpen(newOpen)
+      return
     }
+
+    if (isSubmitting) return
+
+    if (preventClose && onBeforeClose && !onBeforeClose()) return
+    if (preventClose && !onBeforeClose) return
 
     setOpen(newOpen)
   }
@@ -77,6 +86,12 @@ export function FormSheet({
       <SheetContent
         id={id}
         className={cn('max-w-2xl flex flex-col', className)}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault()
+        }}
+        onPointerDownOutside={(e) => {
+          e.preventDefault()
+        }}
       >
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>{title}</SheetTitle>

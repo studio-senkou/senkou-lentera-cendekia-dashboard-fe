@@ -1,8 +1,7 @@
-'use client'
-
-import * as React from 'react'
 import { Check, ChevronsUpDown, X } from 'lucide-react'
 
+import {  useCallback, useMemo, useState } from 'react'
+import type {MouseEventHandler} from 'react';
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
 import {
@@ -22,7 +21,7 @@ export interface ComboboxOption {
 }
 
 export interface ComboboxProps {
-  options: ComboboxOption[]
+  options: Array<ComboboxOption>
   value?: string
   onValueChange?: (value: string) => void
   placeholder?: string
@@ -54,12 +53,12 @@ export function Combobox({
   loading = false,
   loadingMessage = 'Loading...',
 }: ComboboxProps) {
-  const [open, setOpen] = React.useState(false)
-  const [searchValue, setSearchValue] = React.useState('')
+  const [open, setOpen] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
 
-  const selectedOption = options?.find((option) => option.value === value)
+  const selectedOption = options.find((option) => option.value === value)
 
-  const handleSelect = React.useCallback(
+  const handleSelect = useCallback(
     (selectedValue: string) => {
       onValueChange?.(selectedValue)
       setOpen(false)
@@ -68,8 +67,8 @@ export function Combobox({
     [onValueChange],
   )
 
-  const handleClear = React.useCallback(
-    (e: React.MouseEvent) => {
+  const handleClear: MouseEventHandler<HTMLButtonElement> = useCallback(
+    (e) => {
       e.stopPropagation()
       onValueChange?.('')
       setSearchValue('')
@@ -77,7 +76,7 @@ export function Combobox({
     [onValueChange],
   )
 
-  const filteredOptions = React.useMemo(() => {
+  const filteredOptions = useMemo(() => {
     if (!searchValue) return options
     return options.filter((option) =>
       option.label.toLowerCase().includes(searchValue.toLowerCase()),
@@ -136,31 +135,28 @@ export function Combobox({
             <CommandList>
               {loading ? (
                 <CommandEmpty>{loadingMessage}</CommandEmpty>
-              ) : filteredOptions?.length === 0 ? (
+              ) : filteredOptions.length === 0 ? (
                 <CommandEmpty>{emptyMessage}</CommandEmpty>
               ) : (
                 <CommandGroup>
-                  {filteredOptions?.map((option) => (
+                  {filteredOptions.map((option) => (
                     <CommandItem
                       key={option.value}
                       value={option.value}
                       disabled={option.disabled}
-                      className="cursor-pointer"
+                      onSelect={(currentValue) => {
+                        handleSelect(currentValue === value ? "" : currentValue)
+                      }}
                     >
-                      <div
-                        className="flex items-center w-full"
-                        onClick={() => handleSelect(option.value)}
-                      >
-                        <Check
-                          className={cn(
-                            'mr-2 h-4 w-4',
-                            value === option.value
-                              ? 'opacity-100'
-                              : 'opacity-0',
-                          )}
-                        />
-                        <span className="flex-1">{option.label}</span>
-                      </div>
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          value === option.value
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {option.label}
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -175,8 +171,8 @@ export function Combobox({
 
 export interface MultiComboboxProps
   extends Omit<ComboboxProps, 'value' | 'onValueChange' | 'clearable'> {
-  value?: string[]
-  onValueChange?: (value: string[]) => void
+  value?: Array<string>
+  onValueChange?: (value: Array<string>) => void
   maxSelected?: number
   displayValue?: (selectedCount: number) => string
   showSelectedCount?: boolean
@@ -192,15 +188,15 @@ export function MultiCombobox({
   showSelectedCount = true,
   ...props
 }: MultiComboboxProps) {
-  const [open, setOpen] = React.useState(false)
-  const [searchValue, setSearchValue] = React.useState('')
+  const [open, setOpen] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
 
-  const selectedOptions = React.useMemo(
+  const selectedOptions = useMemo(
     () => options.filter((option) => value.includes(option.value)),
     [options, value],
   )
 
-  const getDisplayValue = React.useCallback(() => {
+  const getDisplayValue = useCallback(() => {
     if (selectedOptions.length === 0) return placeholder
     if (displayValue) return displayValue(selectedOptions.length)
     if (selectedOptions.length === 1) return selectedOptions[0].label
@@ -208,7 +204,7 @@ export function MultiCombobox({
     return selectedOptions.map((opt) => opt.label).join(', ')
   }, [selectedOptions, placeholder, displayValue, showSelectedCount])
 
-  const handleSelect = React.useCallback(
+  const handleSelect = useCallback(
     (optionValue: string) => {
       const newValue = value.includes(optionValue)
         ? value.filter((v) => v !== optionValue)
@@ -221,8 +217,8 @@ export function MultiCombobox({
     [value, maxSelected, onValueChange],
   )
 
-  const handleClearAll = React.useCallback(
-    (e: React.MouseEvent) => {
+  const handleClearAll: MouseEventHandler<HTMLButtonElement> = useCallback(
+    (e) => {
       e.stopPropagation()
       onValueChange?.([])
       setSearchValue('')
@@ -230,7 +226,7 @@ export function MultiCombobox({
     [onValueChange],
   )
 
-  const filteredOptions = React.useMemo(() => {
+  const filteredOptions = useMemo(() => {
     if (!searchValue) return options
     return options.filter((option) =>
       option.label.toLowerCase().includes(searchValue.toLowerCase()),
@@ -309,27 +305,24 @@ export function MultiCombobox({
                         key={option.value}
                         value={option.value}
                         disabled={isDisabled}
-                        className="cursor-pointer"
+                        onSelect={(currentValue) => {
+                          handleSelect(currentValue)
+                        }}
                       >
-                        <div
-                          className="flex items-center w-full"
-                          onClick={() => handleSelect(option.value)}
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              isSelected ? 'opacity-100' : 'opacity-0',
-                            )}
-                          />
-                          <span className="flex-1">{option.label}</span>
-                          {maxSelected &&
-                            !isSelected &&
-                            value.length >= maxSelected && (
-                              <span className="text-xs text-muted-foreground">
-                                Max reached
-                              </span>
-                            )}
-                        </div>
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            isSelected ? 'opacity-100' : 'opacity-0',
+                          )}
+                        />
+                        <span className="flex-1">{option.label}</span>
+                        {maxSelected &&
+                          !isSelected &&
+                          value.length >= maxSelected && (
+                            <span className="text-xs text-muted-foreground">
+                              Max reached
+                            </span>
+                          )}
                       </CommandItem>
                     )
                   })}

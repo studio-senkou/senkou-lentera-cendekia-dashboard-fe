@@ -3,14 +3,15 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { BookText, Check, Loader2 } from 'lucide-react'
 
+import type {RegisterUserFormRef} from '@/features/users/widgets/user.form';
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { forceActivateUser, getAllUsers } from '@/entities/users'
 import { Table } from '@/widgets/table'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import {
-  RegisterUserForm,
-  type RegisterUserFormRef,
+  RegisterUserForm
+  
 } from '@/features/users/widgets/user.form'
 import {
   Tooltip,
@@ -57,11 +58,7 @@ function RouteComponent() {
       throw new Error('Form ref is not available')
     }
 
-    try {
-      await formRef.current.submit()
-    } catch (error) {
-      throw error
-    }
+    await formRef.current.submit()
   }
 
   const [activatedUserID, setActivatedUserID] = useState<number | null>(null)
@@ -83,6 +80,8 @@ function RouteComponent() {
       <div className="flex items-center justify-end">
         {/* <h1 className="text-2xl font-medium">List Pengguna</h1> */}
         <FormSheet
+          preventClose
+          onBeforeClose={() => true}
           trigger={<Button>Tambah Pengguna</Button>}
           title="Buat Pengguna Baru"
           description="Tindakan ini akan membuat pengguna baru. Silakan isi formulir di bawah ini untuk melanjutkan."

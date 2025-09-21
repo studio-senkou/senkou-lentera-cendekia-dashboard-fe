@@ -1,12 +1,13 @@
-import * as React from 'react'
 import { useStore } from '@tanstack/react-form'
+import { useCallback } from 'react';
 import { useFieldContext } from '../hooks/form-context'
+import { Label } from './label'
+import type {ComboboxOption} from '@/shared/ui/combobox';
 import {
   Combobox,
-  MultiCombobox,
-  type ComboboxOption,
+  
+  MultiCombobox
 } from '@/shared/ui/combobox'
-import { Label } from './label'
 
 function ErrorMessages({
   errors,
@@ -37,13 +38,14 @@ export function ComboboxField({
   loading = false,
   loadingMessage,
   required = false,
+  disabled = false,
   className,
   buttonClassName,
   contentClassName,
   width = 'w-full',
 }: {
   label: string
-  options: ComboboxOption[]
+  options: Array<ComboboxOption>
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
@@ -51,6 +53,7 @@ export function ComboboxField({
   loading?: boolean
   loadingMessage?: string
   required?: boolean
+  disabled?: boolean
   className?: string
   buttonClassName?: string
   contentClassName?: string
@@ -59,7 +62,7 @@ export function ComboboxField({
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
 
-  const handleValueChange = React.useCallback(
+  const handleValueChange = useCallback(
     (value: string) => {
       field.handleChange(value)
     },
@@ -82,6 +85,7 @@ export function ComboboxField({
         clearable={clearable}
         loading={loading}
         loadingMessage={loadingMessage}
+        disabled={disabled}
         className={className}
         buttonClassName={buttonClassName}
         contentClassName={contentClassName}
@@ -104,13 +108,14 @@ export function MultiComboboxField({
   loading = false,
   loadingMessage,
   required = false,
+  disabled = false,
   className,
   buttonClassName,
   contentClassName,
   width = 'w-full',
 }: {
   label: string
-  options: ComboboxOption[]
+  options: Array<ComboboxOption>
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
@@ -120,16 +125,17 @@ export function MultiComboboxField({
   loading?: boolean
   loadingMessage?: string
   required?: boolean
+  disabled?: boolean
   className?: string
   buttonClassName?: string
   contentClassName?: string
   width?: string | number
 }) {
-  const field = useFieldContext<string[]>()
+  const field = useFieldContext<Array<string>>()
   const errors = useStore(field.store, (state) => state.meta.errors)
 
-  const handleValueChange = React.useCallback(
-    (values: string[]) => {
+  const handleValueChange = useCallback(
+    (values: Array<string>) => {
       field.handleChange(values)
     },
     [field],
@@ -143,7 +149,7 @@ export function MultiComboboxField({
       </Label>
       <MultiCombobox
         options={options}
-        value={field.state.value || []}
+        value={field.state.value}
         onValueChange={handleValueChange}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
@@ -153,6 +159,7 @@ export function MultiComboboxField({
         showSelectedCount={showSelectedCount}
         loading={loading}
         loadingMessage={loadingMessage}
+        disabled={disabled}
         className={className}
         buttonClassName={buttonClassName}
         contentClassName={contentClassName}

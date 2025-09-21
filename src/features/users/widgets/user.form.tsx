@@ -23,6 +23,9 @@ const registerSchema = z.object({
     .email('Alamat email tidak valid')
     .min(1, 'Email diperlukan'),
   role: z.enum(['user', 'mentor']),
+  minimal_sessions: z.number().min(1, {
+    message: 'Sesi minimal harus lebih besar dari 0',
+  }),
   classes: z.array(z.string()),
 })
 
@@ -41,36 +44,35 @@ export const RegisterUserForm = forwardRef<
     defaultValues: {
       name: '',
       email: '',
-      role: 'user',
-      classes: [] as string[],
+      role: 'user' as 'user' | 'mentor',
+      minimal_sessions: 1,
+      classes: [] as Array<string>,
     },
     validators: {
       onSubmit: registerSchema,
     },
+    onSubmitInvalid: () => {
+      throw new Error('Failed to submit form')
+    },
+    canSubmitWhenInvalid: false,
     onSubmit: async ({ value }) => {
-      try {
-        await registerUser({
-          name: value.name,
-          email: value.email,
-          role: value.role as 'user' | 'mentor',
-        })
+      await registerUser({
+        name: value.name,
+        email: value.email,
+        role: value.role,
+        classes: value.classes,
+        minimal_sessions: value.minimal_sessions,
+      })
 
-        await queryClient.refetchQueries({ queryKey: ['users'] })
-        form.reset()
-        onSuccess?.()
-      } catch (error) {
-        throw error
-      }
+      await queryClient.refetchQueries({ queryKey: ['users'] })
+      form.reset()
+      onSuccess?.()
     },
   })
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
-      try {
-        await form.handleSubmit()
-      } catch (error) {
-        throw error
-      }
+      await form.handleSubmit()
     },
   }))
 
@@ -110,15 +112,43 @@ export const RegisterUserForm = forwardRef<
         </AppField>
 
         <AppField name="classes">
-          {({ MultiComboboxField }) => (
-            <MultiComboboxField
-              label="Kelas"
-              placeholder="Pilih kelas"
-              options={classesDropdown}
-              required
-            />
-          )}
+          {({ MultiComboboxField }) => {
+            let maxSelected = undefined
+
+            switch (form.getFieldValue('role')) {
+              case 'user':
+                maxSelected = 1
+                break
+              case 'mentor':
+                maxSelected = 10
+                break
+              default:
+                maxSelected = undefined
+            }
+
+            return (
+              <MultiComboboxField
+                label="Kelas"
+                placeholder="Pilih kelas"
+                options={classesDropdown}
+                maxSelected={maxSelected}
+                disabled={maxSelected === undefined}
+                required
+              />
+            )
+          }}
         </AppField>
+
+        {form.getFieldValue('role') === 'user' && (
+          <AppField name="minimal_sessions">
+            {({ NumberField }) => (
+              <NumberField
+                label="Sesi Minimal per Minggu"
+                required
+              />
+            )}
+          </AppField>
+        )}
 
         <AppField name="role">
           {({ Select }) => (

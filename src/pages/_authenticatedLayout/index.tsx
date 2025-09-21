@@ -1,13 +1,13 @@
-import { StatCard } from '@/widgets/stat-card'
-import { Table } from '@/widgets/table'
-import { useHeaderStore } from '@/shared/hooks/use-header'
-import { getMeetingSessions } from '@/entities/meeting-sessions'
-import { getUserCount } from '@/entities/users'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
+import { StatCard } from '@/widgets/stat-card'
+import { Table } from '@/widgets/table'
+import { useHeaderStore } from '@/shared/hooks/use-header'
+import { getMeetingSessions } from '@/entities/meeting-sessions'
+import { getUserCount } from '@/entities/users'
 
 export const Route = createFileRoute('/_authenticatedLayout/')({
   loader: () => {

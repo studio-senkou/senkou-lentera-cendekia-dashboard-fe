@@ -1,18 +1,11 @@
-import { useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
+import type { MeetingSession } from '@/shared/types/response'
 import { useHeaderStore } from '@/shared/hooks/use-header'
-import { Button } from '@/shared/ui/button'
-import { FormSheet } from '@/shared/ui/form-sheet'
 
 import { getMeetingSessions } from '@/entities/meeting-sessions'
-import type { MeetingSession } from '@/shared/types/response'
 
-import {
-  MeetingSessionForm,
-  type MeetingSessionFormRef,
-} from '@/features/meeting-sessions/widgets/meeting-sessions.form'
 import { MeetingDataSkeleton } from '@/features/meeting-sessions/widgets/meeting-data-skeleton'
 import { MeetingSessionsDataGrid } from '@/features/meeting-sessions/widgets/meeting-sessions.data-grid'
 
@@ -27,40 +20,43 @@ export const Route = createFileRoute('/_authenticatedLayout/meeting-sessions/')(
 )
 
 function RouteComponent() {
-  const formRef = useRef<MeetingSessionFormRef>(null)
-
-  const {
-    data: meetingSessions,
-    refetch: refetchMeetingSessions,
-    isLoading,
-  } = useQuery<MeetingSession[]>({
+  const { data, isLoading } = useQuery<Array<MeetingSession>>({
     queryKey: ['meeting-sessions'],
     queryFn: getMeetingSessions,
-    select: (sessions) => sessions ?? [],
+    select: (datas) => {
+      const emptyRows = Array.from({length: datas.length + 10}).map((_) => ({
+        mentor_id: undefined,
+        student_id: undefined,
+        session_date: undefined,
+        session_time: undefined,
+        duration: undefined,
+        note: undefined,
+        description: undefined,
+        created_at: new Date(),
+        updated_at: new Date(),
+        student: null,
+        mentor: null,
+        status: undefined,
+      })) as unknown as Array<MeetingSession>
+
+      return [...datas, ...emptyRows]
+    },
   })
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
-        <FormSheet
-          trigger={<Button>Tambah Sesi Pertemuan</Button>}
-          title="Buat Sesi Pertemuan Baru"
-          description="Tindakan ini akan membuat sesi pertemuan baru. Silakan isi formulir di bawah ini untuk melanjutkan."
-          onSubmitForm={() => {}}
-          disabled={false}
-        >
-          <MeetingSessionForm
-            ref={formRef}
-            onSuccess={async () => {
-              await refetchMeetingSessions()
-            }}
-          />
-        </FormSheet>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-medium">List Pertemuan</h1>
+          <p className="text-sm text-gray-500">
+            Daftar sesi pertemuan yang telah dijadwalkan
+          </p>
+        </div>
       </div>
 
       <div className="w-full">
         {isLoading && <MeetingDataSkeleton />}
-        {!isLoading && <MeetingSessionsDataGrid data={meetingSessions ?? []} />}
+        {!isLoading && <MeetingSessionsDataGrid data={data ?? []} />}
       </div>
     </div>
   )

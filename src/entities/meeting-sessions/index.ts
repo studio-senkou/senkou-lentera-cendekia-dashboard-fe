@@ -1,6 +1,6 @@
 import { toast } from 'sonner'
-import { http } from '@/shared/lib/axios'
 import type { MeetingSession } from '@/shared/types/response'
+import { http } from '@/shared/lib/axios'
 
 export interface CreateMeetingSessionRequest {
   student_id: number
@@ -47,7 +47,9 @@ export const bulkCreateMeetingSessions = async ({
 
 export const getMeetingSessions = async (filters = {}) => {
   try {
-    const response = await http.get('/meeting-sessions', { params: filters })
+    const response = await http.get('/meeting-sessions', {
+      params: Object.keys(filters).length ? filters : undefined,
+    })
     return response.data.data.sessions
   } catch (error) {
     toast.error('Failed to get meeting sessions')
