@@ -42,3 +42,14 @@ export const fetchClassesForDropdown = async () => {
     return []
   }
 }
+
+export const deleteClass = async (classId: number) => {
+  try {
+    const response = await http.delete(`/classes/${classId}`)
+    toast.success('Kelas berhasil dihapus')
+    return response.data
+  } catch (error) {
+    toast.error('Gagal menghapus kelas')
+    throw error
+  }
+}

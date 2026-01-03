@@ -37,13 +37,16 @@ export function NumberField({
   const errors = useStore(field.store, (state) => state.meta.errors)
   const [value, setValue] = useState(field.state.value)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseFloat(e.target.value)
+    const inputValue = e.target.value
+    if (inputValue === '') {
+      setValue('' as unknown as number)
+      field.handleChange(undefined as unknown as number)
+      return
+    }
+    const newValue = parseFloat(inputValue)
     if (!isNaN(newValue)) {
       setValue(newValue)
       field.handleChange(newValue)
-    } else {
-      setValue(0)
-      field.handleChange(0)
     }
   }
 

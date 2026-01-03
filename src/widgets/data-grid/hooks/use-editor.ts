@@ -5,6 +5,7 @@ import numberEditor from '../components/number-editor.data-grid'
 import selectEditor from '../components/select.data-grid'
 import dateEditor from '../components/date-editor.data-grid'
 import timeEditor from '../components/time-editor.data-grid'
+import durationEditor from '../components/duration-editor.data-grid'
 
 import type { RenderEditCellProps } from 'react-data-grid'
 import type { SelectOption } from '../types'
@@ -42,6 +43,11 @@ export const useEditor = <TData>() => {
     [],
   )
 
+  const renderDurationEditor = useCallback(
+    (props: RenderEditCellProps<NoInfer<TData>>) => durationEditor(props),
+    [],
+  )
+
   const editor = useMemo(() => {
     return {
       renderTextEditor,
@@ -49,6 +55,7 @@ export const useEditor = <TData>() => {
       renderSelectEditor,
       renderDateEditor,
       renderTimeEditor,
+      renderDurationEditor,
     }
   }, [])
 
@@ -56,3 +63,4 @@ export const useEditor = <TData>() => {
     editor,
   }
 }
+

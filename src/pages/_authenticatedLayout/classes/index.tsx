@@ -1,14 +1,33 @@
 import { useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { Trash2 } from 'lucide-react'
 
-import { fetchClasses } from '@/entities/classes'
+import { deleteClass, fetchClasses } from '@/entities/classes'
+import type { Class } from '@/shared/types/response'
 import { ClassForm } from '@/features/classes/widgets/classes.form'
 import type { ClassFormRef } from '@/features/classes/widgets/classes.form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { Table } from '@/widgets/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/ui/tooltip'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shared/ui/alert-dialog'
 
 export const Route = createFileRoute('/_authenticatedLayout/classes/')({
   component: RouteComponent,
@@ -20,11 +39,18 @@ export const Route = createFileRoute('/_authenticatedLayout/classes/')({
 function RouteComponent() {
   const createClassRef = useRef<ClassFormRef>(null)
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['classes'],
     queryFn: fetchClasses,
     staleTime: Infinity,
     select: (data) => data ?? [],
+  })
+
+  const { mutate: handleDeleteClass } = useMutation({
+    mutationFn: (classId: number) => deleteClass(classId),
+    onSuccess: async () => {
+      await refetch()
+    },
   })
 
   const handleSubmitCreateClass = async () => {
@@ -53,11 +79,60 @@ function RouteComponent() {
         </FormSheet>
       </div>
 
-      <Table
+      <Table<Class>
         columns={[
           {
             accessorKey: 'classname',
             header: 'Nama Kelas',
+          },
+          {
+            header: 'Aksi',
+            cell: ({ row }) => {
+              return (
+                <TooltipProvider>
+                  <div className="flex items-center justify-end gap-2">
+                    <Tooltip>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              aria-label="Hapus Kelas"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Apakah Anda yakin?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
+                              kelas <strong>{row.original.classname}</strong> secara
+                              permanen dari server.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteClass(row.original.id)}
+                            >
+                              Hapus
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <TooltipContent>
+                        <p>Hapus Kelas</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
+              )
+            },
           },
         ]}
         data={data}

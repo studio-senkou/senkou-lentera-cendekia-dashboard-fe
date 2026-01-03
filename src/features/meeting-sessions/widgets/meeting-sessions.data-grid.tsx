@@ -95,8 +95,8 @@ export function MeetingSessionsDataGrid({
   }
 
   const columns = useMemo(() => {
-    return [
-      !studentId && {
+    const allColumns: Array<ColumnOrColumnGroup<NoInfer<MeetingSession>>> = [
+      {
         key: 'student_id',
         name: 'Nama Siswa',
         renderEditCell: (props) =>
@@ -166,7 +166,14 @@ export function MeetingSessionsDataGrid({
       {
         key: 'duration',
         name: 'Durasi Sesi',
-        renderEditCell: editor.renderNumberEditor,
+        renderEditCell: editor.renderDurationEditor,
+        renderCell: ({ row }) => {
+          const minutes = Number(row.duration) || 0
+          if (minutes < 60) return <span>{minutes}m</span>
+          const hours = Math.floor(minutes / 60)
+          const mins = minutes % 60
+          return <span>{mins > 0 ? `${hours}h ${mins}m` : `${hours}h`}</span>
+        },
       },
       {
         key: 'note',
@@ -178,13 +185,16 @@ export function MeetingSessionsDataGrid({
           </div>
         ),
       },
-    ] as Array<ColumnOrColumnGroup<NoInfer<MeetingSession>>>
-  }, [editor, mentorOptions])
+    ]
+    
+    // Filter out student_id column if studentId is provided
+    return studentId ? allColumns.filter(col => typeof col === 'object' && col !== null && 'key' in col && col.key !== 'student_id') : allColumns
+  }, [editor, mentorOptions, studentId, studentOptions])
 
   return (
     <div className="flex flex-col justify-center items-end gap-2">
       <Tooltip>
-        <TooltipTrigger>
+        <TooltipTrigger asChild>
           <Button onClick={handleSyncData}>
             <Cloud />
           </Button>

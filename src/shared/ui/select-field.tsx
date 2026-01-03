@@ -27,11 +27,13 @@ export function Select({
   values,
   placeholder,
   required = false,
+  onChange,
 }: {
   label: string
   values: Array<{ label: string; value: string }>
   placeholder?: string
   required?: boolean
+  onChange?: (value: string) => void
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
@@ -45,10 +47,13 @@ export function Select({
       <ShadcnSelect.Select
         name={field.name}
         value={field.state.value}
-        onValueChange={(value) => field.handleChange(value)}
+        onValueChange={(value) => {
+          field.handleChange(value)
+          onChange?.(value)
+        }}
         required={required}
       >
-        <ShadcnSelect.SelectTrigger className="w-full">
+        <ShadcnSelect.SelectTrigger id={field.name} className="w-full">
           <ShadcnSelect.SelectValue placeholder={placeholder} />
         </ShadcnSelect.SelectTrigger>
         <ShadcnSelect.SelectContent>

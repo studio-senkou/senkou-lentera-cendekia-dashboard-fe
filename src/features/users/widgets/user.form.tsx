@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import z from 'zod'
 
@@ -23,11 +23,22 @@ const registerSchema = z.object({
     .email('Alamat email tidak valid')
     .min(1, 'Email diperlukan'),
   role: z.enum(['user', 'mentor']),
-  minimal_sessions: z.number().min(1, {
-    message: 'Sesi minimal harus lebih besar dari 0',
-  }),
+  minimal_sessions: z.number(),
   classes: z.array(z.string()),
 })
+
+const validateForm = (
+  values: z.infer<typeof registerSchema>
+): boolean | void => {
+  if (values.role === 'user') {
+    if (!values.minimal_sessions || values.minimal_sessions < 1) {
+      throw new Error('Sesi minimal harus lebih besar dari 0')
+    }
+    if (!values.classes || values.classes.length === 0) {
+      throw new Error('Kelas harus dipilih')
+    }
+  }
+}
 
 export const RegisterUserForm = forwardRef<
   RegisterUserFormRef,
@@ -49,7 +60,9 @@ export const RegisterUserForm = forwardRef<
       classes: [] as Array<string>,
     },
     validators: {
-      onSubmit: registerSchema,
+      onSubmitAsync: async ({ value }) => {
+        validateForm(value)
+      },
     },
     onSubmitInvalid: () => {
       throw new Error('Failed to submit form')
@@ -77,6 +90,9 @@ export const RegisterUserForm = forwardRef<
   }))
 
   const { AppField } = form
+  
+  // Track role to trigger re-render when it changes
+  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>('user')
 
   return (
     <form
@@ -111,35 +127,21 @@ export const RegisterUserForm = forwardRef<
           )}
         </AppField>
 
-        <AppField name="classes">
-          {({ MultiComboboxField }) => {
-            let maxSelected = undefined
-
-            switch (form.getFieldValue('role')) {
-              case 'user':
-                maxSelected = 1
-                break
-              case 'mentor':
-                maxSelected = 10
-                break
-              default:
-                maxSelected = undefined
-            }
-
-            return (
+        {currentRole === 'user' && (
+          <AppField name="classes">
+            {({ MultiComboboxField }) => (
               <MultiComboboxField
                 label="Kelas"
                 placeholder="Pilih kelas"
                 options={classesDropdown}
-                maxSelected={maxSelected}
-                disabled={maxSelected === undefined}
+                maxSelected={1}
                 required
               />
-            )
-          }}
-        </AppField>
+            )}
+          </AppField>
+        )}
 
-        {form.getFieldValue('role') === 'user' && (
+        {currentRole === 'user' && (
           <AppField name="minimal_sessions">
             {({ NumberField }) => (
               <NumberField
@@ -160,6 +162,7 @@ export const RegisterUserForm = forwardRef<
                 { value: 'user', label: 'Murid' },
                 { value: 'mentor', label: 'Mentor' },
               ]}
+              onChange={(value) => setCurrentRole(value as 'user' | 'mentor')}
             />
           )}
         </AppField>

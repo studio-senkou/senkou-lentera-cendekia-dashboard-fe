@@ -54,3 +54,11 @@ export interface Article {
   created_at: string
   updated_at: string
 }
+
+export interface Class {
+  id: number
+  classname: string
+  created_at: string
+  updated_at: string
+}
+

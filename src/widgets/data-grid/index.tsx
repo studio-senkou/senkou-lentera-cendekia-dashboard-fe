@@ -34,7 +34,7 @@ export function DataGrid<T>({
   const onRowsChange = useCallback(
     (rows: Array<T>) => {
       const result = handleRowsChange(rows)
-      if (result && 'changes' in result && 'changedRows' in result) {
+      if (result && typeof result === 'object' && 'changes' in result && 'changedRows' in result) {
         const { changedRows, changes } = result
         onRowsDataChange?.(changedRows, changes)
       } else {
@@ -51,7 +51,7 @@ export function DataGrid<T>({
       }
 
       const contentLengths = columns
-        .filter((col): col is any => 'key' in col)
+        .filter((col): col is any => typeof col === 'object' && col !== null && 'key' in col)
         .map((col) => {
           const key = col.key as keyof T
           const value = row[key]
