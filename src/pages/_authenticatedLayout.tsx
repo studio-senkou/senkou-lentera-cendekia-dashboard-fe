@@ -1,8 +1,9 @@
+import { useEffect } from 'react'
 import Header from '@/widgets/header'
 import { AppSidebar } from '@/widgets/sidebar'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar'
 import { useSessionStore } from '@/shared/hooks/use-session'
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticatedLayout')({
   loader: () => {
@@ -14,6 +15,15 @@ export const Route = createFileRoute('/_authenticatedLayout')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
+  const refreshToken = useSessionStore((state) => state.refreshToken)
+
+  useEffect(() => {
+    if (!refreshToken) {
+      navigate({ to: '/login' })
+    }
+  }, [refreshToken, navigate])
+
   return (
     <SidebarProvider
       style={

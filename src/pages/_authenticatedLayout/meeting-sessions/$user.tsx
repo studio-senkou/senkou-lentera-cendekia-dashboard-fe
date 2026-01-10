@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useParams } from '@tanstack/react-router'
-import { User, Calendar } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import type { MeetingSession } from '@/shared/types/response'
 import { getMeetingSessionByUser } from '@/entities/meeting-sessions'
 import { getUserById } from '@/entities/users'
