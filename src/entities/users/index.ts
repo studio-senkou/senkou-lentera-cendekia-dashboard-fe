@@ -52,6 +52,16 @@ export const forceActivateUser = async (userID: number) => {
   }
 }
 
+export const getUserById = async (userId: string): Promise<User | null> => {
+  try {
+    const response = await http.get(`/users/${userId}`)
+    return response.data.data.user
+  } catch (error) {
+    toast.error('Failed to get user details')
+    return null
+  }
+}
+
 export const getUserDetails = async (): Promise<User | null> => {
   try {
     const response = await http.get('/users/me')

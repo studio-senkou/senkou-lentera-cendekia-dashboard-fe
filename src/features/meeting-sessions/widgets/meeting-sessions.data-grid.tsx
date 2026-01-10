@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
-import { useQuery } from '@tanstack/react-query'
-import { Cloud } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Cloud, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { MeetingSession } from '@/shared/types/response'
-import type { ColumnOrColumnGroup } from 'react-data-grid'
+import { SelectColumn, type ColumnOrColumnGroup } from 'react-data-grid'
+
+type RowKey = number
 import type { DataGridChangedRow } from '@/widgets/data-grid/types'
 import { useEditor } from '@/widgets/data-grid/hooks/use-editor'
 import { DataGrid } from '@/widgets/data-grid'
@@ -14,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import {
   bulkCreateMeetingSessions,
   bulkUpdateMeetingSessions,
+  deleteMeetingSession,
 } from '@/entities/meeting-sessions'
 
 export interface MeetingSessionDataGridProps {
@@ -25,10 +28,19 @@ export function MeetingSessionsDataGrid({
   data,
   studentId,
 }: MeetingSessionDataGridProps) {
+  const queryClient = useQueryClient()
   const { editor } = useEditor<MeetingSession>()
   const [unsyncedChanges, setUnsyncedChanges] = useState<Array<MeetingSession>>(
     [],
   )
+  const [selectedRows, setSelectedRows] = useState<ReadonlySet<RowKey>>(
+    () => new Set(),
+  )
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleSelectedRowsChange = (rows: Set<unknown>) => {
+    setSelectedRows(rows as Set<RowKey>)
+  }
 
   const { data: studentOptions } = useQuery({
     queryKey: ['students', 'dropdown'],
@@ -94,8 +106,35 @@ export function MeetingSessionsDataGrid({
     }
   }
 
+  const handleDeleteSelected = async () => {
+    if (selectedRows.size === 0) return
+    
+    setIsDeleting(true)
+    try {
+      const deletePromises = Array.from(selectedRows).map((id) =>
+        deleteMeetingSession(id as number),
+      )
+      await Promise.all(deletePromises)
+      
+      setSelectedRows(new Set())
+      await queryClient.invalidateQueries({ queryKey: ['meeting-sessions'] })
+    } catch (error) {
+      toast.error('Gagal menghapus sesi pertemuan. Silakan coba lagi.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const columns = useMemo(() => {
     const allColumns: Array<ColumnOrColumnGroup<NoInfer<MeetingSession>>> = [
+      SelectColumn,
+      {
+        key: 'rowNumber',
+        name: 'No',
+        width: 50,
+        frozen: true,
+        renderCell: ({ rowIdx }) => <span>{rowIdx + 1}</span>,
+      },
       {
         key: 'student_id',
         name: 'Nama Siswa',
@@ -188,24 +227,52 @@ export function MeetingSessionsDataGrid({
     ]
     
     // Filter out student_id column if studentId is provided
-    return studentId ? allColumns.filter(col => typeof col === 'object' && col !== null && 'key' in col && col.key !== 'student_id') : allColumns
+    const filteredColumns = studentId 
+      ? allColumns.filter(col => {
+          if (col === SelectColumn) return true
+          return typeof col === 'object' && col !== null && 'key' in col && col.key !== 'student_id'
+        }) 
+      : allColumns
+    return filteredColumns
   }, [editor, mentorOptions, studentId, studentOptions])
 
   return (
     <div className="flex flex-col justify-center items-end gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={handleSyncData}>
-            <Cloud />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Sync Data</p>
-        </TooltipContent>
-      </Tooltip>
+      <div className="flex gap-2">
+        {selectedRows.size > 0 && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteSelected}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="ml-1">{selectedRows.size}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Hapus {selectedRows.size} sesi yang dipilih</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={handleSyncData}>
+              <Cloud />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sync Data</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
       <DataGrid<MeetingSession>
         rows={data}
         columns={columns}
+        rowKeyGetter={(row) => row.id}
+        selectedRows={selectedRows}
+        onSelectedRowsChange={handleSelectedRowsChange}
         enableVirtualization
         enableVariableRowHeight
         estimatedRowHeight={80}
