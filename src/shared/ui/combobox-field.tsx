@@ -2,12 +2,8 @@ import { useStore } from '@tanstack/react-form'
 import { useCallback } from 'react';
 import { useFieldContext } from '../hooks/form-context'
 import { Label } from './label'
-import type {ComboboxOption} from '@/shared/ui/combobox';
-import {
-  Combobox,
-  
-  MultiCombobox
-} from '@/shared/ui/combobox'
+import type { ComboboxOption } from '@/shared/ui/combobox';
+import { Combobox, MultiCombobox } from '@/shared/ui/combobox'
 
 function ErrorMessages({
   errors,

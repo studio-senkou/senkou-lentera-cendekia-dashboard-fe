@@ -3,10 +3,12 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 
-import { deleteClass, fetchClasses } from '@/entities/classes'
 import type { Class } from '@/shared/types/response'
-import { ClassForm } from '@/features/classes/widgets/classes.form'
 import type { ClassFormRef } from '@/features/classes/widgets/classes.form'
+import { deleteClass, fetchClasses } from '@/entities/classes'
+import { ClassForm } from '@/features/classes/widgets/classes.form'
+import EditClassSheet from '@/features/classes/widgets/edit-class.sheet'
+import ClassActions from '@/features/classes/widgets/class.actions'
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
@@ -43,7 +45,7 @@ function RouteComponent() {
     queryKey: ['classes'],
     queryFn: fetchClasses,
     staleTime: Infinity,
-    select: (data) => data ?? [],
+    select: (classes) => classes ?? [],
   })
 
   const { mutate: handleDeleteClass } = useMutation({
@@ -58,11 +60,7 @@ function RouteComponent() {
       throw new Error('Form ref is not available')
     }
 
-    try {
-      await createClassRef.current.submit()
-    } catch (error) {
-      throw error
-    }
+    await createClassRef.current.submit()
   }
 
   return (
@@ -89,48 +87,12 @@ function RouteComponent() {
             header: 'Aksi',
             cell: ({ row }) => {
               return (
-                <TooltipProvider>
-                  <div className="flex items-center justify-end gap-2">
-                    <Tooltip>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              aria-label="Hapus Kelas"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Apakah Anda yakin?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus
-                              kelas <strong>{row.original.classname}</strong> secara
-                              permanen dari server.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteClass(row.original.id)}
-                            >
-                              Hapus
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      <TooltipContent>
-                        <p>Hapus Kelas</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TooltipProvider>
+                <ClassActions
+                  id={row.original.id}
+                  classname={row.original.classname}
+                  onEditSuccess={() => refetch()}
+                  onDelete={(id) => handleDeleteClass(id)}
+                />
               )
             },
           },

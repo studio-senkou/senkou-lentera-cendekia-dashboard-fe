@@ -28,14 +28,11 @@ const registerSchema = z.object({
 })
 
 const validateForm = (
-  values: z.infer<typeof registerSchema>
+  values: z.infer<typeof registerSchema>,
 ): boolean | void => {
   if (values.role === 'user') {
     if (!values.minimal_sessions || values.minimal_sessions < 1) {
       throw new Error('Sesi minimal harus lebih besar dari 0')
-    }
-    if (!values.classes || values.classes.length === 0) {
-      throw new Error('Kelas harus dipilih')
     }
   }
 }
@@ -60,7 +57,7 @@ export const RegisterUserForm = forwardRef<
       classes: [] as Array<string>,
     },
     validators: {
-      onSubmitAsync: async ({ value }) => {
+      onSubmitAsync: ({ value }) => {
         validateForm(value)
       },
     },
@@ -90,7 +87,7 @@ export const RegisterUserForm = forwardRef<
   }))
 
   const { AppField } = form
-  
+
   // Track role to trigger re-render when it changes
   const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>('user')
 
@@ -133,7 +130,7 @@ export const RegisterUserForm = forwardRef<
               <MultiComboboxField
                 label="Kelas"
                 placeholder="Pilih kelas"
-                options={classesDropdown}
+                options={classesDropdown ?? []}
                 maxSelected={1}
                 required
               />
@@ -144,10 +141,7 @@ export const RegisterUserForm = forwardRef<
         {currentRole === 'user' && (
           <AppField name="minimal_sessions">
             {({ NumberField }) => (
-              <NumberField
-                label="Sesi Minimal per Minggu"
-                required
-              />
+              <NumberField label="Sesi Minimal per Minggu" required />
             )}
           </AppField>
         )}

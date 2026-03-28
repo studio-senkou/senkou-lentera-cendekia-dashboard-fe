@@ -53,3 +53,14 @@ export const deleteClass = async (classId: number) => {
     throw error
   }
 }
+
+export const updateClass = async (classId: number, classname: string) => {
+  try {
+    const response = await http.put(`/classes/${classId}`, { classname })
+    toast.success('Kelas berhasil diperbarui')
+    return response.data.data
+  } catch (error) {
+    toast.error('Gagal memperbarui kelas')
+    throw error
+  }
+}
