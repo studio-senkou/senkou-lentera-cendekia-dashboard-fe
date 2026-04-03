@@ -101,7 +101,7 @@ export const RegisterUserForm = forwardRef<
         form.handleSubmit()
       }}
     >
-      <div className="grid gap-3">
+      <div className="grid gap-6">
         <AppField name="name">
           {({ TextField }) => (
             <TextField
@@ -140,9 +140,7 @@ export const RegisterUserForm = forwardRef<
 
         {currentRole === 'user' && (
           <AppField name="minimal_sessions">
-            {({ NumberField }) => (
-              <NumberField label="Sesi Minimal per Minggu" required />
-            )}
+            {({ NumberField }) => <NumberField label="Jumlah Sesi" required />}
           </AppField>
         )}
 

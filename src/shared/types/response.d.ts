@@ -15,11 +15,11 @@ export interface MeetingSession {
   session_time: string
   duration: number // in minutes
   student_id: string
-  student: User,
+  student: User
   mentor_id: string
-  mentor: User,
+  mentor: User
   description: string
-  note: string | null 
+  note: string | null
   status: 'pending' | 'completed' | 'cancelled'
   created_at: string
   updated_at: string
@@ -62,3 +62,54 @@ export interface Class {
   updated_at: string
 }
 
+export interface Quiz {
+  id: number
+  title: string
+  description: string | null
+  passing_score: number
+  time_limit_minutes: number | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface QuizOption {
+  id: number
+  question_id: number
+  option_text: string
+  is_correct: boolean
+  order_number: number
+  created_at: string
+  updated_at: string
+}
+
+export interface QuizQuestion {
+  id: number
+  quiz_id: number
+  question_text: string
+  order_number: number
+  options: Array<QuizOption>
+  created_at: string
+  updated_at: string
+}
+
+export interface QuizDetail {
+  quiz: Quiz
+  questions: Array<QuizQuestion>
+}
+
+export interface QuizAttempt {
+  id: number
+  quiz_id: number
+  user_id: number
+  status: 'in_progress' | 'completed' | 'reset'
+  score: number | null
+  started_at: string
+  submitted_at: string | null
+  reset_at: string | null
+  reset_by: number | null
+  created_at: string
+  updated_at: string
+  user_name: string
+  user_email: string
+}

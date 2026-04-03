@@ -15,10 +15,12 @@ import { Route as AuthenticatedLayoutRouteImport } from './_authenticatedLayout'
 import { Route as AuthenticatedLayoutIndexRouteImport } from './_authenticatedLayout/index'
 import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './_uauthenticatedLayout/login/index'
 import { Route as AuthenticatedLayoutUsersIndexRouteImport } from './_authenticatedLayout/users/index'
+import { Route as AuthenticatedLayoutQuizzesIndexRouteImport } from './_authenticatedLayout/quizzes/index'
 import { Route as AuthenticatedLayoutPageSettingsIndexRouteImport } from './_authenticatedLayout/page-settings/index'
 import { Route as AuthenticatedLayoutMeetingSessionsIndexRouteImport } from './_authenticatedLayout/meeting-sessions/index'
 import { Route as AuthenticatedLayoutClassesIndexRouteImport } from './_authenticatedLayout/classes/index'
 import { Route as AuthenticatedLayoutArticlesIndexRouteImport } from './_authenticatedLayout/articles/index'
+import { Route as AuthenticatedLayoutQuizzesQuizIdRouteImport } from './_authenticatedLayout/quizzes/$quizId'
 import { Route as AuthenticatedLayoutMeetingSessionsUserRouteImport } from './_authenticatedLayout/meeting-sessions/$user'
 
 const Routes_rootRoute = Routes_rootRouteImport.update({
@@ -51,6 +53,12 @@ const AuthenticatedLayoutUsersIndexRoute =
     path: '/users/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutQuizzesIndexRoute =
+  AuthenticatedLayoutQuizzesIndexRouteImport.update({
+    id: '/quizzes/',
+    path: '/quizzes/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 const AuthenticatedLayoutPageSettingsIndexRoute =
   AuthenticatedLayoutPageSettingsIndexRouteImport.update({
     id: '/page-settings/',
@@ -75,6 +83,12 @@ const AuthenticatedLayoutArticlesIndexRoute =
     path: '/articles/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutQuizzesQuizIdRoute =
+  AuthenticatedLayoutQuizzesQuizIdRouteImport.update({
+    id: '/quizzes/$quizId',
+    path: '/quizzes/$quizId',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 const AuthenticatedLayoutMeetingSessionsUserRoute =
   AuthenticatedLayoutMeetingSessionsUserRouteImport.update({
     id: '/meeting-sessions/$user',
@@ -86,10 +100,12 @@ export interface FileRoutesByFullPath {
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
+  '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
   '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/users': typeof AuthenticatedLayoutUsersIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
@@ -97,10 +113,12 @@ export interface FileRoutesByTo {
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
+  '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
   '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/users': typeof AuthenticatedLayoutUsersIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
@@ -111,10 +129,12 @@ export interface FileRoutesById {
   '/routes/__root': typeof Routes_rootRoute
   '/_authenticatedLayout/': typeof AuthenticatedLayoutIndexRoute
   '/_authenticatedLayout/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
+  '/_authenticatedLayout/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
   '/_authenticatedLayout/articles/': typeof AuthenticatedLayoutArticlesIndexRoute
   '/_authenticatedLayout/classes/': typeof AuthenticatedLayoutClassesIndexRoute
   '/_authenticatedLayout/meeting-sessions/': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/_authenticatedLayout/page-settings/': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/_authenticatedLayout/quizzes/': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/_authenticatedLayout/users/': typeof AuthenticatedLayoutUsersIndexRoute
   '/_uauthenticatedLayout/login/': typeof UauthenticatedLayoutLoginIndexRoute
 }
@@ -124,10 +144,12 @@ export interface FileRouteTypes {
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
+    | '/quizzes/$quizId'
     | '/articles'
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
+    | '/quizzes'
     | '/users'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
@@ -135,10 +157,12 @@ export interface FileRouteTypes {
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
+    | '/quizzes/$quizId'
     | '/articles'
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
+    | '/quizzes'
     | '/users'
     | '/login'
   id:
@@ -148,10 +172,12 @@ export interface FileRouteTypes {
     | '/routes/__root'
     | '/_authenticatedLayout/'
     | '/_authenticatedLayout/meeting-sessions/$user'
+    | '/_authenticatedLayout/quizzes/$quizId'
     | '/_authenticatedLayout/articles/'
     | '/_authenticatedLayout/classes/'
     | '/_authenticatedLayout/meeting-sessions/'
     | '/_authenticatedLayout/page-settings/'
+    | '/_authenticatedLayout/quizzes/'
     | '/_authenticatedLayout/users/'
     | '/_uauthenticatedLayout/login/'
   fileRoutesById: FileRoutesById
@@ -206,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutUsersIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/quizzes/': {
+      id: '/_authenticatedLayout/quizzes/'
+      path: '/quizzes'
+      fullPath: '/quizzes'
+      preLoaderRoute: typeof AuthenticatedLayoutQuizzesIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
     '/_authenticatedLayout/page-settings/': {
       id: '/_authenticatedLayout/page-settings/'
       path: '/page-settings'
@@ -234,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutArticlesIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/quizzes/$quizId': {
+      id: '/_authenticatedLayout/quizzes/$quizId'
+      path: '/quizzes/$quizId'
+      fullPath: '/quizzes/$quizId'
+      preLoaderRoute: typeof AuthenticatedLayoutQuizzesQuizIdRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
     '/_authenticatedLayout/meeting-sessions/$user': {
       id: '/_authenticatedLayout/meeting-sessions/$user'
       path: '/meeting-sessions/$user'
@@ -247,10 +287,12 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedLayoutRouteChildren {
   AuthenticatedLayoutIndexRoute: typeof AuthenticatedLayoutIndexRoute
   AuthenticatedLayoutMeetingSessionsUserRoute: typeof AuthenticatedLayoutMeetingSessionsUserRoute
+  AuthenticatedLayoutQuizzesQuizIdRoute: typeof AuthenticatedLayoutQuizzesQuizIdRoute
   AuthenticatedLayoutArticlesIndexRoute: typeof AuthenticatedLayoutArticlesIndexRoute
   AuthenticatedLayoutClassesIndexRoute: typeof AuthenticatedLayoutClassesIndexRoute
   AuthenticatedLayoutMeetingSessionsIndexRoute: typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   AuthenticatedLayoutPageSettingsIndexRoute: typeof AuthenticatedLayoutPageSettingsIndexRoute
+  AuthenticatedLayoutQuizzesIndexRoute: typeof AuthenticatedLayoutQuizzesIndexRoute
   AuthenticatedLayoutUsersIndexRoute: typeof AuthenticatedLayoutUsersIndexRoute
 }
 
@@ -258,12 +300,14 @@ const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
   AuthenticatedLayoutIndexRoute: AuthenticatedLayoutIndexRoute,
   AuthenticatedLayoutMeetingSessionsUserRoute:
     AuthenticatedLayoutMeetingSessionsUserRoute,
+  AuthenticatedLayoutQuizzesQuizIdRoute: AuthenticatedLayoutQuizzesQuizIdRoute,
   AuthenticatedLayoutArticlesIndexRoute: AuthenticatedLayoutArticlesIndexRoute,
   AuthenticatedLayoutClassesIndexRoute: AuthenticatedLayoutClassesIndexRoute,
   AuthenticatedLayoutMeetingSessionsIndexRoute:
     AuthenticatedLayoutMeetingSessionsIndexRoute,
   AuthenticatedLayoutPageSettingsIndexRoute:
     AuthenticatedLayoutPageSettingsIndexRoute,
+  AuthenticatedLayoutQuizzesIndexRoute: AuthenticatedLayoutQuizzesIndexRoute,
   AuthenticatedLayoutUsersIndexRoute: AuthenticatedLayoutUsersIndexRoute,
 }
 

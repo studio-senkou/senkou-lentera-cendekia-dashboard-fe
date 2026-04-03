@@ -5,6 +5,7 @@ import {
   DotSquare,
   // File,
   Folder,
+  FileText,
   LogOut,
   PanelsTopLeft,
   // Paperclip,
@@ -74,23 +75,29 @@ const data = {
       roles: ['admin', 'mentor'],
     },
     {
+      title: 'Kuis',
+      url: '/quizzes',
+      icon: FileText,
+      roles: ['admin'],
+    },
+    {
       title: 'Sesi Pertemuan',
       url: '/meeting-sessions',
       icon: UserCircle,
       roles: ['admin'],
     },
-    {
-      title: 'Pengaturan Profile Website',
-      url: '/page-settings',
-      icon: PanelsTopLeft,
-      roles: ['admin'],
-    },
-    {
-      title: 'Artikel',
-      url: '/articles',
-      icon: UserCircle,
-      roles: ['admin', 'mentor'],
-    },
+    // {
+    //   title: 'Pengaturan Profile Website',
+    //   url: '/page-settings',
+    //   icon: PanelsTopLeft,
+    //   roles: ['admin'],
+    // },
+    // {
+    //   title: 'Artikel',
+    //   url: '/articles',
+    //   icon: UserCircle,
+    //   roles: ['admin', 'mentor'],
+    // },
   ],
   // documents: [
   //   {

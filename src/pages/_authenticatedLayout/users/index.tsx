@@ -3,16 +3,13 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { BookText, Check, Loader2 } from 'lucide-react'
 
-import type {RegisterUserFormRef} from '@/features/users/widgets/user.form';
+import type { RegisterUserFormRef } from '@/features/users/widgets/user.form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { forceActivateUser, getAllUsers } from '@/entities/users'
 import { Table } from '@/widgets/table'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
-import {
-  RegisterUserForm
-  
-} from '@/features/users/widgets/user.form'
+import { RegisterUserForm } from '@/features/users/widgets/user.form'
 import {
   Tooltip,
   TooltipContent,

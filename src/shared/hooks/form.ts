@@ -11,6 +11,7 @@ import { DatePicker } from '@/shared/ui/date-picker'
 import { FileInput } from '@/shared/ui/file-input'
 import { DateTimePicker } from '@/shared/ui/date-time-picker'
 import { SubscribeButton } from '@/shared/ui/subscribe-button'
+import { Switch as SwitchField } from '@/shared/ui/switch-field'
 
 export const { useAppForm } = createFormHook({
   fieldComponents: {
@@ -24,6 +25,7 @@ export const { useAppForm } = createFormHook({
     DatePicker,
     FileInput,
     DateTimePicker,
+    Switch: SwitchField,
   },
   formComponents: {
     SubscribeButton,
