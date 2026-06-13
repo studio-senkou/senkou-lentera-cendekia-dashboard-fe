@@ -55,49 +55,64 @@ const data = {
     role: role ?? '',
     avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name ?? '')}`,
   },
-  navigations: [
+  navGroups: [
     {
-      title: 'Dashboard',
-      url: '/',
-      icon: PanelsTopLeft,
-      roles: ['admin', 'mentor'],
+      label: 'Utama',
+      items: [
+        {
+          title: 'Dashboard',
+          url: '/',
+          icon: PanelsTopLeft,
+          roles: ['admin', 'mentor'],
+        },
+      ],
     },
     {
-      title: 'Pengguna',
-      url: '/users',
-      icon: User,
-      roles: ['admin'],
+      label: 'Manajemen Pengguna',
+      items: [
+        {
+          title: 'Daftar Murid',
+          url: '/users/students',
+          icon: User,
+          roles: ['admin'],
+        },
+        {
+          title: 'Daftar Tentor',
+          url: '/users/mentors',
+          icon: UserCircle,
+          roles: ['admin'],
+        },
+        {
+          title: 'Pengguna Terhapus',
+          url: '/users/deleted',
+          icon: Trash,
+          roles: ['admin'],
+        },
+      ],
     },
     {
-      title: 'Kelas',
-      url: '/classes',
-      icon: Folder,
-      roles: ['admin', 'mentor'],
+      label: 'Pembelajaran',
+      items: [
+        {
+          title: 'Kelas',
+          url: '/classes',
+          icon: Folder,
+          roles: ['admin', 'mentor'],
+        },
+        {
+          title: 'Kuis',
+          url: '/quizzes',
+          icon: FileText,
+          roles: ['admin'],
+        },
+        {
+          title: 'Sesi Pertemuan',
+          url: '/meeting-sessions',
+          icon: UserCircle,
+          roles: ['admin'],
+        },
+      ],
     },
-    {
-      title: 'Kuis',
-      url: '/quizzes',
-      icon: FileText,
-      roles: ['admin'],
-    },
-    {
-      title: 'Sesi Pertemuan',
-      url: '/meeting-sessions',
-      icon: UserCircle,
-      roles: ['admin'],
-    },
-    // {
-    //   title: 'Pengaturan Profile Website',
-    //   url: '/page-settings',
-    //   icon: PanelsTopLeft,
-    //   roles: ['admin'],
-    // },
-    // {
-    //   title: 'Artikel',
-    //   url: '/articles',
-    //   icon: UserCircle,
-    //   roles: ['admin', 'mentor'],
-    // },
   ],
   // documents: [
   //   {
@@ -144,7 +159,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navigations} />
+        <NavMain groups={data.navGroups} />
         {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
@@ -156,70 +171,60 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
 }
 
 function NavMain({
-  items,
+  groups,
 }: {
-  items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    roles: string[]
+  groups: {
+    label: string
+    items: {
+      title: string
+      url: string
+      icon?: LucideIcon
+      roles: string[]
+    }[]
   }[]
 }) {
   const { pathname } = useLocation()
   const { isMobile, setOpenMobile } = useSidebar()
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
-        {/* <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <CirclePlus />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <Mail />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu> */}
-        <SidebarGroupLabel>Menu</SidebarGroupLabel>
-        <SidebarMenu>
-          {items
-            .filter((item) =>
-              item.roles.includes((role as string)?.toLowerCase()),
-            )
-            // .sort((a, b) => a.title.localeCompare(b.title)) // Sort alphabetically
-            .map((item) => (
-              <SidebarMenuItem
-                key={item.title}
-                className={cn(pathname === item.url && 'bg-neutral-100')}
-              >
-                <SidebarMenuButton asChild tooltip={item.title}>
-                  <Link
-                    to={item.url}
-                    preload={false}
-                    role="link"
-                    onClick={() => {
-                      if (isMobile) setOpenMobile(false)
-                    }}
+    <>
+      {groups.map((group) => {
+        const visibleItems = group.items.filter((item) =>
+          item.roles.includes((role as string)?.toLowerCase()),
+        )
+        if (visibleItems.length === 0) return null
+
+        return (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupContent className="flex flex-col gap-2">
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {visibleItems.map((item) => (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={cn(pathname === item.url && 'bg-neutral-100')}
                   >
-                    {item.icon && createElement(item.icon)}
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <Link
+                        to={item.url}
+                        preload={false}
+                        role="link"
+                        onClick={() => {
+                          if (isMobile) setOpenMobile(false)
+                        }}
+                      >
+                        {item.icon && createElement(item.icon)}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )
+      })}
+    </>
   )
 }
 
@@ -265,7 +270,7 @@ export function NavDocuments({
   const { isMobile } = useSidebar()
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Documents</SidebarGroupLabel>
+      <SidebarGroupLabel>Dokumen</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
@@ -292,16 +297,16 @@ export function NavDocuments({
               >
                 <DropdownMenuItem>
                   <Folder />
-                  <span>Open</span>
+                  <span>Buka</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Share />
-                  <span>Share</span>
+                  <span>Bagikan</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive">
                   <Trash />
-                  <span>Delete</span>
+                  <span>Hapus</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -310,7 +315,7 @@ export function NavDocuments({
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <DotSquare className="text-sidebar-foreground/70" />
-            <span>More</span>
+            <span>Lainnya</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -404,7 +409,7 @@ export function NavUser({
             <DropdownMenuSeparator /> */}
             <DropdownMenuItem onClick={handleClearSession}>
               <LogOut />
-              Log out
+              Keluar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

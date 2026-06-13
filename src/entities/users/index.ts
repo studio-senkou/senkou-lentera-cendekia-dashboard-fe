@@ -94,9 +94,10 @@ export const getUserCount = async (): Promise<{
   }
 }
 
-export const getAllUsers = async (): Promise<Array<User>> => {
+export const getAllUsers = async (role?: string): Promise<Array<User>> => {
   try {
-    const response = await http.get('/users')
+    const url = role ? `/users?role=${role}` : '/users'
+    const response = await http.get(url)
     return response.data.data.users
   } catch (error) {
     toast.error('Failed to get users')
@@ -130,5 +131,24 @@ export const deleteUser = async (userId: number) => {
     toast.success('User deleted successfully')
   } catch (error) {
     toast.error('Failed to delete user')
+  }
+}
+
+export const getDeletedUsers = async (): Promise<Array<User>> => {
+  try {
+    const response = await http.get('/users/deleted')
+    return response.data.data.users
+  } catch (error) {
+    toast.error('Failed to get deleted users')
+    return []
+  }
+}
+
+export const restoreUser = async (userId: number) => {
+  try {
+    await http.post(`/users/${userId}/restore`)
+    toast.success('User restored successfully')
+  } catch (error) {
+    toast.error('Failed to restore user')
   }
 }

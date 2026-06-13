@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { BookText, Check, Loader2 } from 'lucide-react'
+import { BookText, Check, Loader2, Trash2 } from 'lucide-react'
 
 import type { RegisterUserFormRef } from '@/features/users/widgets/user.form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
-import { forceActivateUser, getAllUsers } from '@/entities/users'
+import { forceActivateUser, getAllUsers, deleteUser } from '@/entities/users'
 import { Table } from '@/widgets/table'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
@@ -28,10 +28,10 @@ import {
   AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 
-export const Route = createFileRoute('/_authenticatedLayout/users/')({
+export const Route = createFileRoute('/_authenticatedLayout/users/mentors')({
   loader: () => {
     const setTitle = useHeaderStore.getState().setTitle
-    setTitle('Pengguna')
+    setTitle('Daftar Tentor')
   },
   component: RouteComponent,
 })
@@ -46,8 +46,8 @@ function RouteComponent() {
     isLoading,
     refetch: refetchUserList,
   } = useQuery({
-    queryKey: ['users'],
-    queryFn: getAllUsers,
+    queryKey: ['users', 'mentors'],
+    queryFn: () => getAllUsers('mentor'),
   })
 
   const handleSubmitForm = async () => {
@@ -72,10 +72,23 @@ function RouteComponent() {
     },
   })
 
+  const [deletedUserID, setDeletedUserID] = useState<number | null>(null)
+  const { mutate: doDeleteUser, isPending: deletingUser } = useMutation({
+    mutationFn: (userID: number) => deleteUser(userID),
+    onMutate: (id: number) => {
+      setDeletedUserID(id)
+    },
+    onSettled: () => {
+      setDeletedUserID(null)
+    },
+    onSuccess: async () => {
+      await refetchUserList()
+    },
+  })
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-end">
-        {/* <h1 className="text-2xl font-medium">List Pengguna</h1> */}
         <FormSheet
           preventClose
           onBeforeClose={() => true}
@@ -147,20 +160,18 @@ function RouteComponent() {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Are you absolutely sure?
+                          Apakah Anda yakin?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete your account and remove your data from our
-                          servers.
+                          Tindakan ini akan mengaktifkan akun pengguna dan memperbarui datanya di server kami.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => activateUser(row.original.id)}
                         >
-                          Continue
+                          Lanjutkan
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -208,6 +219,48 @@ function RouteComponent() {
                     ) : (
                       <UserActivationButton disabled />
                     )}
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              aria-label="Hapus Pengguna"
+                            >
+                              {deletingUser && row.original.id === deletedUserID ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Hapus Pengguna
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tindakan ini tidak dapat dibatalkan. Data pengguna ini akan dihapus secara permanen.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => doDeleteUser(row.original.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Hapus
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Hapus Pengguna</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </TooltipProvider>
               )

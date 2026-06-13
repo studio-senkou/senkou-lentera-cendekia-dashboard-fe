@@ -231,16 +231,15 @@ function RouteComponent() {
                     />
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        Are you sure you want to delete this asset?
+                        Apakah Anda yakin?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your asset and remove it from our servers.
+                        Tindakan ini tidak dapat dibatalkan. Gambar akan dihapus secara permanen dari server kami.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                   </div>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => {
                         deleteStaticAssetData(asset.id)

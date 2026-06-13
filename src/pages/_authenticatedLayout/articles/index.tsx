@@ -200,15 +200,14 @@ function RouteComponent() {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Do you really want to delete this article?
+                          Apakah Anda yakin ingin menghapus artikel ini?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete the article and all of its content.
+                          Tindakan ini tidak dapat dibatalkan. Artikel beserta seluruh kontennya akan dihapus secara permanen.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={async () => {
                             await deleteArticleMutation(article.id)
@@ -217,7 +216,7 @@ function RouteComponent() {
                           {deletingArticle && (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           )}
-                          Yes, Delete it
+                          Ya, Hapus
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

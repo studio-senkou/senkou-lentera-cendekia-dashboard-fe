@@ -15,8 +15,8 @@ interface LoginFormProps extends React.HTMLAttributes<HTMLFormElement> {
 }
 
 const schema = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email('Alamat email tidak valid').min(1, 'Email wajib diisi'),
+  password: z.string().min(1, 'Kata sandi wajib diisi'),
 })
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -70,9 +70,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {...props}
     >
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">Masuk ke akun Anda</h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
+          Masukkan email Anda di bawah ini untuk masuk
         </p>
       </div>
       <div className="grid gap-6">
@@ -88,7 +88,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             {(field) => (
               <field.TextField
                 name="password"
-                label="Password"
+                label="Kata Sandi"
                 type="password"
                 secondaryLabel={
                   <a
@@ -96,7 +96,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     tabIndex={-1}
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
-                    Forgot your password?
+                    Lupa kata sandi?
                   </a>
                 }
               />
@@ -105,11 +105,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
         <Button type="submit" className="w-full">
           {isSubmitting && <Loader2 className="animate-spin mr-4" />}
-          Login
+          Masuk
         </Button>
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
-            Or continue with
+            Atau lanjutkan dengan
           </span>
         </div>
         <Button variant="outline" className="w-full" disabled>
@@ -138,7 +138,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               />
             </g>
           </svg>
-          Login with Google
+          Masuk dengan Google
         </Button>
       </div>
     </form>

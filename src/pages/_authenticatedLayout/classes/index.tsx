@@ -7,29 +7,11 @@ import type { Class } from '@/shared/types/response'
 import type { ClassFormRef } from '@/features/classes/widgets/classes.form'
 import { deleteClass, fetchClasses } from '@/entities/classes'
 import { ClassForm } from '@/features/classes/widgets/classes.form'
-import EditClassSheet from '@/features/classes/widgets/edit-class.sheet'
 import ClassActions from '@/features/classes/widgets/class.actions'
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { Table } from '@/widgets/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/shared/ui/tooltip'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/shared/ui/alert-dialog'
 
 export const Route = createFileRoute('/_authenticatedLayout/classes/')({
   component: RouteComponent,

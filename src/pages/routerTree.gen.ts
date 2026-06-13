@@ -13,13 +13,16 @@ import { Route as Routes_rootRouteImport } from './routes/__root'
 import { Route as UauthenticatedLayoutRouteImport } from './_uauthenticatedLayout'
 import { Route as AuthenticatedLayoutRouteImport } from './_authenticatedLayout'
 import { Route as AuthenticatedLayoutIndexRouteImport } from './_authenticatedLayout/index'
+import { Route as ReportUserRouteImport } from './report/$user'
 import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './_uauthenticatedLayout/login/index'
-import { Route as AuthenticatedLayoutUsersIndexRouteImport } from './_authenticatedLayout/users/index'
 import { Route as AuthenticatedLayoutQuizzesIndexRouteImport } from './_authenticatedLayout/quizzes/index'
 import { Route as AuthenticatedLayoutPageSettingsIndexRouteImport } from './_authenticatedLayout/page-settings/index'
 import { Route as AuthenticatedLayoutMeetingSessionsIndexRouteImport } from './_authenticatedLayout/meeting-sessions/index'
 import { Route as AuthenticatedLayoutClassesIndexRouteImport } from './_authenticatedLayout/classes/index'
 import { Route as AuthenticatedLayoutArticlesIndexRouteImport } from './_authenticatedLayout/articles/index'
+import { Route as AuthenticatedLayoutUsersStudentsRouteImport } from './_authenticatedLayout/users/students'
+import { Route as AuthenticatedLayoutUsersMentorsRouteImport } from './_authenticatedLayout/users/mentors'
+import { Route as AuthenticatedLayoutUsersDeletedRouteImport } from './_authenticatedLayout/users/deleted'
 import { Route as AuthenticatedLayoutQuizzesQuizIdRouteImport } from './_authenticatedLayout/quizzes/$quizId'
 import { Route as AuthenticatedLayoutMeetingSessionsUserRouteImport } from './_authenticatedLayout/meeting-sessions/$user'
 
@@ -41,17 +44,16 @@ const AuthenticatedLayoutIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const ReportUserRoute = ReportUserRouteImport.update({
+  id: '/report/$user',
+  path: '/report/$user',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UauthenticatedLayoutLoginIndexRoute =
   UauthenticatedLayoutLoginIndexRouteImport.update({
     id: '/login/',
     path: '/login/',
     getParentRoute: () => UauthenticatedLayoutRoute,
-  } as any)
-const AuthenticatedLayoutUsersIndexRoute =
-  AuthenticatedLayoutUsersIndexRouteImport.update({
-    id: '/users/',
-    path: '/users/',
-    getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 const AuthenticatedLayoutQuizzesIndexRoute =
   AuthenticatedLayoutQuizzesIndexRouteImport.update({
@@ -83,6 +85,24 @@ const AuthenticatedLayoutArticlesIndexRoute =
     path: '/articles/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutUsersStudentsRoute =
+  AuthenticatedLayoutUsersStudentsRouteImport.update({
+    id: '/users/students',
+    path: '/users/students',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedLayoutUsersMentorsRoute =
+  AuthenticatedLayoutUsersMentorsRouteImport.update({
+    id: '/users/mentors',
+    path: '/users/mentors',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedLayoutUsersDeletedRoute =
+  AuthenticatedLayoutUsersDeletedRouteImport.update({
+    id: '/users/deleted',
+    path: '/users/deleted',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 const AuthenticatedLayoutQuizzesQuizIdRoute =
   AuthenticatedLayoutQuizzesQuizIdRouteImport.update({
     id: '/quizzes/$quizId',
@@ -97,94 +117,113 @@ const AuthenticatedLayoutMeetingSessionsUserRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/report/$user': typeof ReportUserRoute
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
+  '/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
+  '/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
   '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
-  '/users': typeof AuthenticatedLayoutUsersIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesByTo {
+  '/report/$user': typeof ReportUserRoute
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
+  '/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
+  '/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
   '/articles': typeof AuthenticatedLayoutArticlesIndexRoute
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
-  '/users': typeof AuthenticatedLayoutUsersIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticatedLayout': typeof AuthenticatedLayoutRouteWithChildren
   '/_uauthenticatedLayout': typeof UauthenticatedLayoutRouteWithChildren
+  '/report/$user': typeof ReportUserRoute
   '/routes/__root': typeof Routes_rootRoute
   '/_authenticatedLayout/': typeof AuthenticatedLayoutIndexRoute
   '/_authenticatedLayout/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/_authenticatedLayout/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/_authenticatedLayout/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
+  '/_authenticatedLayout/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
+  '/_authenticatedLayout/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
   '/_authenticatedLayout/articles/': typeof AuthenticatedLayoutArticlesIndexRoute
   '/_authenticatedLayout/classes/': typeof AuthenticatedLayoutClassesIndexRoute
   '/_authenticatedLayout/meeting-sessions/': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/_authenticatedLayout/page-settings/': typeof AuthenticatedLayoutPageSettingsIndexRoute
   '/_authenticatedLayout/quizzes/': typeof AuthenticatedLayoutQuizzesIndexRoute
-  '/_authenticatedLayout/users/': typeof AuthenticatedLayoutUsersIndexRoute
   '/_uauthenticatedLayout/login/': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/report/$user'
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
     | '/quizzes/$quizId'
+    | '/users/deleted'
+    | '/users/mentors'
+    | '/users/students'
     | '/articles'
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
     | '/quizzes'
-    | '/users'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/report/$user'
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
     | '/quizzes/$quizId'
+    | '/users/deleted'
+    | '/users/mentors'
+    | '/users/students'
     | '/articles'
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
     | '/quizzes'
-    | '/users'
     | '/login'
   id:
     | '__root__'
     | '/_authenticatedLayout'
     | '/_uauthenticatedLayout'
+    | '/report/$user'
     | '/routes/__root'
     | '/_authenticatedLayout/'
     | '/_authenticatedLayout/meeting-sessions/$user'
     | '/_authenticatedLayout/quizzes/$quizId'
+    | '/_authenticatedLayout/users/deleted'
+    | '/_authenticatedLayout/users/mentors'
+    | '/_authenticatedLayout/users/students'
     | '/_authenticatedLayout/articles/'
     | '/_authenticatedLayout/classes/'
     | '/_authenticatedLayout/meeting-sessions/'
     | '/_authenticatedLayout/page-settings/'
     | '/_authenticatedLayout/quizzes/'
-    | '/_authenticatedLayout/users/'
     | '/_uauthenticatedLayout/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedLayoutRoute: typeof AuthenticatedLayoutRouteWithChildren
   UauthenticatedLayoutRoute: typeof UauthenticatedLayoutRouteWithChildren
+  ReportUserRoute: typeof ReportUserRoute
   Routes_rootRoute: typeof Routes_rootRoute
 }
 
@@ -218,19 +257,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/report/$user': {
+      id: '/report/$user'
+      path: '/report/$user'
+      fullPath: '/report/$user'
+      preLoaderRoute: typeof ReportUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_uauthenticatedLayout/login/': {
       id: '/_uauthenticatedLayout/login/'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof UauthenticatedLayoutLoginIndexRouteImport
       parentRoute: typeof UauthenticatedLayoutRoute
-    }
-    '/_authenticatedLayout/users/': {
-      id: '/_authenticatedLayout/users/'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthenticatedLayoutUsersIndexRouteImport
-      parentRoute: typeof AuthenticatedLayoutRoute
     }
     '/_authenticatedLayout/quizzes/': {
       id: '/_authenticatedLayout/quizzes/'
@@ -267,6 +306,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutArticlesIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/users/students': {
+      id: '/_authenticatedLayout/users/students'
+      path: '/users/students'
+      fullPath: '/users/students'
+      preLoaderRoute: typeof AuthenticatedLayoutUsersStudentsRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
+    '/_authenticatedLayout/users/mentors': {
+      id: '/_authenticatedLayout/users/mentors'
+      path: '/users/mentors'
+      fullPath: '/users/mentors'
+      preLoaderRoute: typeof AuthenticatedLayoutUsersMentorsRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
+    '/_authenticatedLayout/users/deleted': {
+      id: '/_authenticatedLayout/users/deleted'
+      path: '/users/deleted'
+      fullPath: '/users/deleted'
+      preLoaderRoute: typeof AuthenticatedLayoutUsersDeletedRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
     '/_authenticatedLayout/quizzes/$quizId': {
       id: '/_authenticatedLayout/quizzes/$quizId'
       path: '/quizzes/$quizId'
@@ -288,12 +348,14 @@ interface AuthenticatedLayoutRouteChildren {
   AuthenticatedLayoutIndexRoute: typeof AuthenticatedLayoutIndexRoute
   AuthenticatedLayoutMeetingSessionsUserRoute: typeof AuthenticatedLayoutMeetingSessionsUserRoute
   AuthenticatedLayoutQuizzesQuizIdRoute: typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  AuthenticatedLayoutUsersDeletedRoute: typeof AuthenticatedLayoutUsersDeletedRoute
+  AuthenticatedLayoutUsersMentorsRoute: typeof AuthenticatedLayoutUsersMentorsRoute
+  AuthenticatedLayoutUsersStudentsRoute: typeof AuthenticatedLayoutUsersStudentsRoute
   AuthenticatedLayoutArticlesIndexRoute: typeof AuthenticatedLayoutArticlesIndexRoute
   AuthenticatedLayoutClassesIndexRoute: typeof AuthenticatedLayoutClassesIndexRoute
   AuthenticatedLayoutMeetingSessionsIndexRoute: typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   AuthenticatedLayoutPageSettingsIndexRoute: typeof AuthenticatedLayoutPageSettingsIndexRoute
   AuthenticatedLayoutQuizzesIndexRoute: typeof AuthenticatedLayoutQuizzesIndexRoute
-  AuthenticatedLayoutUsersIndexRoute: typeof AuthenticatedLayoutUsersIndexRoute
 }
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
@@ -301,6 +363,9 @@ const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
   AuthenticatedLayoutMeetingSessionsUserRoute:
     AuthenticatedLayoutMeetingSessionsUserRoute,
   AuthenticatedLayoutQuizzesQuizIdRoute: AuthenticatedLayoutQuizzesQuizIdRoute,
+  AuthenticatedLayoutUsersDeletedRoute: AuthenticatedLayoutUsersDeletedRoute,
+  AuthenticatedLayoutUsersMentorsRoute: AuthenticatedLayoutUsersMentorsRoute,
+  AuthenticatedLayoutUsersStudentsRoute: AuthenticatedLayoutUsersStudentsRoute,
   AuthenticatedLayoutArticlesIndexRoute: AuthenticatedLayoutArticlesIndexRoute,
   AuthenticatedLayoutClassesIndexRoute: AuthenticatedLayoutClassesIndexRoute,
   AuthenticatedLayoutMeetingSessionsIndexRoute:
@@ -308,7 +373,6 @@ const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
   AuthenticatedLayoutPageSettingsIndexRoute:
     AuthenticatedLayoutPageSettingsIndexRoute,
   AuthenticatedLayoutQuizzesIndexRoute: AuthenticatedLayoutQuizzesIndexRoute,
-  AuthenticatedLayoutUsersIndexRoute: AuthenticatedLayoutUsersIndexRoute,
 }
 
 const AuthenticatedLayoutRouteWithChildren =
@@ -328,6 +392,7 @@ const UauthenticatedLayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedLayoutRoute: AuthenticatedLayoutRouteWithChildren,
   UauthenticatedLayoutRoute: UauthenticatedLayoutRouteWithChildren,
+  ReportUserRoute: ReportUserRoute,
   Routes_rootRoute: Routes_rootRoute,
 }
 export const routeTree = rootRouteImport

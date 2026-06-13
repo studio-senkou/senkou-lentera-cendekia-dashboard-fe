@@ -15,21 +15,21 @@ export function Pagination<T>({ table, isLoading }: PaginationProps<T>) {
             className="mr-2"
             disabled={isLoading}
           >
-            Previous
+            Sebelumnya
           </button>
         )}
         {table.getCanNextPage() && (
           <button onClick={() => table.nextPage()} disabled={isLoading}>
-            Next
+            Selanjutnya
           </button>
         )}
       </div>
       <div>
         {isLoading ? (
-          'Loading…'
+          'Memuat…'
         ) : (
           <>
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
+            Halaman {table.getState().pagination.pageIndex + 1} dari{' '}
             {table.getPageCount()}
           </>
         )}

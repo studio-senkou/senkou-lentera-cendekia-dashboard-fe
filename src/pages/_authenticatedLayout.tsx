@@ -36,11 +36,9 @@ function RouteComponent() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <Header />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 md:px-4">
-              <Outlet />
-            </div>
+        <div className="flex flex-1 flex-col items-center">
+          <div className="@container/main flex flex-1 flex-col w-full px-6 sm:px-12 lg:px-16 py-6 md:py-8 gap-2">
+            <Outlet />
           </div>
         </div>
       </SidebarInset>

@@ -65,6 +65,15 @@ export const getMeetingSessionByUser = async (userId: string) => {
   }
 }
 
+export const getPublicMeetingSessionByUser = async (userId: string) => {
+  try {
+    const response = await http.get(`/public/meeting-sessions/${userId}`)
+    return response.data.data
+  } catch (error) {
+    toast.error('Gagal mengambil data sesi meeting publik')
+  }
+}
+
 export const updateMeetingSession = async ({
   id,
   data,
