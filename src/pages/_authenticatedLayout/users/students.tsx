@@ -92,13 +92,13 @@ function RouteComponent() {
         <FormSheet
           preventClose
           onBeforeClose={() => true}
-          trigger={<Button>Tambah Pengguna</Button>}
-          title="Buat Pengguna Baru"
-          description="Tindakan ini akan membuat pengguna baru. Silakan isi formulir di bawah ini untuk melanjutkan."
+          trigger={<Button>Tambah Murid</Button>}
+          title="Buat Murid Baru"
+          description="Tindakan ini akan membuat murid baru. Silakan isi formulir di bawah ini untuk melanjutkan."
           onSubmitForm={handleSubmitForm}
           disabled={isLoading}
         >
-          <RegisterUserForm ref={formRef} />
+          <RegisterUserForm ref={formRef} fixedRole="user" />
         </FormSheet>
       </div>
 

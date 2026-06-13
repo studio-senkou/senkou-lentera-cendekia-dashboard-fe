@@ -10,6 +10,7 @@ import { fetchClassesForDropdown } from '@/entities/classes'
 interface RegisterUserFormProps {
   className?: string
   onSuccess?: () => void
+  fixedRole?: 'user' | 'mentor'
 }
 
 export interface RegisterUserFormRef {
@@ -40,7 +41,7 @@ const validateForm = (
 export const RegisterUserForm = forwardRef<
   RegisterUserFormRef,
   RegisterUserFormProps
->(({ className, onSuccess }, ref) => {
+>(({ className, onSuccess, fixedRole }, ref) => {
   const queryClient = useQueryClient()
 
   const { data: classesDropdown } = useQuery({
@@ -52,7 +53,7 @@ export const RegisterUserForm = forwardRef<
     defaultValues: {
       name: '',
       email: '',
-      role: 'user' as 'user' | 'mentor',
+      role: fixedRole || ('user' as 'user' | 'mentor'),
       minimal_sessions: 1,
       classes: [] as Array<string>,
     },
@@ -89,7 +90,7 @@ export const RegisterUserForm = forwardRef<
   const { AppField } = form
 
   // Track role to trigger re-render when it changes
-  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>('user')
+  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>(fixedRole || 'user')
 
   return (
     <form
@@ -144,20 +145,22 @@ export const RegisterUserForm = forwardRef<
           </AppField>
         )}
 
-        <AppField name="role">
-          {({ Select }) => (
-            <Select
-              label="Peran"
-              placeholder="Pilih peran pengguna"
-              required
-              values={[
-                { value: 'user', label: 'Murid' },
-                { value: 'mentor', label: 'Mentor' },
-              ]}
-              onChange={(value) => setCurrentRole(value as 'user' | 'mentor')}
-            />
-          )}
-        </AppField>
+        {!fixedRole && (
+          <AppField name="role">
+            {({ Select }) => (
+              <Select
+                label="Peran"
+                placeholder="Pilih peran pengguna"
+                required
+                values={[
+                  { value: 'user', label: 'Murid' },
+                  { value: 'mentor', label: 'Mentor' },
+                ]}
+                onChange={(value) => setCurrentRole(value as 'user' | 'mentor')}
+              />
+            )}
+          </AppField>
+        )}
       </div>
     </form>
   )

@@ -26,8 +26,10 @@ export const registerUser = async (data: RegisterUserRequest) => {
         }
         break
       case 'mentor':
-        delete data.minimal_sessions
-        payload = data
+        payload = {
+          name: data.name,
+          email: data.email,
+        }
         break
     }
 
