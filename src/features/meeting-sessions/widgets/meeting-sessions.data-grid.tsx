@@ -85,6 +85,7 @@ export function MeetingSessionsDataGrid({
         .map((row) => ({
           student_id: !studentId ? Number(row.student_id) : studentId,
           mentor_id: Number(row.mentor_id),
+          subject: row.subject,
           date: row.session_date,
           time: row.session_time,
           duration: Number(row.duration),
@@ -173,6 +174,16 @@ export function MeetingSessionsDataGrid({
             <div className="min-w-[200px]">{mentor ? mentor.label : ''}</div>
           )
         },
+      },
+      {
+        key: 'subject',
+        name: 'Mata Pelajaran',
+        renderEditCell: editor.renderTextEditor,
+        renderCell: ({ row }) => (
+          <div className="min-w-[150px] max-w-none whitespace-normal break-words leading-relaxed py-2">
+            {row.subject}
+          </div>
+        ),
       },
       {
         key: 'description',

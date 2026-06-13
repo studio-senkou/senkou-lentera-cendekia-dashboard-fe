@@ -23,6 +23,7 @@ export interface MeetingSession {
   status: 'pending' | 'completed' | 'cancelled'
   created_at: string
   updated_at: string
+  subject?: string
 }
 
 export interface StaticAsset {

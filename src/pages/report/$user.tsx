@@ -62,6 +62,7 @@ function PublicReportPage() {
       'Waktu',
       'Durasi',
       'Mentor',
+      'Mata Pelajaran',
       'Topik / Deskripsi',
       'Catatan',
     ])
@@ -100,6 +101,7 @@ function PublicReportPage() {
         session.session_time ? session.session_time.slice(0, 5) : '-',
         durationStr,
         session.mentor?.name || '-',
+        session.subject || '-',
         session.description || '-',
         session.note || '-',
       ])
@@ -120,8 +122,9 @@ function PublicReportPage() {
     worksheet.getColumn(3).width = 10
     worksheet.getColumn(4).width = 10
     worksheet.getColumn(5).width = 20
-    worksheet.getColumn(6).width = 40
+    worksheet.getColumn(6).width = 20
     worksheet.getColumn(7).width = 40
+    worksheet.getColumn(8).width = 40
 
     const buffer = await workbook.xlsx.writeBuffer()
     const blob = new Blob([buffer], {
@@ -200,6 +203,7 @@ function PublicReportPage() {
                 <TableHead>Waktu</TableHead>
                 <TableHead>Durasi</TableHead>
                 <TableHead>Mentor</TableHead>
+                <TableHead>Mata Pelajaran</TableHead>
                 <TableHead>Materi / Deskripsi</TableHead>
                 <TableHead>Catatan Mentor</TableHead>
               </TableRow>
@@ -207,7 +211,7 @@ function PublicReportPage() {
             <TableBody>
               {data.sessions?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground h-24">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground h-24">
                     Belum ada sesi pembelajaran.
                   </TableCell>
                 </TableRow>
@@ -234,6 +238,9 @@ function PublicReportPage() {
                       <TableCell>{durationStr}</TableCell>
                       <TableCell className="font-medium whitespace-nowrap">
                         {session.mentor?.name || '-'}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {session.subject || '-'}
                       </TableCell>
                       <TableCell className="max-w-xs whitespace-pre-wrap">
                         {session.description || '-'}

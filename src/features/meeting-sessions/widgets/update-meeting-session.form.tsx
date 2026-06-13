@@ -18,6 +18,7 @@ export interface UpdateMeetingSessionFormRef {
 }
 
 const updateMeetingSessionSchema = z.object({
+  subject: z.string().min(1, 'Mata Pelajaran wajib diisi!'),
   topic: z.string().min(1, 'Topic is required!'),
   date: z
     .string()
@@ -51,6 +52,7 @@ export const UpdateMeetingSessionForm = forwardRef<
 
   const form = useAppForm({
     defaultValues: {
+      subject: session.subject ?? '',
       // @ts-ignore
       topic: session.session_topic,
       date: session.session_date
@@ -127,6 +129,11 @@ export const UpdateMeetingSessionForm = forwardRef<
       }}
     >
       <div className="flex flex-col gap-4">
+        <AppField name="subject">
+          {({ TextField }) => (
+            <TextField label="Mata Pelajaran" required name="subject" />
+          )}
+        </AppField>
         <AppField name="topic">
           {({ TextField }) => (
             <TextField label="Topik Sesi" required name="topic" />

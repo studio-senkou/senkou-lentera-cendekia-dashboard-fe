@@ -19,6 +19,7 @@ export interface MeetingSessionFormRef {
 const meetingSessionSchema = z.object({
   student_id: z.string().min(1, 'Please select a student!'),
   mentor_id: z.string().min(1, 'Please select a mentor!'),
+  subject: z.string().min(1, 'Mata Pelajaran wajib diisi!'),
   topic: z.string().min(1, 'Topic is required!'),
   date: z.string().refine((date) => new Date(date) >= new Date(), {
     message: 'Session date must be in the future',
@@ -39,6 +40,7 @@ export const MeetingSessionForm = forwardRef<
     defaultValues: {
       student_id: '',
       mentor_id: '',
+      subject: '',
       topic: '',
       date: '',
       time: '',
@@ -149,6 +151,17 @@ export const MeetingSessionForm = forwardRef<
               />
             )
           }}
+        </AppField>
+        <AppField name="subject">
+          {({ TextField }) => (
+            <TextField
+              type="text"
+              label="Mata Pelajaran"
+              required
+              name="subject"
+              placeholder="Masukkan nama mata pelajaran"
+            />
+          )}
         </AppField>
         <AppField name="topic">
           {({ TextField }) => (
