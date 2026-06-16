@@ -38,11 +38,10 @@ export const useUserStore = create<UserStore & UserStoreActions>()(
       name: 'user-store',
       storage: createJSONStorage(() => ({
         getItem: (name) => {
-          const cookie = Cookies.get(name)
-          return cookie ? JSON.parse(cookie) : null
+          return Cookies.get(name) ?? null
         },
         setItem: (name, value) => {
-          Cookies.set(name, JSON.stringify(value))
+          Cookies.set(name, value, { expires: 7 })
         },
         removeItem: (name) => {
           Cookies.remove(name)

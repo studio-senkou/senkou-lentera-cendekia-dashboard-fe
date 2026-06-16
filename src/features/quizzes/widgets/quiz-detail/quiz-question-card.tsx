@@ -8,6 +8,7 @@ import type { QuizQuestion } from '@/shared/types/response'
 import type { OptionFormRef } from '@/features/quizzes/widgets/option.form'
 import type { QuestionFormRef } from '@/features/quizzes/widgets/question.form'
 import { deleteQuestion } from '@/entities/quizzes'
+import { getFileUrl } from '@/shared/lib/utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,10 +73,19 @@ export function QuizQuestionCard({ quizId, question }: QuizQuestionCardProps) {
   )
 
   return (
-    <div className="rounded-xl border p-4 bg-background">
+    <div className="rounded-xl border p-4 bg-white">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h3 className="text-base font-semibold">{question.question_text}</h3>
+          {question.image_url && (
+            <div className="mt-2 overflow-hidden rounded-lg border border-border">
+              <img
+                src={getFileUrl(question.image_url)}
+                alt="Gambar soal"
+                className="max-h-48 w-full object-contain bg-slate-50"
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

@@ -3,6 +3,18 @@ import { useNavigate } from '@tanstack/react-router'
 import { Edit2, Eye, Loader2, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { format } from 'date-fns'
+import QRCode from 'react-qr-code'
+import { toast } from 'sonner'
+import { QrCode, Copy, Check } from 'lucide-react'
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/ui/dialog'
 
 import type { Quiz } from '@/shared/types/response'
 import { deleteQuiz } from '@/entities/quizzes'
@@ -31,7 +43,22 @@ function QuizActions({ quiz }: { quiz: Quiz }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [deletingQuizId, setDeletingQuizId] = useState<number | null>(null)
+  const [copied, setCopied] = useState(false)
   const formRef = useRef<QuizFormRef>(null)
+
+  const quizUrl = `https://portal.lbblenteracendekia.com/quiz/code/${quiz.code}`
+  const whatsappMessage = `Ayo kerjakan kuis *${quiz.title}* di Lentera Cendekia!\n\nKlik tautan berikut untuk mulai:\n${quizUrl}\n\nAtau masukkan kode kuis: *${quiz.code}*`
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(whatsappMessage)
+      setCopied(true)
+      toast.success('Pesan WhatsApp berhasil disalin!')
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast.error('Gagal menyalin pesan')
+    }
+  }
 
   const { mutateAsync: removeQuiz } = useMutation({
     mutationFn: (quizId: number) => deleteQuiz(quizId),
@@ -68,6 +95,46 @@ function QuizActions({ quiz }: { quiz: Quiz }) {
       >
         <Eye className="h-4 w-4" />
       </Button>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button size="icon" variant="outline" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <QrCode className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bagikan Kuis</DialogTitle>
+            <DialogDescription>
+              Pindai QR Code di bawah atau salin pesan untuk dibagikan via WhatsApp.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center space-y-6 py-4">
+            <div className="rounded-xl border bg-white p-4 shadow-sm">
+              <QRCode value={quizUrl} size={200} level="H" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-slate-900">Kode Kuis</p>
+              <p className="text-2xl font-bold tracking-widest text-[#FF5C06]">{quiz.code}</p>
+            </div>
+          </div>
+          <div className="flex justify-center pb-2">
+            <Button onClick={copyToClipboard} className="w-full sm:w-auto" variant="outline">
+              {copied ? (
+                <>
+                  <Check className="mr-2 h-4 w-4 text-green-600" />
+                  <span className="text-green-600">Berhasil Disalin!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Salin Pesan WhatsApp
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <FormSheet
         trigger={

@@ -88,6 +88,7 @@ export interface QuizQuestion {
   id: number
   quiz_id: number
   question_text: string
+  image_url?: string | null
   order_number: number
   options: Array<QuizOption>
   created_at: string

@@ -62,7 +62,7 @@ export function QuizDetailPage() {
         <div className="space-y-1">
           <Button
             variant="outline"
-            className="p-4 rounded-xl mb-5"
+            className="p-4 rounded-xl mb-5 bg-white"
             onClick={() => navigate({ to: '/quizzes' })}
           >
             <ChevronLeft />

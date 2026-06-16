@@ -59,7 +59,7 @@ export function TextField({
         onChange={(e) => field.handleChange(e.target.value)}
         onBlur={field.handleBlur}
         required={required}
-        className="bg-background"
+        className="bg-white"
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>

@@ -78,7 +78,7 @@ export function DatePicker({
           type="date"
           value={field.state.value}
           placeholder="YYYY-MM-DD"
-          className="bg-background pr-10 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
+          className="bg-white pr-10 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
           onChange={(e) => {
             field.handleChange(e.target.value)
             const d = parseLocalDate(e.target.value)

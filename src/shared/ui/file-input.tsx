@@ -164,7 +164,7 @@ export function FileInput({
               ? 'border-primary bg-primary/5'
               : 'border-border hover:border-primary/50'
           }
-          ${currentFiles.length > 0 ? 'bg-muted/20' : 'bg-background'}
+          ${currentFiles.length > 0 ? 'bg-muted/20' : 'bg-white'}
         `}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

@@ -134,7 +134,7 @@ export function TimePicker({
                 ? 'HH:MM:SS'
                 : 'HH:MM'
           }
-          className="bg-background pr-10 cursor-pointer"
+          className="bg-white pr-10 cursor-pointer"
           readOnly
           onClick={() => setOpen(true)}
           onBlur={field.handleBlur}

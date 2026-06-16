@@ -109,7 +109,7 @@ export function QuizSummaryHeader({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-          <div className="rounded-3xl border bg-background p-5">
+          <div className="rounded-3xl border bg-white p-5">
             <div className="flex items-center gap-2 text-sm font-medium">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                 <Sparkles className="h-4 w-4" />

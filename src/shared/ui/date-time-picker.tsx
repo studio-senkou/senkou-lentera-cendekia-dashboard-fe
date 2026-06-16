@@ -165,7 +165,7 @@ export function DateTimePicker({
                 ? 'YYYY-MM-DD HH:MM:SS'
                 : 'YYYY-MM-DD HH:MM'
           }
-          className="bg-background pr-10 cursor-pointer"
+          className="bg-white pr-10 cursor-pointer"
           readOnly
           onClick={() => setOpen(true)}
           onBlur={field.handleBlur}

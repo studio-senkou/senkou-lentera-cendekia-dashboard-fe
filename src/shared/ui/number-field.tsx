@@ -62,7 +62,7 @@ export function NumberField({
         value={value}
         onChange={handleChange}
         onBlur={field.handleBlur}
-        className="bg-background"
+        className="bg-white"
         required={required}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}

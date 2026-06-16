@@ -1,6 +1,5 @@
 import { toast } from 'sonner'
 
-import { http } from '@/shared/lib/axios'
 import type {
   Quiz,
   QuizAttempt,
@@ -8,6 +7,7 @@ import type {
   QuizOption,
   QuizQuestion,
 } from '@/shared/types/response'
+import { http } from '@/shared/lib/axios'
 
 export interface CreateQuizRequest {
   title: string
@@ -22,6 +22,7 @@ export interface UpdateQuizRequest extends CreateQuizRequest {}
 export interface CreateQuestionRequest {
   question_text: string
   order_number?: number
+  image_url?: File | null
 }
 
 export interface UpdateQuestionRequest extends CreateQuestionRequest {}
@@ -94,7 +95,19 @@ export const createQuestion = async (
   data: CreateQuestionRequest,
 ) => {
   try {
-    const response = await http.post(`/admin/quizzes/${quizId}/questions`, data)
+    const formData = new FormData()
+    formData.append('question_text', data.question_text)
+    if (data.order_number != null) {
+      formData.append('order_number', String(data.order_number))
+    }
+    if (data.image_url instanceof File) {
+      formData.append('image', data.image_url)
+    }
+    const response = await http.post(
+      `/admin/quizzes/${quizId}/questions`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
     toast.success('Question created successfully')
     return response.data.data as QuizQuestion
   } catch (error) {
@@ -109,9 +122,18 @@ export const updateQuestion = async (
   data: UpdateQuestionRequest,
 ) => {
   try {
+    const formData = new FormData()
+    formData.append('question_text', data.question_text)
+    if (data.order_number != null) {
+      formData.append('order_number', String(data.order_number))
+    }
+    if (data.image_url instanceof File) {
+      formData.append('image', data.image_url)
+    }
     const response = await http.put(
       `/admin/quizzes/${quizId}/questions/${questionId}`,
-      data,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     toast.success('Question updated successfully')
     return response.data.data as QuizQuestion

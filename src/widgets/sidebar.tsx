@@ -46,94 +46,76 @@ import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { cn } from '@/shared/lib/utils'
 import { useUserStore } from '@/shared/hooks/use-user'
 
-const { name, email, role } = useUserStore.getState()
+const NAV_GROUPS = [
+  {
+    label: 'Utama',
+    items: [
+      {
+        title: 'Dashboard',
+        url: '/',
+        icon: PanelsTopLeft,
+        roles: ['admin', 'mentor'],
+      },
+    ],
+  },
+  {
+    label: 'Manajemen Pengguna',
+    items: [
+      {
+        title: 'Daftar Murid',
+        url: '/users/students',
+        icon: User,
+        roles: ['admin'],
+      },
+      {
+        title: 'Daftar Tentor',
+        url: '/users/mentors',
+        icon: UserCircle,
+        roles: ['admin'],
+      },
+      {
+        title: 'Pengguna Terhapus',
+        url: '/users/deleted',
+        icon: Trash,
+        roles: ['admin'],
+      },
+    ],
+  },
+  {
+    label: 'Pembelajaran',
+    items: [
+      {
+        title: 'Kelas',
+        url: '/classes',
+        icon: Folder,
+        roles: ['admin', 'mentor'],
+      },
+      {
+        title: 'Kuis',
+        url: '/quizzes',
+        icon: FileText,
+        roles: ['admin'],
+      },
+      {
+        title: 'Sesi Pertemuan',
+        url: '/meeting-sessions',
+        icon: UserCircle,
+        roles: ['admin'],
+      },
+    ],
+  },
+]
 
-const data = {
-  user: {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+  const { name, email, role } = useUserStore()
+
+  const user = {
     name: name ?? '',
     email: email ?? '',
     role: role ?? '',
     avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name ?? '')}`,
-  },
-  navGroups: [
-    {
-      label: 'Utama',
-      items: [
-        {
-          title: 'Dashboard',
-          url: '/',
-          icon: PanelsTopLeft,
-          roles: ['admin', 'mentor'],
-        },
-      ],
-    },
-    {
-      label: 'Manajemen Pengguna',
-      items: [
-        {
-          title: 'Daftar Murid',
-          url: '/users/students',
-          icon: User,
-          roles: ['admin'],
-        },
-        {
-          title: 'Daftar Tentor',
-          url: '/users/mentors',
-          icon: UserCircle,
-          roles: ['admin'],
-        },
-        {
-          title: 'Pengguna Terhapus',
-          url: '/users/deleted',
-          icon: Trash,
-          roles: ['admin'],
-        },
-      ],
-    },
-    {
-      label: 'Pembelajaran',
-      items: [
-        {
-          title: 'Kelas',
-          url: '/classes',
-          icon: Folder,
-          roles: ['admin', 'mentor'],
-        },
-        {
-          title: 'Kuis',
-          url: '/quizzes',
-          icon: FileText,
-          roles: ['admin'],
-        },
-        {
-          title: 'Sesi Pertemuan',
-          url: '/meeting-sessions',
-          icon: UserCircle,
-          roles: ['admin'],
-        },
-      ],
-    },
-  ],
-  // documents: [
-  //   {
-  //     name: 'Data Library',
-  //     url: '#',
-  //     icon: Database,
-  //   },
-  //   {
-  //     name: 'Reports',
-  //     url: '#',
-  //     icon: Paperclip,
-  //   },
-  //   {
-  //     name: 'Word Assistant',
-  //     url: '#',
-  //     icon: File,
-  //   },
-  // ],
-}
+  }
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -159,12 +141,12 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain groups={data.navGroups} />
+        <NavMain groups={NAV_GROUPS} />
         {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )
@@ -185,6 +167,7 @@ function NavMain({
 }) {
   const { pathname } = useLocation()
   const { isMobile, setOpenMobile } = useSidebar()
+  const role = useUserStore((state) => state.role)
 
   return (
     <>
