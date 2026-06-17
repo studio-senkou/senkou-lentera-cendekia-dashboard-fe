@@ -53,7 +53,7 @@ export function Select({
         }}
         required={required}
       >
-        <ShadcnSelect.SelectTrigger id={field.name} className="w-full">
+        <ShadcnSelect.SelectTrigger id={field.name} className="w-full py-5">
           <ShadcnSelect.SelectValue placeholder={placeholder} />
         </ShadcnSelect.SelectTrigger>
         <ShadcnSelect.SelectContent>

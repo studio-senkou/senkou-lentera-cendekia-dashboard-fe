@@ -50,8 +50,9 @@ export interface Article {
   id: number
   title: string
   content: string
-  author_id: number
-  author: User
+  author_name: string
+  author_email: string
+  author_role: string
   created_at: string
   updated_at: string
 }

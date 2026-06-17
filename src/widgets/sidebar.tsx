@@ -1,20 +1,19 @@
 import {
-  // Bell,
-  // CreditCard,
-  // Database,
   DotSquare,
-  // File,
-  Folder,
   FileText,
+  Folder,
   LogOut,
+  Newspaper,
   PanelsTopLeft,
-  // Paperclip,
   Share,
   Trash,
   User,
   UserCircle,
-  type LucideIcon,
 } from 'lucide-react'
+import { createElement } from 'react'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import type { ComponentProps } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -29,12 +28,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/sidebar'
-// import { Button } from './ui/button'
-import { createElement, type ComponentProps } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  // DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -42,7 +38,6 @@ import {
 } from '@/shared/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { useSessionStore } from '@/shared/hooks/use-session'
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { cn } from '@/shared/lib/utils'
 import { useUserStore } from '@/shared/hooks/use-user'
 
@@ -104,6 +99,17 @@ const NAV_GROUPS = [
       },
     ],
   },
+  {
+    label: 'Website',
+    items: [
+      {
+        title: 'Artikel',
+        url: '/articles',
+        icon: Newspaper,
+        roles: ['admin'],
+      },
+    ],
+  },
 ]
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
@@ -142,8 +148,6 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={NAV_GROUPS} />
-        {/* <NavDocuments items={data.documents} /> */}
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
@@ -155,15 +159,15 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
 function NavMain({
   groups,
 }: {
-  groups: {
+  groups: Array<{
     label: string
-    items: {
+    items: Array<{
       title: string
       url: string
       icon?: LucideIcon
-      roles: string[]
-    }[]
-  }[]
+      roles: Array<string>
+    }>
+  }>
 }) {
   const { pathname } = useLocation()
   const { isMobile, setOpenMobile } = useSidebar()
@@ -173,7 +177,7 @@ function NavMain({
     <>
       {groups.map((group) => {
         const visibleItems = group.items.filter((item) =>
-          item.roles.includes((role as string)?.toLowerCase()),
+          item.roles.includes((role as string).toLowerCase()),
         )
         if (visibleItems.length === 0) return null
 
@@ -211,44 +215,14 @@ function NavMain({
   )
 }
 
-// function NavSecondary({
-//   items,
-//   ...props
-// }: {
-//   items: {
-//     title: string
-//     url: string
-//     icon: LucideIcon
-//   }[]
-// } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-//   return (
-//     <SidebarGroup {...props}>
-//       <SidebarGroupContent>
-//         <SidebarMenu>
-//           {items.map((item) => (
-//             <SidebarMenuItem key={item.title}>
-//               <SidebarMenuButton asChild>
-//                 <a href={item.url}>
-//                   <item.icon />
-//                   <span>{item.title}</span>
-//                 </a>
-//               </SidebarMenuButton>
-//             </SidebarMenuItem>
-//           ))}
-//         </SidebarMenu>
-//       </SidebarGroupContent>
-//     </SidebarGroup>
-//   )
-// }
-
 export function NavDocuments({
   items,
 }: {
-  items: {
+  items: Array<{
     name: string
     url: string
     icon: LucideIcon
-  }[]
+  }>
 }) {
   const { isMobile } = useSidebar()
   return (
@@ -375,21 +349,6 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator /> */}
             <DropdownMenuItem onClick={handleClearSession}>
               <LogOut />
               Keluar

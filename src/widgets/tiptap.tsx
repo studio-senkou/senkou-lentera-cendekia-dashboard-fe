@@ -1,25 +1,25 @@
-import { useEditor, EditorContent } from '@tiptap/react'
+import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import {
   Bold,
-  Italic,
-  Strikethrough,
   Code,
   Heading1,
   Heading2,
   Heading3,
+  ImageIcon,
+  Italic,
   List,
   ListOrdered,
   Quote,
-  Undo,
   Redo,
+  Strikethrough,
   Type,
-  ImageIcon,
+  Undo,
 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
-import { useState, useEffect, useCallback } from 'react'
 
 const MenuBar = ({ editor }: { editor: any }) => {
   const addImage = useCallback(() => {
@@ -53,7 +53,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
   }
 
   return (
-    <div className="border border-input bg-background rounded-md p-1 flex items-center gap-1 flex-wrap">
+    <div className="border border-input bg-white rounded-md p-1 flex items-center gap-1 flex-wrap">
       <Button
         variant={editor.isActive('bold') ? 'default' : 'ghost'}
         size="sm"
@@ -411,6 +411,7 @@ export function Tiptap({
     ],
     content: value,
     editable,
+    // eslint-disable-next-line no-shadow
     onUpdate: ({ editor }) => {
       const html = editor.getHTML()
       onChange?.(html)
@@ -435,7 +436,7 @@ export function Tiptap({
               reader.onload = (readerEvent) => {
                 const result = readerEvent.target?.result as string
                 if (result) {
-                  editor?.chain().focus().setImage({ src: result }).run()
+                  editor.chain().focus().setImage({ src: result }).run()
                 }
               }
               reader.readAsDataURL(file)
@@ -451,7 +452,6 @@ export function Tiptap({
         if (
           !moved &&
           event.dataTransfer &&
-          event.dataTransfer.files &&
           event.dataTransfer.files.length > 0
         ) {
           const files = Array.from(event.dataTransfer.files)
@@ -493,7 +493,7 @@ export function Tiptap({
 
   // Sync external value changes
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
+    if (value !== editor.getHTML()) {
       editor.commands.setContent(value)
     }
   }, [editor, value])
@@ -502,7 +502,7 @@ export function Tiptap({
     <div className={`w-full ${className}`}>
       <MenuBar editor={editor} />
 
-      <div className="border border-input rounded-md mt-2 relative">
+      <div className="border border-input bg-white rounded-md mt-2 relative">
         <CustomFloatingMenu editor={editor} />
         <CustomBubbleMenu editor={editor} />
         <div className="tiptap-editor [&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto [&_.ProseMirror_img]:rounded-md [&_.ProseMirror_img]:my-2 [&_.ProseMirror_img]:block">

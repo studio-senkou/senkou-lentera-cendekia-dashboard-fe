@@ -1,3 +1,8 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
+import { Edit, Loader2, X } from 'lucide-react'
+import { useState } from 'react'
+import z from 'zod'
 import { ArticleCard } from '@/widgets/article'
 import { Tiptap } from '@/widgets/tiptap'
 import {
@@ -15,17 +20,13 @@ import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useAppForm } from '@/shared/hooks/form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
+import { useUserStore } from '@/shared/hooks/use-user'
 import {
   createArticle,
   deleteArticle,
   getArticles,
   updateArticle,
 } from '@/entities/articles'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { Edit, Loader2, X } from 'lucide-react'
-import { useState } from 'react'
-import z from 'zod'
 
 export const Route = createFileRoute('/_authenticatedLayout/articles/')({
   loader: () => {
@@ -50,6 +51,8 @@ function RouteComponent() {
     staleTime: 1000 * 60 * 5,
   })
 
+  const user = useUserStore()
+
   const form = useAppForm({
     defaultValues: {
       title: '',
@@ -63,17 +66,20 @@ function RouteComponent() {
         await updateArticle(editingArticle.id, values.value)
         setEditingArticle(null)
       } else {
-        await createArticle(values.value)
+        await createArticle({
+          ...values.value,
+          author_name: user.name || 'Admin',
+          author_email: user.email || 'admin@admin.com',
+          author_role: user.role || 'admin',
+        })
       }
 
+      form.setFieldValue('title', '')
+      form.setFieldValue('content', '')
       form.reset()
       queryClient.invalidateQueries({ queryKey: ['articles'] })
     },
   })
-
-  const {
-    state: { values },
-  } = form
 
   const handleEditArticle = (article: any) => {
     setEditingArticle(article)
@@ -154,13 +160,17 @@ function RouteComponent() {
 
         <div className="mt-4">
           <label className="block text-sm font-medium mb-2">Isi Artikel</label>
-          <Tiptap
-            value={values.content}
-            onChange={(html) => form.setFieldValue('content', html)}
-            placeholder="Tulis isi artikel di sini..."
-            minHeight="400px"
-            className="max-w-4xl mx-auto"
-          />
+          <form.Field name="content">
+            {(field) => (
+              <Tiptap
+                value={field.state.value}
+                onChange={(html) => field.handleChange(html)}
+                placeholder="Tulis isi artikel di sini..."
+                minHeight="400px"
+                className="max-w-4xl mx-auto"
+              />
+            )}
+          </form.Field>
         </div>
       </div>
 
@@ -178,9 +188,10 @@ function RouteComponent() {
                 <ArticleCard
                   title={article.title}
                   content={article.content}
-                  author={article.author}
+                  author_name={article.author_name}
+                  author_role={article.author_role}
                 />
-                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 flex gap-2 transition-opacity">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -203,7 +214,8 @@ function RouteComponent() {
                           Apakah Anda yakin ingin menghapus artikel ini?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          Tindakan ini tidak dapat dibatalkan. Artikel beserta seluruh kontennya akan dihapus secara permanen.
+                          Tindakan ini tidak dapat dibatalkan. Artikel beserta
+                          seluruh kontennya akan dihapus secara permanen.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
