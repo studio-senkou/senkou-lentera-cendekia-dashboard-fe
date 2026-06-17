@@ -5,7 +5,7 @@ import { http } from '@/shared/lib/axios'
 export interface CreateMeetingSessionRequest {
   student_id: number
   mentor_id: number
-  subject: string
+  subject?: string
   date: string
   time: string
   duration: number

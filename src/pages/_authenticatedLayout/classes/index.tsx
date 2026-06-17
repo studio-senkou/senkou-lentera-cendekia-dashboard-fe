@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Trash2 } from 'lucide-react'
 
 import type { Class } from '@/shared/types/response'
 import type { ClassFormRef } from '@/features/classes/widgets/classes.form'

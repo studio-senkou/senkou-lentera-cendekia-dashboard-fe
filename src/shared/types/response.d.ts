@@ -67,6 +67,7 @@ export interface Class {
 export interface Quiz {
   id: number
   title: string
+  code: string
   description: string | null
   passing_score: number
   time_limit_minutes: number | null
@@ -115,4 +116,25 @@ export interface QuizAttempt {
   updated_at: string
   user_name: string
   user_email: string
+}
+
+export interface Program {
+  id: number
+  image_url: string | null
+  title: string
+  description: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Testimonial {
+  id: number
+  testimoner_name: string
+  testimoner_position: string
+  testimoner_photo: string | null
+  testimony_text: string
+  is_active: boolean
+  gender: 'man' | 'woman' | 'man-woman'
+  created_at: string
+  updated_at: string
 }

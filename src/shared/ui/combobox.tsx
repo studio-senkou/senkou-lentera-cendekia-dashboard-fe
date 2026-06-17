@@ -361,7 +361,8 @@ function Combobox({
                 key={option.value}
                 value={option.value}
                 disabled={option.disabled}
-                onPointerUp={(e) => {
+                onPointerDown={(e) => e.preventDefault()}
+                onPointerUp={() => {
                   if (option.disabled) return
                   onValueChange?.(option.value)
                 }}
@@ -464,7 +465,7 @@ function MultiCombobox({
                     value.length >= maxSelected &&
                     !value.includes(option.value))
                 }
-                onPointerUp={(e) => {
+                onPointerUp={() => {
                   if (
                     option.disabled ||
                     (maxSelected !== undefined &&

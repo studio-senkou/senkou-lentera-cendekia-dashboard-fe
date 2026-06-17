@@ -50,7 +50,7 @@ function RouteComponent() {
           loading={loadingUsers}
           variant="solid"
           note="Increased from last month"
-          onClick={() => navigate({ to: '/users' })}
+          onClick={() => navigate({ to: '/users/students' })}
         />
         <StatCard
           title="Total Mentor"
@@ -58,7 +58,7 @@ function RouteComponent() {
           loading={loadingUsers}
           variant="plain"
           note="Increased from last month"
-          onClick={() => navigate({ to: '/users' })}
+          onClick={() => navigate({ to: '/users/mentors' })}
         />
       </div>
 

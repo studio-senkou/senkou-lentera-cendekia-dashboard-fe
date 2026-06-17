@@ -15,7 +15,9 @@ import { Route as AuthenticatedLayoutRouteImport } from './_authenticatedLayout'
 import { Route as AuthenticatedLayoutIndexRouteImport } from './_authenticatedLayout/index'
 import { Route as ReportUserRouteImport } from './report/$user'
 import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './_uauthenticatedLayout/login/index'
+import { Route as AuthenticatedLayoutTestimonialsIndexRouteImport } from './_authenticatedLayout/testimonials/index'
 import { Route as AuthenticatedLayoutQuizzesIndexRouteImport } from './_authenticatedLayout/quizzes/index'
+import { Route as AuthenticatedLayoutProgramsIndexRouteImport } from './_authenticatedLayout/programs/index'
 import { Route as AuthenticatedLayoutPageSettingsIndexRouteImport } from './_authenticatedLayout/page-settings/index'
 import { Route as AuthenticatedLayoutMeetingSessionsIndexRouteImport } from './_authenticatedLayout/meeting-sessions/index'
 import { Route as AuthenticatedLayoutClassesIndexRouteImport } from './_authenticatedLayout/classes/index'
@@ -55,10 +57,22 @@ const UauthenticatedLayoutLoginIndexRoute =
     path: '/login/',
     getParentRoute: () => UauthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutTestimonialsIndexRoute =
+  AuthenticatedLayoutTestimonialsIndexRouteImport.update({
+    id: '/testimonials/',
+    path: '/testimonials/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 const AuthenticatedLayoutQuizzesIndexRoute =
   AuthenticatedLayoutQuizzesIndexRouteImport.update({
     id: '/quizzes/',
     path: '/quizzes/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedLayoutProgramsIndexRoute =
+  AuthenticatedLayoutProgramsIndexRouteImport.update({
+    id: '/programs/',
+    path: '/programs/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 const AuthenticatedLayoutPageSettingsIndexRoute =
@@ -129,7 +143,9 @@ export interface FileRoutesByFullPath {
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/programs': typeof AuthenticatedLayoutProgramsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
+  '/testimonials': typeof AuthenticatedLayoutTestimonialsIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesByTo {
@@ -145,7 +161,9 @@ export interface FileRoutesByTo {
   '/classes': typeof AuthenticatedLayoutClassesIndexRoute
   '/meeting-sessions': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/page-settings': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/programs': typeof AuthenticatedLayoutProgramsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
+  '/testimonials': typeof AuthenticatedLayoutTestimonialsIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRoutesById {
@@ -164,7 +182,9 @@ export interface FileRoutesById {
   '/_authenticatedLayout/classes/': typeof AuthenticatedLayoutClassesIndexRoute
   '/_authenticatedLayout/meeting-sessions/': typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   '/_authenticatedLayout/page-settings/': typeof AuthenticatedLayoutPageSettingsIndexRoute
+  '/_authenticatedLayout/programs/': typeof AuthenticatedLayoutProgramsIndexRoute
   '/_authenticatedLayout/quizzes/': typeof AuthenticatedLayoutQuizzesIndexRoute
+  '/_authenticatedLayout/testimonials/': typeof AuthenticatedLayoutTestimonialsIndexRoute
   '/_uauthenticatedLayout/login/': typeof UauthenticatedLayoutLoginIndexRoute
 }
 export interface FileRouteTypes {
@@ -182,7 +202,9 @@ export interface FileRouteTypes {
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
+    | '/programs'
     | '/quizzes'
+    | '/testimonials'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -198,7 +220,9 @@ export interface FileRouteTypes {
     | '/classes'
     | '/meeting-sessions'
     | '/page-settings'
+    | '/programs'
     | '/quizzes'
+    | '/testimonials'
     | '/login'
   id:
     | '__root__'
@@ -216,7 +240,9 @@ export interface FileRouteTypes {
     | '/_authenticatedLayout/classes/'
     | '/_authenticatedLayout/meeting-sessions/'
     | '/_authenticatedLayout/page-settings/'
+    | '/_authenticatedLayout/programs/'
     | '/_authenticatedLayout/quizzes/'
+    | '/_authenticatedLayout/testimonials/'
     | '/_uauthenticatedLayout/login/'
   fileRoutesById: FileRoutesById
 }
@@ -271,11 +297,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UauthenticatedLayoutLoginIndexRouteImport
       parentRoute: typeof UauthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/testimonials/': {
+      id: '/_authenticatedLayout/testimonials/'
+      path: '/testimonials'
+      fullPath: '/testimonials'
+      preLoaderRoute: typeof AuthenticatedLayoutTestimonialsIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
     '/_authenticatedLayout/quizzes/': {
       id: '/_authenticatedLayout/quizzes/'
       path: '/quizzes'
       fullPath: '/quizzes'
       preLoaderRoute: typeof AuthenticatedLayoutQuizzesIndexRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
+    '/_authenticatedLayout/programs/': {
+      id: '/_authenticatedLayout/programs/'
+      path: '/programs'
+      fullPath: '/programs'
+      preLoaderRoute: typeof AuthenticatedLayoutProgramsIndexRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
     '/_authenticatedLayout/page-settings/': {
@@ -355,7 +395,9 @@ interface AuthenticatedLayoutRouteChildren {
   AuthenticatedLayoutClassesIndexRoute: typeof AuthenticatedLayoutClassesIndexRoute
   AuthenticatedLayoutMeetingSessionsIndexRoute: typeof AuthenticatedLayoutMeetingSessionsIndexRoute
   AuthenticatedLayoutPageSettingsIndexRoute: typeof AuthenticatedLayoutPageSettingsIndexRoute
+  AuthenticatedLayoutProgramsIndexRoute: typeof AuthenticatedLayoutProgramsIndexRoute
   AuthenticatedLayoutQuizzesIndexRoute: typeof AuthenticatedLayoutQuizzesIndexRoute
+  AuthenticatedLayoutTestimonialsIndexRoute: typeof AuthenticatedLayoutTestimonialsIndexRoute
 }
 
 const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
@@ -372,7 +414,10 @@ const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
     AuthenticatedLayoutMeetingSessionsIndexRoute,
   AuthenticatedLayoutPageSettingsIndexRoute:
     AuthenticatedLayoutPageSettingsIndexRoute,
+  AuthenticatedLayoutProgramsIndexRoute: AuthenticatedLayoutProgramsIndexRoute,
   AuthenticatedLayoutQuizzesIndexRoute: AuthenticatedLayoutQuizzesIndexRoute,
+  AuthenticatedLayoutTestimonialsIndexRoute:
+    AuthenticatedLayoutTestimonialsIndexRoute,
 }
 
 const AuthenticatedLayoutRouteWithChildren =

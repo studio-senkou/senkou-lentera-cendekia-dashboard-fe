@@ -2,7 +2,9 @@ import {
   DotSquare,
   FileText,
   Folder,
+  LayoutList,
   LogOut,
+  MessageSquareQuote,
   Newspaper,
   PanelsTopLeft,
   Share,
@@ -12,8 +14,8 @@ import {
 } from 'lucide-react'
 import { createElement } from 'react'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
-import type { ComponentProps } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import type { ComponentProps } from 'react'
 import {
   Sidebar,
   SidebarContent,
@@ -106,6 +108,18 @@ const NAV_GROUPS = [
         title: 'Artikel',
         url: '/articles',
         icon: Newspaper,
+        roles: ['admin'],
+      },
+      {
+        title: 'Program',
+        url: '/programs',
+        icon: LayoutList,
+        roles: ['admin'],
+      },
+      {
+        title: 'Testimonial',
+        url: '/testimonials',
+        icon: MessageSquareQuote,
         roles: ['admin'],
       },
     ],

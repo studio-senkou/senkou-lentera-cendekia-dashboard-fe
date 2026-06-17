@@ -61,7 +61,7 @@ function RouteComponent() {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-start">
         <Button asChild variant="outline">
-          <Link to="/users">Kembali ke Daftar Pengguna</Link>
+          <Link to="/users/students">Kembali ke Daftar Pengguna</Link>
         </Button>
       </div>
 
@@ -87,7 +87,7 @@ function RouteComponent() {
             accessorKey: 'deleted_at',
             header: 'Dihapus Pada',
             cell: ({ row }) => {
-              const date = new Date(row.original.deleted_at || row.original.updated_at || row.original.created_at)
+              const date = new Date(row.original.updated_at || row.original.created_at)
               return date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: '2-digit',
