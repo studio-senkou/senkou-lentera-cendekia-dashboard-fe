@@ -90,7 +90,9 @@ export const RegisterUserForm = forwardRef<
   const { AppField } = form
 
   // Track role to trigger re-render when it changes
-  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>(fixedRole || 'user')
+  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>(
+    fixedRole || 'user',
+  )
 
   return (
     <form
@@ -127,12 +129,11 @@ export const RegisterUserForm = forwardRef<
 
         {currentRole === 'user' && (
           <AppField name="classes">
-            {({ MultiComboboxField }) => (
-              <MultiComboboxField
+            {({ Select }) => (
+              <Select
                 label="Kelas"
                 placeholder="Pilih kelas"
-                options={classesDropdown ?? []}
-                maxSelected={1}
+                values={classesDropdown ?? []}
                 required
               />
             )}
