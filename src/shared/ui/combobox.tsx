@@ -361,6 +361,10 @@ function Combobox({
                 key={option.value}
                 value={option.value}
                 disabled={option.disabled}
+                onPointerUp={(e) => {
+                  if (option.disabled) return
+                  onValueChange?.(option.value)
+                }}
               >
                 {option.label}
               </ComboboxItem>
@@ -460,6 +464,21 @@ function MultiCombobox({
                     value.length >= maxSelected &&
                     !value.includes(option.value))
                 }
+                onPointerUp={(e) => {
+                  if (
+                    option.disabled ||
+                    (maxSelected !== undefined &&
+                      value.length >= maxSelected &&
+                      !value.includes(option.value))
+                  ) {
+                    return
+                  }
+                  const isSelected = value.includes(option.value)
+                  const newValue = isSelected
+                    ? value.filter((v) => v !== option.value)
+                    : [...value, option.value]
+                  onValueChange?.(newValue)
+                }}
               >
                 {option.label}
               </ComboboxItem>
