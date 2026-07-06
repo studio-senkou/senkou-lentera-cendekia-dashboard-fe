@@ -22,6 +22,7 @@ interface SessionActions {
   setAccessToken: (token: string) => void
   setRefreshToken: (token: string) => void
   clearSession: () => Promise<void>
+  clearLocalSession: () => void
 }
 
 export const useSessionStore = create<SessionState & SessionActions>()(
@@ -59,8 +60,9 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       } catch (error) {
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
-        toast.error('Failed to renew session')
-        throw new Error('Failed to renew session')
+        // ponytail: also clear Zustand state to avoid stale session store
+        set({ accessToken: null, refreshToken: null })
+        throw error
       }
     },
     updateSession: ({
@@ -100,10 +102,15 @@ export const useSessionStore = create<SessionState & SessionActions>()(
         await http.delete('/auth/logout')
         toast.success('Logged out successfully')
       } catch (error) {
-        toast.error('Failed to logged out')
-        throw new Error('Failed to logged out')
+        // ponytail: log error but don't prevent local cleanup
+        console.error('Failed to logout on backend:', error)
+      } finally {
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
+        set({ accessToken: null, refreshToken: null })
       }
-
+    },
+    clearLocalSession: () => {
       Cookies.remove('access_token')
       Cookies.remove('refresh_token')
       set({ accessToken: null, refreshToken: null })

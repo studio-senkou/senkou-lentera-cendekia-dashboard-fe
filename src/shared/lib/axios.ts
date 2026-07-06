@@ -26,41 +26,67 @@ http.interceptors.request.use(
 )
 
 let retryCountMap = new WeakMap<any, number>()
+let refreshPromise: Promise<any> | null = null
 
 http.interceptors.response.use(
   (response) => {
     return response
   },
   async (error) => {
-    const { refreshToken, renewSession, clearSession } =
+    const originalRequest = error.config
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
+
+    // ponytail: prevent infinite loop if the auth requests themselves fail
+    if (
+      originalRequest.url?.includes('/auth/refresh') ||
+      originalRequest.url?.includes('/auth/logout')
+    ) {
+      return Promise.reject(error)
+    }
+
+    const { refreshToken, renewSession, clearLocalSession } =
       useSessionStore.getState()
 
     if (error.response?.status === 401) {
-      let retries = retryCountMap.get(error.config) || 0
+      let retries = retryCountMap.get(originalRequest) || 0
 
       if (retries >= 2) {
-        toast.error('Session expired. Please log in again.')
-        await clearSession()
-        window.location.href = '/login'
+        if (window.location.pathname !== '/login') {
+          toast.error('Session expired. Please log in again.')
+          clearLocalSession()
+          window.location.href = '/login'
+        }
         return Promise.reject(error)
       }
 
       if (refreshToken) {
-        retryCountMap.set(error.config, retries + 1)
+        retryCountMap.set(originalRequest, retries + 1)
         try {
-          const data = await renewSession()
-          error.config.headers.Authorization = `Bearer ${data.access_token}`
-          return await http.request(error.config)
+          // ponytail: share a single refresh promise for concurrent requests
+          if (!refreshPromise) {
+            refreshPromise = renewSession().finally(() => {
+              refreshPromise = null
+            })
+          }
+          const data = await refreshPromise
+          originalRequest.headers.Authorization = `Bearer ${data.access_token}`
+          return await http.request(originalRequest)
         } catch (renewError) {
-          toast.error('Failed to renew session. Please log in again.')
-          await clearSession()
-          window.location.href = '/login'
-          return await Promise.reject(renewError)
+          if (window.location.pathname !== '/login') {
+            toast.error('Failed to renew session. Please log in again.')
+            clearLocalSession()
+            window.location.href = '/login'
+          }
+          return Promise.reject(renewError)
         }
       } else {
-        toast.error('Session expired. Please log in again.')
-        await clearSession()
-        window.location.href = '/login'
+        if (window.location.pathname !== '/login') {
+          toast.error('Session expired. Please log in again.')
+          clearLocalSession()
+          window.location.href = '/login'
+        }
         return Promise.reject(error)
       }
     } else if (error.response?.status === 403) {
