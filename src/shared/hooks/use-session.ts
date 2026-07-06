@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import Cookies from 'js-cookie'
 import { http } from '@/shared/lib/axios'
 import { toast } from 'sonner'
+import { useUserStore } from '@/shared/hooks/use-user'
 
 interface SessionState {
   accessToken: string | null
@@ -62,6 +63,7 @@ export const useSessionStore = create<SessionState & SessionActions>()(
         Cookies.remove('refresh_token')
         // ponytail: also clear Zustand state to avoid stale session store
         set({ accessToken: null, refreshToken: null })
+        useUserStore.getState().clearUser()
         throw error
       }
     },
@@ -108,12 +110,14 @@ export const useSessionStore = create<SessionState & SessionActions>()(
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
         set({ accessToken: null, refreshToken: null })
+        useUserStore.getState().clearUser()
       }
     },
     clearLocalSession: () => {
       Cookies.remove('access_token')
       Cookies.remove('refresh_token')
       set({ accessToken: null, refreshToken: null })
+      useUserStore.getState().clearUser()
     },
   }),
 )

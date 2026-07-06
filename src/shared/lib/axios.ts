@@ -25,9 +25,6 @@ http.interceptors.request.use(
   },
 )
 
-let retryCountMap = new WeakMap<any, number>()
-let refreshPromise: Promise<any> | null = null
-
 http.interceptors.response.use(
   (response) => {
     return response
@@ -46,49 +43,15 @@ http.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    const { refreshToken, renewSession, clearLocalSession } =
-      useSessionStore.getState()
+    const { clearLocalSession } = useSessionStore.getState()
 
     if (error.response?.status === 401) {
-      let retries = retryCountMap.get(originalRequest) || 0
-
-      if (retries >= 2) {
-        if (window.location.pathname !== '/login') {
-          toast.error('Session expired. Please log in again.')
-          clearLocalSession()
-          window.location.href = '/login'
-        }
-        return Promise.reject(error)
+      if (window.location.pathname !== '/login') {
+        toast.error('Session expired. Please log in again.')
+        clearLocalSession()
+        window.location.href = '/login'
       }
-
-      if (refreshToken) {
-        retryCountMap.set(originalRequest, retries + 1)
-        try {
-          // ponytail: share a single refresh promise for concurrent requests
-          if (!refreshPromise) {
-            refreshPromise = renewSession().finally(() => {
-              refreshPromise = null
-            })
-          }
-          const data = await refreshPromise
-          originalRequest.headers.Authorization = `Bearer ${data.access_token}`
-          return await http.request(originalRequest)
-        } catch (renewError) {
-          if (window.location.pathname !== '/login') {
-            toast.error('Failed to renew session. Please log in again.')
-            clearLocalSession()
-            window.location.href = '/login'
-          }
-          return Promise.reject(renewError)
-        }
-      } else {
-        if (window.location.pathname !== '/login') {
-          toast.error('Session expired. Please log in again.')
-          clearLocalSession()
-          window.location.href = '/login'
-        }
-        return Promise.reject(error)
-      }
+      return Promise.reject(error)
     } else if (error.response?.status === 403) {
       toast.error('You do not have permission to perform this action.')
       return Promise.reject(error)
