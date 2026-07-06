@@ -190,9 +190,10 @@ function NavMain({
   return (
     <>
       {groups.map((group) => {
-        const visibleItems = group.items.filter((item) =>
-          role && item.roles.includes(role.toLowerCase()),
-        )
+        const visibleItems = group.items.filter((item) => {
+          if (!role) return false
+          return item.roles.includes(role.toLowerCase())
+        })
         if (visibleItems.length === 0) return null
 
         return (
