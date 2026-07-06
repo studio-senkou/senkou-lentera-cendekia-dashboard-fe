@@ -191,7 +191,7 @@ function NavMain({
     <>
       {groups.map((group) => {
         const visibleItems = group.items.filter((item) =>
-          item.roles.includes((role as string).toLowerCase()),
+          role && item.roles.includes(role.toLowerCase()),
         )
         if (visibleItems.length === 0) return null
 
