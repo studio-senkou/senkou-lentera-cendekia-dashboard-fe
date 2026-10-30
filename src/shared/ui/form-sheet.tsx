@@ -1,29 +1,26 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '../ui/sheet'
+
 import { Button } from '../ui/button'
-import { cn } from '@/shared/lib/utils'
+import { DrawerCommon, DrawerSize } from '../ui/drawer'
+import type { DrawerCommonProps } from '../ui/drawer'
 
 interface FormSheetProps {
   id?: string
   className?: string
   children: React.ReactNode
   disabled?: boolean
-  trigger: React.ReactNode
+  trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   title: string
   description?: string
   onSubmitForm?: () => Promise<void> | void
   onSuccess?: () => void
   preventClose?: boolean
   onBeforeClose?: () => boolean
+  size?: DrawerSize
+  withoutCloseButton?: boolean
 }
 
 export function FormSheet({
@@ -32,16 +29,28 @@ export function FormSheet({
   children,
   disabled,
   trigger,
+  open: controlledOpen,
+  onOpenChange,
   title,
   description,
   onSubmitForm = () => {},
   onSuccess,
   preventClose = false,
   onBeforeClose,
+  size = DrawerSize.MD,
+  withoutCloseButton = false,
 }: FormSheetProps) {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasError, setHasError] = useState(false)
+
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (newOpen: boolean) => {
+    if (!isControlled) setInternalOpen(newOpen)
+    onOpenChange?.(newOpen)
+  }
 
   const handleSubmit = async () => {
     if (isSubmitting) return
@@ -78,47 +87,45 @@ export function FormSheet({
     setOpen(newOpen)
   }
 
+  const drawerFooter: DrawerCommonProps['drawerFooter'] = (
+    <Button
+      type="button"
+      onClick={handleSubmit}
+      disabled={disabled || isSubmitting}
+      className="min-w-[100px]"
+      variant={hasError ? 'destructive' : 'default'}
+    >
+      {isSubmitting ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Memproses...
+        </>
+      ) : hasError ? (
+        'Coba Lagi'
+      ) : (
+        'Submit'
+      )}
+    </Button>
+  )
+
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetTrigger asChild disabled={disabled}>
-        {trigger}
-      </SheetTrigger>
-      <SheetContent
-        id={id}
-        className={cn('max-w-2xl flex flex-col', className)}
-        onEscapeKeyDown={(e) => {
-          e.preventDefault()
-        }}
-        onPointerDownOutside={(e) => {
-          e.preventDefault()
-        }}
-      >
-        <SheetHeader className="flex-shrink-0">
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
-        </SheetHeader>
-        <div className="flex-1 overflow-y-auto px-1 pb-4">{children}</div>
-        <SheetFooter className="flex-shrink-0 border-t bg-background pt-4">
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={disabled || isSubmitting}
-            className="min-w-[100px]"
-            variant={hasError ? 'destructive' : 'default'}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Memproses...
-              </>
-            ) : hasError ? (
-              'Coba Lagi'
-            ) : (
-              'Submit'
-            )}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+    <DrawerCommon
+      isOpen={open}
+      onOpen={() => handleOpenChange(true)}
+      onClose={() => handleOpenChange(false)}
+      title={title}
+      subtitle={description}
+      size={size}
+      className={className}
+      contentClassName="px-2"
+      drawerFooter={drawerFooter}
+      trigger={trigger}
+      triggerDisabled={disabled}
+      withoutCloseButton={withoutCloseButton}
+      preventCloseOnOutsideClick
+      preventCloseOnEscape
+    >
+      <div id={id}>{children}</div>
+    </DrawerCommon>
   )
 }

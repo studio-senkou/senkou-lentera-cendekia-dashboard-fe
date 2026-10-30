@@ -1,28 +1,10 @@
 import { useStore } from '@tanstack/react-form'
-import { useCallback } from 'react';
-import { useFieldContext } from '../hooks/form-context'
-import { Label } from './label'
-import type { ComboboxOption } from '@/shared/ui/combobox';
-import { Combobox, MultiCombobox } from '@/shared/ui/combobox'
+import { useCallback } from 'react'
 
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
+import { useFieldContext } from '../hooks/form-context'
+import type { ComboboxOption } from '@/shared/ui/combobox'
+import { Combobox, MultiCombobox } from '@/shared/ui/combobox'
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
 
 export function ComboboxField({
   label,
@@ -57,6 +39,7 @@ export function ComboboxField({
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
 
   const handleValueChange = useCallback(
     (value: string) => {
@@ -66,11 +49,12 @@ export function ComboboxField({
   )
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={field.name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={field.name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+    >
       <Combobox
         options={options}
         value={field.state.value || ''}
@@ -87,8 +71,7 @@ export function ComboboxField({
         contentClassName={contentClassName}
         width={width}
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }
 
@@ -129,6 +112,7 @@ export function MultiComboboxField({
 }) {
   const field = useFieldContext<Array<string>>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
 
   const handleValueChange = useCallback(
     (values: Array<string>) => {
@@ -138,11 +122,12 @@ export function MultiComboboxField({
   )
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={field.name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={field.name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+    >
       <MultiCombobox
         options={options}
         value={field.state.value}
@@ -161,7 +146,6 @@ export function MultiComboboxField({
         contentClassName={contentClassName}
         width={width}
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

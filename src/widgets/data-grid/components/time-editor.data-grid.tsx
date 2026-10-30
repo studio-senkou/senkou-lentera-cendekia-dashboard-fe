@@ -122,7 +122,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   size="sm"
                   className="h-7 w-14"
                   onClick={() =>
-                    updateTime(selectedHours >= 23 ? 0 : selectedHours + 1, selectedMinutes)
+                    updateTime(
+                      selectedHours >= 23 ? 0 : selectedHours + 1,
+                      selectedMinutes,
+                    )
                   }
                 >
                   ▲
@@ -133,7 +136,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   max={23}
                   value={selectedHours}
                   onChange={(e) => {
-                    const h = Math.max(0, Math.min(23, parseInt(e.target.value) || 0))
+                    const h = Math.max(
+                      0,
+                      Math.min(23, parseInt(e.target.value) || 0),
+                    )
                     updateTime(h, selectedMinutes)
                   }}
                   className="w-14 text-center h-9 text-lg font-medium"
@@ -144,7 +150,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   size="sm"
                   className="h-7 w-14"
                   onClick={() =>
-                    updateTime(selectedHours <= 0 ? 23 : selectedHours - 1, selectedMinutes)
+                    updateTime(
+                      selectedHours <= 0 ? 23 : selectedHours - 1,
+                      selectedMinutes,
+                    )
                   }
                 >
                   ▼
@@ -152,10 +161,14 @@ export default function TimeEditor<TRow, TSummaryRow>({
               </div>
             </div>
 
-            <div className="text-2xl font-bold text-muted-foreground pt-6">:</div>
+            <div className="text-2xl font-bold text-muted-foreground pt-6">
+              :
+            </div>
 
             <div className="flex flex-col items-center">
-              <Label className="text-xs mb-2 text-muted-foreground">Minute</Label>
+              <Label className="text-xs mb-2 text-muted-foreground">
+                Minute
+              </Label>
               <div className="flex flex-col items-center">
                 <Button
                   type="button"
@@ -163,7 +176,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   size="sm"
                   className="h-7 w-14"
                   onClick={() =>
-                    updateTime(selectedHours, selectedMinutes >= 59 ? 0 : selectedMinutes + 1)
+                    updateTime(
+                      selectedHours,
+                      selectedMinutes >= 59 ? 0 : selectedMinutes + 1,
+                    )
                   }
                 >
                   ▲
@@ -174,7 +190,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   max={59}
                   value={selectedMinutes}
                   onChange={(e) => {
-                    const m = Math.max(0, Math.min(59, parseInt(e.target.value) || 0))
+                    const m = Math.max(
+                      0,
+                      Math.min(59, parseInt(e.target.value) || 0),
+                    )
                     updateTime(selectedHours, m)
                   }}
                   className="w-14 text-center h-9 text-lg font-medium"
@@ -185,7 +204,10 @@ export default function TimeEditor<TRow, TSummaryRow>({
                   size="sm"
                   className="h-7 w-14"
                   onClick={() =>
-                    updateTime(selectedHours, selectedMinutes <= 0 ? 59 : selectedMinutes - 1)
+                    updateTime(
+                      selectedHours,
+                      selectedMinutes <= 0 ? 59 : selectedMinutes - 1,
+                    )
                   }
                 >
                   ▼
@@ -204,7 +226,9 @@ export default function TimeEditor<TRow, TSummaryRow>({
                 <Button
                   key={time}
                   type="button"
-                  variant={currentValue.startsWith(time) ? 'default' : 'outline'}
+                  variant={
+                    currentValue.startsWith(time) ? 'default' : 'outline'
+                  }
                   size="sm"
                   className="h-7 text-xs"
                   onClick={() => handleSelectPreset(time)}
@@ -217,7 +241,12 @@ export default function TimeEditor<TRow, TSummaryRow>({
 
           {/* Actions */}
           <div className="flex justify-between border-t pt-3">
-            <Button type="button" variant="outline" size="sm" onClick={handleSetNow}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSetNow}
+            >
               Now
             </Button>
             <Button type="button" size="sm" onClick={handleConfirm}>

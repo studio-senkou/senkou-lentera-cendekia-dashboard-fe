@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { useHeaderStore } from '@/shared/hooks/use-header'
 import { QuizDetailPage } from '@/features/quizzes/widgets/quiz-detail'
+import BasePageLayout from '@/widgets/base-page-layout'
 
 export const Route = createFileRoute('/_authenticatedLayout/quizzes/$quizId')({
   loader: () => {
@@ -11,5 +12,9 @@ export const Route = createFileRoute('/_authenticatedLayout/quizzes/$quizId')({
   component: RouteComponent,
 })
 function RouteComponent() {
-  return <QuizDetailPage />
+  return (
+    <BasePageLayout subtitle="Kelola metadata kuis, soal, pilihan jawaban, dan attempt user.">
+      <QuizDetailPage />
+    </BasePageLayout>
+  )
 }

@@ -1,27 +1,34 @@
-import { TableRow, TableCell } from '@/shared/ui/table'
+import { fixedRightBodyClass } from '../utils'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { TableCell, TableRow } from '@/shared/ui/table'
+import { cn } from '@/shared/lib/utils'
 
 interface SkeletonRowProps {
   rowIndex: number
   columnCount: number
+  fixedRightColumnIndex?: number
 }
 
-export function SkeletonRow({ rowIndex, columnCount }: SkeletonRowProps) {
-  const widths = ['w-20', 'w-28', 'w-24', 'w-32']
-
+export function SkeletonRow({
+  rowIndex,
+  columnCount,
+  fixedRightColumnIndex = -1,
+}: SkeletonRowProps) {
   return (
-    <TableRow key={`skeleton-row-${rowIndex}`} className="border-b">
-      <TableCell className="p-4">
+    <TableRow>
+      <TableCell className="w-16">
         <Skeleton className="h-4 w-6" />
       </TableCell>
-      {Array.from({ length: columnCount }).map((__, cIdx) => {
-        const w = widths[cIdx % widths.length]
-        return (
-          <TableCell key={`skeleton-cell-${rowIndex}-${cIdx}`}>
-            <Skeleton className={`h-4 ${w}`} />
-          </TableCell>
-        )
-      })}
+      {Array.from({ length: columnCount }).map((_, cellIndex) => (
+        <TableCell
+          key={`skeleton-cell-${rowIndex}-${cellIndex}`}
+          className={cn(
+            cellIndex === fixedRightColumnIndex && fixedRightBodyClass,
+          )}
+        >
+          <Skeleton className="h-6 w-full" />
+        </TableCell>
+      ))}
     </TableRow>
   )
 }

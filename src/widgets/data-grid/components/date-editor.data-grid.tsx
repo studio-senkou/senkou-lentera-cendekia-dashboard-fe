@@ -34,7 +34,9 @@ export default function DateEditor<TRow, TSummaryRow>({
   }
 
   const selectedDate = parseDate(currentValue)
-  const [month, setMonth] = useState<Date | undefined>(selectedDate ?? new Date())
+  const [month, setMonth] = useState<Date | undefined>(
+    selectedDate ?? new Date(),
+  )
 
   const handleSelectDate = (date: Date | undefined) => {
     if (date) {

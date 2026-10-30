@@ -94,7 +94,9 @@ function PublicReportPage() {
       const row = worksheet.addRow([
         index + 1,
         session.session_date
-          ? format(new Date(session.session_date), 'dd MMMM yyyy', { locale: id })
+          ? format(new Date(session.session_date), 'dd MMMM yyyy', {
+              locale: id,
+            })
           : '-',
         session.session_time ? session.session_time.slice(0, 5) : '-',
         durationStr,
@@ -134,13 +136,19 @@ function PublicReportPage() {
   // ── Loading State ──────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: '#FFF8EE' }}>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ background: '#FFF8EE' }}
+      >
         <div className="text-center space-y-3">
           <div
             className="mx-auto h-10 w-10 rounded-full border-4 border-t-transparent animate-spin"
             style={{ borderColor: '#FF5C06', borderTopColor: 'transparent' }}
           />
-          <p className="text-sm" style={{ color: '#667085', fontFamily: 'Inter, sans-serif' }}>
+          <p
+            className="text-sm"
+            style={{ color: '#667085', fontFamily: 'Inter, sans-serif' }}
+          >
             Memuat laporan...
           </p>
         </div>
@@ -175,7 +183,8 @@ function PublicReportPage() {
           className="max-w-md text-base leading-relaxed"
           style={{ color: '#667085', fontFamily: 'Inter, sans-serif' }}
         >
-          Maaf, tautan laporan sesi yang Anda akses tidak valid atau data murid tersebut telah dihapus dari sistem.
+          Maaf, tautan laporan sesi yang Anda akses tidak valid atau data murid
+          tersebut telah dihapus dari sistem.
         </p>
       </div>
     )
@@ -183,7 +192,10 @@ function PublicReportPage() {
 
   // ── Main Page ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen" style={{ background: '#FFF8EE', fontFamily: 'Inter, sans-serif' }}>
+    <div
+      className="min-h-screen"
+      style={{ background: '#FFF8EE', fontFamily: 'Inter, sans-serif' }}
+    >
       {/* ── Navbar (matches dashboard header) ── */}
       <header
         className="sticky top-0 z-10 flex h-[64px] w-full items-center border-b px-6 sm:px-12 lg:px-16"
@@ -208,14 +220,16 @@ function PublicReportPage() {
           </span>
         </div>
         <div className="ml-auto">
-          <span className="text-xs" style={{ color: '#98A2B3', fontFamily: 'Inter, sans-serif' }}>
+          <span
+            className="text-xs"
+            style={{ color: '#98A2B3', fontFamily: 'Inter, sans-serif' }}
+          >
             Laporan Publik Murid
           </span>
         </div>
       </header>
 
       <div className="mx-auto max-w-5xl px-4 py-8 md:px-8 md:py-12 space-y-8">
-
         {/* ── Student Profile Card ── */}
         <div
           className="rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5"
@@ -309,14 +323,54 @@ function PublicReportPage() {
           >
             <Table>
               <TableHeader>
-                <TableRow style={{ background: '#F9FAFB', borderBottom: '1px solid rgba(16,24,40,0.08)' }}>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Tanggal</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Waktu</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Durasi</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Mentor</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Mata Pelajaran</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Materi / Deskripsi</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider py-3" style={{ color: '#667085' }}>Catatan Mentor</TableHead>
+                <TableRow
+                  style={{
+                    background: '#F9FAFB',
+                    borderBottom: '1px solid rgba(16,24,40,0.08)',
+                  }}
+                >
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Tanggal
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Waktu
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Durasi
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Mentor
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Mata Pelajaran
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Materi / Deskripsi
+                  </TableHead>
+                  <TableHead
+                    className="text-xs font-semibold uppercase tracking-wider py-3"
+                    style={{ color: '#667085' }}
+                  >
+                    Catatan Mentor
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -356,19 +410,37 @@ function PublicReportPage() {
                           style={{ color: '#101828' }}
                         >
                           {session.session_date
-                            ? format(new Date(session.session_date), 'dd MMM yyyy', { locale: id })
+                            ? format(
+                                new Date(session.session_date),
+                                'dd MMM yyyy',
+                                { locale: id },
+                              )
                             : '-'}
                         </TableCell>
-                        <TableCell className="py-3 text-sm whitespace-nowrap" style={{ color: '#667085' }}>
-                          {session.session_time ? session.session_time.slice(0, 5) : '-'}
+                        <TableCell
+                          className="py-3 text-sm whitespace-nowrap"
+                          style={{ color: '#667085' }}
+                        >
+                          {session.session_time
+                            ? session.session_time.slice(0, 5)
+                            : '-'}
                         </TableCell>
-                        <TableCell className="py-3 text-sm whitespace-nowrap" style={{ color: '#667085' }}>
+                        <TableCell
+                          className="py-3 text-sm whitespace-nowrap"
+                          style={{ color: '#667085' }}
+                        >
                           {durationStr}
                         </TableCell>
-                        <TableCell className="py-3 text-sm whitespace-nowrap font-medium" style={{ color: '#101828' }}>
+                        <TableCell
+                          className="py-3 text-sm whitespace-nowrap font-medium"
+                          style={{ color: '#101828' }}
+                        >
                           {session.mentor?.name || '-'}
                         </TableCell>
-                        <TableCell className="py-3 text-sm whitespace-nowrap" style={{ color: '#667085' }}>
+                        <TableCell
+                          className="py-3 text-sm whitespace-nowrap"
+                          style={{ color: '#667085' }}
+                        >
                           {session.subject ? (
                             <span
                               className="inline-block px-2 py-0.5 rounded text-xs font-medium"
@@ -379,17 +451,27 @@ function PublicReportPage() {
                             >
                               {session.subject}
                             </span>
-                          ) : '-'}
+                          ) : (
+                            '-'
+                          )}
                         </TableCell>
                         <TableCell
                           className="py-3 text-sm max-w-xs"
-                          style={{ color: '#667085', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                          style={{
+                            color: '#667085',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                          }}
                         >
                           {session.description || '-'}
                         </TableCell>
                         <TableCell
                           className="py-3 text-sm max-w-xs"
-                          style={{ color: '#667085', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                          style={{
+                            color: '#667085',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                          }}
                         >
                           {session.note || '-'}
                         </TableCell>
@@ -408,8 +490,8 @@ function PublicReportPage() {
             Dokumen ini diterbitkan oleh{' '}
             <span className="font-semibold" style={{ color: '#667085' }}>
               Lentera Cendekia
-            </span>
-            {' '}· Bersifat rahasia dan hanya untuk keperluan internal.
+            </span>{' '}
+            · Bersifat rahasia dan hanya untuk keperluan internal.
           </p>
         </div>
       </div>

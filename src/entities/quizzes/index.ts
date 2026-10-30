@@ -7,6 +7,11 @@ import type {
   QuizOption,
   QuizQuestion,
 } from '@/shared/types/response'
+import type {
+  CursorPaginationMeta,
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 import { http } from '@/shared/lib/axios'
 
 export interface CreateQuizRequest {
@@ -35,13 +40,38 @@ export interface CreateOptionRequest {
 
 export interface UpdateOptionRequest extends CreateOptionRequest {}
 
-export const getQuizzes = async (): Promise<Array<Quiz>> => {
+export const getQuizzes = async (
+  pagination?: PaginationParams,
+): Promise<{ quizzes: Array<Quiz>; meta?: PaginationMeta }> => {
   try {
-    const response = await http.get('/admin/quizzes')
-    return response.data.data ?? []
-  } catch (error) {
+    const response = await http.get('/admin/quizzes', {
+      params: pagination ?? undefined,
+    })
+    return {
+      quizzes: response.data.data ?? [],
+      meta: response.data.meta,
+    }
+  } catch {
     toast.error('Failed to fetch quizzes')
-    return []
+    return { quizzes: [] }
+  }
+}
+
+export const getQuizQuestions = async (
+  quizId: number,
+  params: { limit: number; cursor?: number | null },
+): Promise<{ questions: Array<QuizQuestion>; meta: CursorPaginationMeta }> => {
+  const response = await http.get(`/admin/quizzes/${quizId}/questions`, {
+    params: {
+      limit: params.limit,
+      ...(params.cursor !== null && params.cursor !== undefined
+        ? { cursor: params.cursor }
+        : {}),
+    },
+  })
+  return {
+    questions: response.data.data ?? [],
+    meta: response.data.meta,
   }
 }
 
@@ -51,7 +81,7 @@ export const getQuizById = async (
   try {
     const response = await http.get(`/admin/quizzes/${quizId}`)
     return response.data.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to fetch quiz detail')
     return null
   }
@@ -212,13 +242,19 @@ export const deleteQuestionOption = async (
 
 export const getQuizAttempts = async (
   quizId: number,
-): Promise<Array<QuizAttempt>> => {
+  pagination?: PaginationParams,
+): Promise<{ attempts: Array<QuizAttempt>; meta?: PaginationMeta }> => {
   try {
-    const response = await http.get(`/admin/quizzes/${quizId}/attempts`)
-    return response.data.data ?? []
-  } catch (error) {
+    const response = await http.get(`/admin/quizzes/${quizId}/attempts`, {
+      params: pagination ?? undefined,
+    })
+    return {
+      attempts: response.data.data ?? [],
+      meta: response.data.meta,
+    }
+  } catch {
     toast.error('Failed to fetch quiz attempts')
-    return []
+    return { attempts: [] }
   }
 }
 

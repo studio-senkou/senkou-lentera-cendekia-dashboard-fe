@@ -1,4 +1,9 @@
 import { http } from '@/shared/lib/axios'
+import type { Class } from '@/shared/types/response'
+import type {
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 import { toast } from 'sonner'
 
 export interface CreateClass {
@@ -15,13 +20,20 @@ export const createClass = async ({ classname }: CreateClass) => {
   }
 }
 
-export const fetchClasses = async () => {
+export const fetchClasses = async (
+  pagination?: PaginationParams,
+): Promise<{ classes: Array<Class>; meta?: PaginationMeta }> => {
   try {
-    const response = await http.get('/classes')
-    return response.data.data.classes
-  } catch (error) {
+    const response = await http.get('/classes', {
+      params: pagination ?? undefined,
+    })
+    return {
+      classes: response.data.data.classes ?? [],
+      meta: response.data.meta,
+    }
+  } catch {
     toast.error('Failed to fetch classes')
-    return []
+    return { classes: [] }
   }
 }
 
@@ -37,7 +49,7 @@ export const fetchClassesForDropdown = async () => {
       value: item.id,
       label: item.name,
     }))
-  } catch (error) {
+  } catch {
     toast.error('Failed to fetch classes for dropdown')
     return []
   }

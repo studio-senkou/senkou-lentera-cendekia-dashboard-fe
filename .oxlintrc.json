@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "unicorn", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react/purity": "off",
+    "react/set-state-in-effect": "off",
+    "react/refs": "off",
+    "react/immutability": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/static-components": "off",
+    "react/use-memo": "off"
+  },
+  "ignorePatterns": ["dist/**", "public/**", "src/pages/routerTree.gen.ts"],
+  "overrides": [
+    {
+      "files": ["src/shared/ui/**/*.ts", "src/shared/ui/**/*.tsx"],
+      "rules": {
+        "no-shadow": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "eslint/no-unused-vars": "off"
+      }
+    }
+  ]
+}

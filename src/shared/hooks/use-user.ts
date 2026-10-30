@@ -6,11 +6,33 @@ export interface UserStore {
   name: string | null
   email: string | null
   role: 'user' | 'mentor' | 'admin' | null
+  isOwner: boolean
+}
+
+export interface UserIdentity {
+  name: string
+  email: string
+  role: string
+  is_owner?: boolean
 }
 
 export interface UserStoreActions {
-  setUser: (user: UserStore) => void
+  setUser: (user: UserIdentity) => void
   clearUser: () => void
+}
+
+function normalizeRole(role: string): UserStore['role'] {
+  const normalized = role.toLowerCase()
+
+  if (
+    normalized === 'admin' ||
+    normalized === 'mentor' ||
+    normalized === 'user'
+  ) {
+    return normalized
+  }
+
+  return null
 }
 
 export const useUserStore = create<UserStore & UserStoreActions>()(
@@ -19,12 +41,14 @@ export const useUserStore = create<UserStore & UserStoreActions>()(
       name: null,
       email: null,
       role: null,
+      isOwner: false,
 
-      setUser: (user: UserStore) =>
+      setUser: (user: UserIdentity) =>
         set(() => ({
           name: user.name,
           email: user.email,
-          role: user.role,
+          role: normalizeRole(user.role),
+          isOwner: user.is_owner === true,
         })),
 
       clearUser: () =>
@@ -32,6 +56,7 @@ export const useUserStore = create<UserStore & UserStoreActions>()(
           name: null,
           email: null,
           role: null,
+          isOwner: false,
         })),
     }),
     {

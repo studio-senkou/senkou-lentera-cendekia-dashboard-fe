@@ -11,6 +11,8 @@ interface EditClassSheetProps {
   classname: string
   disabled?: boolean
   onSuccess?: () => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function EditClassSheet({
@@ -18,6 +20,8 @@ export function EditClassSheet({
   classname,
   disabled,
   onSuccess,
+  open,
+  onOpenChange,
 }: EditClassSheetProps) {
   const [name, setName] = useState(classname)
 
@@ -33,14 +37,18 @@ export function EditClassSheet({
   return (
     <FormSheet
       trigger={
-        <Button size="icon" variant="warning" aria-label="Edit Kelas">
-          <Edit3 className="h-4 w-4" />
-        </Button>
+        open === undefined ? (
+          <Button size="icon" variant="warning" aria-label="Edit Kelas">
+            <Edit3 className="h-4 w-4" />
+          </Button>
+        ) : undefined
       }
       title="Edit Nama Kelas"
       description="Ubah nama kelas. Hanya diperlukan satu input berupa nama baru kelas."
       onSubmitForm={handleSubmit}
       disabled={disabled}
+      open={open}
+      onOpenChange={onOpenChange}
     >
       <div className="px-4 pt-2">
         <Label htmlFor="edit-classname">Nama Kelas</Label>

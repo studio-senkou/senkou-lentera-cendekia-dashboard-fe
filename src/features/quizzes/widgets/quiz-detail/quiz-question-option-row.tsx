@@ -43,6 +43,9 @@ export function QuizQuestionOptionRow({
     onSettled: () => setDeletingOptionId(null),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['quiz', quizId] })
+      await queryClient.invalidateQueries({
+        queryKey: ['quiz', quizId, 'questions'],
+      })
       await queryClient.invalidateQueries({ queryKey: ['quizzes'] })
     },
   })

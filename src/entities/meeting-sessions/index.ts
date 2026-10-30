@@ -1,5 +1,9 @@
 import { toast } from 'sonner'
 import type { MeetingSession } from '@/shared/types/response'
+import type {
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 import { http } from '@/shared/lib/axios'
 
 export interface CreateMeetingSessionRequest {
@@ -25,7 +29,7 @@ export const createMeetingSession = async (
     const response = await http.post('/meeting-sessions', data)
     toast.success('Sesi pertemuan berhasil dibuat')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to create meeting session')
   }
 }
@@ -41,7 +45,7 @@ export const bulkCreateMeetingSessions = async ({
     })
     toast.success('Sesi pertemuan berhasil dibuat')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to create meeting session')
   }
 }
@@ -52,8 +56,23 @@ export const getMeetingSessions = async (filters = {}) => {
       params: Object.keys(filters).length ? filters : undefined,
     })
     return response.data.data.sessions
-  } catch (error) {
+  } catch {
     toast.error('Failed to get meeting sessions')
+  }
+}
+
+export const getPaginatedMeetingSessions = async (
+  filters: PaginationParams & { date?: string },
+): Promise<{ sessions: Array<MeetingSession>; meta?: PaginationMeta }> => {
+  try {
+    const response = await http.get('/meeting-sessions', { params: filters })
+    return {
+      sessions: response.data.data.sessions ?? [],
+      meta: response.data.meta,
+    }
+  } catch {
+    toast.error('Failed to get meeting sessions')
+    return { sessions: [] }
   }
 }
 
@@ -61,7 +80,7 @@ export const getMeetingSessionByUser = async (userId: string) => {
   try {
     const response = await http.get(`/meeting-sessions?user=${userId}`)
     return response.data.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to get meeting sessions by user')
   }
 }
@@ -70,7 +89,7 @@ export const getPublicMeetingSessionByUser = async (userId: string) => {
   try {
     const response = await http.get(`/public/meeting-sessions/${userId}`)
     return response.data.data
-  } catch (error) {
+  } catch {
     toast.error('Gagal mengambil data sesi meeting publik')
   }
 }
@@ -83,7 +102,7 @@ export const updateMeetingSession = async ({
     const response = await http.put(`/meeting-sessions/${id}`, data)
     toast.success('Sesi pertemuan berhasil diperbarui')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to update meeting session')
   }
 }
@@ -99,7 +118,7 @@ export const bulkUpdateMeetingSessions = async ({
     })
     toast.success('Sesi pertemuan berhasil diperbarui')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to bulk update meeting sessions')
   }
 }
@@ -109,7 +128,7 @@ export const completeMeetingSession = async (id: number) => {
     const response = await http.patch(`/meeting-sessions/${id}/complete`)
     toast.success('Sesi pertemuan berhasil diselesaikan')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to complete meeting session')
   }
 }
@@ -119,7 +138,7 @@ export const cancelMeetingSession = async (id: number) => {
     const response = await http.patch(`/meeting-sessions/${id}/cancel`)
     toast.success('Sesi pertemuan berhasil dibatalkan')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to cancel meeting session')
   }
 }
@@ -129,7 +148,7 @@ export const deleteMeetingSession = async (id: number) => {
     const response = await http.delete(`/meeting-sessions/${id}`)
     toast.success('Sesi pertemuan berhasil dihapus')
     return response.data
-  } catch (error) {
+  } catch {
     toast.error('Failed to delete meeting session')
   }
 }

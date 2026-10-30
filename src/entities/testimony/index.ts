@@ -1,6 +1,10 @@
 import { toast } from 'sonner'
 import { http } from '@/shared/lib/axios'
 import type { Testimony } from '@/shared/types/response'
+import type {
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 
 export interface CreateTestimonyPayload {
   testimoner_name: string
@@ -35,18 +39,25 @@ export const storeNewTestimony = async ({
       },
     })
     return response.status === 200 && response.data.status === 'success'
-  } catch (error) {
+  } catch {
     toast.error('Failed to create testimony')
     return false
   }
 }
 
-export const getAllTestimonies = async (): Promise<Testimony[]> => {
+export const getAllTestimonies = async (
+  pagination?: PaginationParams,
+): Promise<{ testimonials: Testimony[]; meta?: PaginationMeta }> => {
   try {
-    const response = await http.get('/testimonies')
-    return response.data.data.testimonials
-  } catch (error) {
-    return []
+    const response = await http.get('/testimonies', {
+      params: pagination ?? undefined,
+    })
+    return {
+      testimonials: response.data.data.testimonials ?? [],
+      meta: response.data.meta,
+    }
+  } catch {
+    return { testimonials: [] }
   }
 }
 

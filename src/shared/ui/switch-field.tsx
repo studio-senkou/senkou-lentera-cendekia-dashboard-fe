@@ -1,43 +1,31 @@
 import { useStore } from '@tanstack/react-form'
-import { useFieldContext } from '../hooks/form-context'
-import { Switch as ShadcnSwitch } from '@/shared/ui/switch'
-import { Label } from '@/shared/ui/label'
 
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
+import { useFieldContext } from '../hooks/form-context'
+import { FormErrorMessage } from '@/shared/ui/form-error-message'
+import { fieldErrorMessage } from '@/shared/ui/form-field'
+import { Label } from '@/shared/ui/label'
+import { Switch as ShadcnSwitch } from '@/shared/ui/switch'
 
 export function Switch({ label }: { label: string }) {
   const field = useFieldContext<boolean>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
 
   return (
-    <div>
+    <div className="grid gap-1">
       <div className="flex items-center gap-2">
         <ShadcnSwitch
-          id={label}
+          id={field.name}
           onBlur={field.handleBlur}
           checked={field.state.value}
           onCheckedChange={(checked) => field.handleChange(checked)}
         />
-        <Label htmlFor={label}>{label}</Label>
+        <Label htmlFor={field.name}>{label}</Label>
       </div>
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+      <FormErrorMessage
+        showError={field.state.meta.isTouched && !!error}
+        message={error || ''}
+      />
     </div>
   )
 }

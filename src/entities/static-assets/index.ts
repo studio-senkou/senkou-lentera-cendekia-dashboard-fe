@@ -13,7 +13,7 @@ export const storeNewAsset = async (asset: File) => {
       },
     })
     return response.status === 200 && response.data.status === 'success'
-  } catch (error) {
+  } catch {
     toast.error('Failed to upload asset')
     return false
   }
@@ -23,7 +23,7 @@ export const getAllStaticAssets = async () => {
   try {
     const response = await http.get('/static-assets')
     return response.data.data
-  } catch (error) {
+  } catch {
     return []
   }
 }
@@ -36,7 +36,7 @@ export const deleteStaticAsset = async (assetID: number) => {
       return true
     }
     return false
-  } catch (error) {
+  } catch {
     toast.error('Failed to delete asset')
     return false
   }

@@ -82,6 +82,9 @@ export const QuestionForm = forwardRef<QuestionFormRef, QuestionFormProps>(
         }
 
         await queryClient.invalidateQueries({ queryKey: ['quiz', quizId] })
+        await queryClient.invalidateQueries({
+          queryKey: ['quiz', quizId, 'questions'],
+        })
         await queryClient.invalidateQueries({ queryKey: ['quizzes'] })
         form.reset()
         clearImage()

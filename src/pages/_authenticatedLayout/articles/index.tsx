@@ -20,6 +20,7 @@ import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useAppForm } from '@/shared/hooks/form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
+import BasePageLayout from '@/widgets/base-page-layout'
 import { useUserStore } from '@/shared/hooks/use-user'
 import {
   createArticle,
@@ -103,142 +104,146 @@ function RouteComponent() {
     })
 
   return (
-    <div>
-      <div className="max-w-4xl p-4">
-        {editingArticle && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between">
-            <span className="text-blue-800 text-sm">
-              Mengedit artikel: "{editingArticle.title}"
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleCancelEdit}
-            >
-              <X className="h-4 w-4" />
-              Batal
-            </Button>
-          </div>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
-          }}
-          className="space-y-4"
-        >
-          <div className="mb-4">
-            <form.AppField name="title">
-              {({ TextField }) => (
-                <TextField
-                  label="Judul Artikel"
-                  placeholder="Masukkan judul artikel"
-                  name="title"
-                />
-              )}
-            </form.AppField>
-          </div>
-
-          <div className="mt-4 flex justify-end gap-2">
-            {editingArticle && (
+    <BasePageLayout subtitle="Kelola artikel dan konten publikasi website.">
+      <div>
+        <div className="max-w-4xl">
+          {editingArticle && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between">
+              <span className="text-blue-800 text-sm">
+                Mengedit artikel: "{editingArticle.title}"
+              </span>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
+                size="sm"
                 onClick={handleCancelEdit}
               >
+                <X className="h-4 w-4" />
                 Batal
               </Button>
-            )}
-            <Button type="submit" className="px-4 py-2">
-              {editingArticle ? 'Update Artikel' : 'Simpan Artikel'}
-            </Button>
-          </div>
-        </form>
+            </div>
+          )}
 
-        <div className="mt-4">
-          <label className="block text-sm font-medium mb-2">Isi Artikel</label>
-          <form.Field name="content">
-            {(field) => (
-              <Tiptap
-                value={field.state.value}
-                onChange={(html) => field.handleChange(html)}
-                placeholder="Tulis isi artikel di sini..."
-                minHeight="400px"
-                className="max-w-4xl mx-auto"
-              />
-            )}
-          </form.Field>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              form.handleSubmit()
+            }}
+            className="space-y-4"
+          >
+            <div className="mb-4">
+              <form.AppField name="title">
+                {({ TextField }) => (
+                  <TextField
+                    label="Judul Artikel"
+                    placeholder="Masukkan judul artikel"
+                    name="title"
+                  />
+                )}
+              </form.AppField>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-2">
+              {editingArticle && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelEdit}
+                >
+                  Batal
+                </Button>
+              )}
+              <Button type="submit" className="px-4 py-2">
+                {editingArticle ? 'Update Artikel' : 'Simpan Artikel'}
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-2">
+              Isi Artikel
+            </label>
+            <form.Field name="content">
+              {(field) => (
+                <Tiptap
+                  value={field.state.value}
+                  onChange={(html) => field.handleChange(html)}
+                  placeholder="Tulis isi artikel di sini..."
+                  minHeight="400px"
+                  className="max-w-4xl mx-auto"
+                />
+              )}
+            </form.Field>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Daftar Artikel</h2>
+          {loadingArticles ? (
+            <div className="flex flex-col space-y-2">
+              <Skeleton className="h-10 w-full mb-4" />
+              <Skeleton className="h-10 w-full mb-4" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {articles?.map((article) => (
+                <div key={article.id} className="relative group">
+                  <ArticleCard
+                    title={article.title}
+                    content={article.content}
+                    author_name={article.author_name}
+                    author_role={article.author_role}
+                  />
+                  <div className="absolute top-4 right-4 flex gap-2 transition-opacity">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleEditArticle(article)}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          <X className="h-4 w-4 mr-1" />
+                          Hapus
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Apakah Anda yakin ingin menghapus artikel ini?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tindakan ini tidak dapat dibatalkan. Artikel beserta
+                            seluruh kontennya akan dihapus secara permanen.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={async () => {
+                              await deleteArticleMutation(article.id)
+                            }}
+                          >
+                            {deletingArticle && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Ya, Hapus
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="max-w-4xl p-4 mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Daftar Artikel</h2>
-        {loadingArticles ? (
-          <div className="flex flex-col space-y-2">
-            <Skeleton className="h-10 w-full mb-4" />
-            <Skeleton className="h-10 w-full mb-4" />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {articles?.map((article) => (
-              <div key={article.id} className="relative group">
-                <ArticleCard
-                  title={article.title}
-                  content={article.content}
-                  author_name={article.author_name}
-                  author_role={article.author_role}
-                />
-                <div className="absolute top-4 right-4 flex gap-2 transition-opacity">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleEditArticle(article)}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <X className="h-4 w-4 mr-1" />
-                        Hapus
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Apakah Anda yakin ingin menghapus artikel ini?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Tindakan ini tidak dapat dibatalkan. Artikel beserta
-                          seluruh kontennya akan dihapus secara permanen.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => {
-                            await deleteArticleMutation(article.id)
-                          }}
-                        >
-                          {deletingArticle && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          )}
-                          Ya, Hapus
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    </BasePageLayout>
   )
 }

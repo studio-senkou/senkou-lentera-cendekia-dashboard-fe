@@ -1,30 +1,12 @@
 import { useStore } from '@tanstack/react-form'
+import { CalendarIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useFieldContext } from '../hooks/form-context'
 import { Button } from '@/shared/ui/button'
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-import { CalendarIcon } from 'lucide-react'
-import { useState } from 'react'
-
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
 
 export function DateTimePicker({
   label,
@@ -41,6 +23,7 @@ export function DateTimePicker({
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
   const [open, setOpen] = useState(false)
 
   const parseDateTime = (dateTimeString: string) => {
@@ -145,11 +128,12 @@ export function DateTimePicker({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+    >
       <div className="relative">
         <Input
           id={name}
@@ -475,7 +459,6 @@ export function DateTimePicker({
           </PopoverContent>
         </Popover>
       </div>
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

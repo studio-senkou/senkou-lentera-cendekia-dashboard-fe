@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Edit, Loader2, Plus, Trash } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import z from 'zod'
 import { createColumnHelper } from '@tanstack/react-table'
 import type { Testimonial } from '@/shared/types/response'
@@ -14,17 +14,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/shared/ui/sheet'
+import { FormSheet } from '@/shared/ui/form-sheet'
 import {
   Dialog,
   DialogContent,
@@ -32,9 +24,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/dialog'
-import { Table } from '@/widgets/table'
+import BasePageLayout from '@/widgets/base-page-layout'
+import { RowActions, Table } from '@/widgets/table'
 import { useAppForm } from '@/shared/hooks/form'
 import { useHeaderStore } from '@/shared/hooks/use-header'
+import { useServerTable } from '@/shared/hooks/use-server-table'
 import {
   createTestimonial,
   deleteTestimonial,
@@ -61,16 +55,100 @@ const testimonialSchema = z.object({
 
 const columnHelper = createColumnHelper<Testimonial>()
 
+function TestimonialRowActions({
+  testimonial,
+  isDeleting,
+  onEdit,
+  onDelete,
+}: {
+  testimonial: Testimonial
+  isDeleting: boolean
+  onEdit: (testimonial: Testimonial) => void
+  onDelete: (id: number) => void
+}) {
+  const [deleteOpen, setDeleteOpen] = useState(false)
+
+  return (
+    <>
+      <RowActions
+        actions={[
+          {
+            key: 'edit',
+            node: null,
+            alwaysOverflow: true,
+            overflow: {
+              icon: <Edit className="h-4 w-4" />,
+              label: 'Edit Testimonial',
+              onSelect: () => onEdit(testimonial),
+            },
+          },
+          {
+            key: 'delete',
+            node: null,
+            alwaysOverflow: true,
+            overflow: {
+              icon: <Trash className="h-4 w-4" />,
+              label: 'Hapus Testimonial',
+              variant: 'destructive',
+              onSelect: () => setDeleteOpen(true),
+            },
+          },
+        ]}
+      />
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Testimonial</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus testimonial dari{' '}
+              <strong>{testimonial.testimoner_name}</strong>? Tindakan ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(testimonial.id)}
+              disabled={isDeleting}
+            >
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Ya, Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
+
 function RouteComponent() {
   const queryClient = useQueryClient()
   const [openForm, setOpenForm] = useState(false)
   const [editingData, setEditingData] = useState<Testimonial | null>(null)
 
-  const { data: testimonials, isLoading: loadingData } = useQuery({
-    queryKey: ['testimonials'],
-    queryFn: getTestimonials,
+  const {
+    pagination,
+    params,
+    search,
+    searchInput,
+    setSearchInput,
+    setPage,
+    setPageSize,
+  } = useServerTable()
+
+  const { data, isLoading: loadingData } = useQuery({
+    queryKey: [
+      'testimonials',
+      pagination.currentPage,
+      pagination.pageSize,
+      search,
+    ],
+    queryFn: () => getTestimonials(params),
     staleTime: 1000 * 60 * 5,
   })
+
+  const testimonials = data?.testimonials ?? []
 
   const form = useAppForm({
     defaultValues: {
@@ -83,6 +161,9 @@ function RouteComponent() {
     },
     validators: {
       onSubmit: testimonialSchema,
+    },
+    onSubmitInvalid: () => {
+      throw new Error('Invalid form submission')
     },
     onSubmit: async (values) => {
       const payload = {
@@ -100,9 +181,6 @@ function RouteComponent() {
         await createTestimonial(payload)
       }
 
-      form.reset()
-      setEditingData(null)
-      setOpenForm(false)
       queryClient.invalidateQueries({ queryKey: ['testimonials'] })
     },
   })
@@ -114,16 +192,19 @@ function RouteComponent() {
     },
   })
 
-  const handleEdit = (data: Testimonial) => {
-    setEditingData(data)
-    form.setFieldValue('testimoner_name', data.testimoner_name)
-    form.setFieldValue('testimoner_position', data.testimoner_position)
-    form.setFieldValue('testimony_text', data.testimony_text)
-    form.setFieldValue('testimoner_photo', data.testimoner_photo || '')
-    form.setFieldValue('is_active', data.is_active)
-    form.setFieldValue('gender', data.gender)
-    setOpenForm(true)
-  }
+  const handleEdit = useCallback(
+    (data: Testimonial) => {
+      setEditingData(data)
+      form.setFieldValue('testimoner_name', data.testimoner_name)
+      form.setFieldValue('testimoner_position', data.testimoner_position)
+      form.setFieldValue('testimony_text', data.testimony_text)
+      form.setFieldValue('testimoner_photo', data.testimoner_photo || '')
+      form.setFieldValue('is_active', data.is_active)
+      form.setFieldValue('gender', data.gender)
+      setOpenForm(true)
+    },
+    [form],
+  )
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -137,6 +218,7 @@ function RouteComponent() {
     () => [
       columnHelper.accessor('testimoner_photo', {
         header: 'Foto',
+        meta: { minWidth: '5rem' },
         cell: (info) => {
           const url = info.getValue()
           return url ? (
@@ -168,13 +250,16 @@ function RouteComponent() {
       }),
       columnHelper.accessor('testimoner_name', {
         header: 'Nama',
+        meta: { minWidth: '12rem' },
         cell: (info) => <span className="font-medium">{info.getValue()}</span>,
       }),
       columnHelper.accessor('testimoner_position', {
         header: 'Posisi',
+        meta: { minWidth: '12rem' },
       }),
       columnHelper.accessor('testimony_text', {
         header: 'Testimoni',
+        meta: { minWidth: '18rem' },
         cell: (info) => (
           <div className="line-clamp-3 max-w-[350px]" title={info.getValue()}>
             {info.getValue()}
@@ -183,6 +268,7 @@ function RouteComponent() {
       }),
       columnHelper.accessor('gender', {
         header: 'Gender',
+        meta: { minWidth: '7rem' },
         cell: (info) => (
           <span className="capitalize">
             {info.getValue().replace('-', ' & ')}
@@ -191,6 +277,7 @@ function RouteComponent() {
       }),
       columnHelper.accessor('is_active', {
         header: 'Status',
+        meta: { minWidth: '8rem' },
         cell: (info) => (
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${info.getValue() ? 'bg-green-100 text-green-800' : 'bg-neutral-100 text-neutral-800'}`}
@@ -202,173 +289,119 @@ function RouteComponent() {
       columnHelper.display({
         id: 'actions',
         header: 'Aksi',
+        meta: { fixed: 'right' },
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleEdit(row.original)}
-            >
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Trash className="h-4 w-4 mr-1" />
-                  Hapus
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Hapus Testimonial</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Apakah Anda yakin ingin menghapus testimonial dari "
-                    {row.original.testimoner_name}"? Tindakan ini tidak dapat
-                    dibatalkan.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={async () => {
-                      await deleteMutation(row.original.id)
-                    }}
-                  >
-                    {deleting && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Ya, Hapus
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+          <TestimonialRowActions
+            testimonial={row.original}
+            isDeleting={deleting}
+            onEdit={handleEdit}
+            onDelete={deleteMutation}
+          />
         ),
       }),
     ],
-    [deleting, deleteMutation],
+    [deleting, deleteMutation, handleEdit],
   )
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Daftar Testimonial</h1>
-
-        <Sheet open={openForm} onOpenChange={handleOpenChange}>
-          <SheetTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah Testimonial
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="w-full sm:max-w-xl overflow-y-auto px-5">
-            <SheetHeader className="mb-6">
-              <SheetTitle>
-                {editingData ? 'Edit Testimonial' : 'Tambah Testimonial'}
-              </SheetTitle>
-              <SheetDescription>
-                Isi form di bawah ini untuk menyimpan data testimonial.
-              </SheetDescription>
-            </SheetHeader>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                form.handleSubmit()
-              }}
-              className="space-y-4"
-            >
-              <form.AppField name="testimoner_name">
-                {({ TextField }) => (
-                  <TextField
-                    label="Nama"
-                    placeholder="Masukkan nama"
-                    name="testimoner_name"
-                  />
-                )}
-              </form.AppField>
-
-              <form.AppField name="testimoner_position">
-                {({ TextField }) => (
-                  <TextField
-                    label="Posisi / Profesi"
-                    placeholder="Masukkan posisi"
-                    name="testimoner_position"
-                  />
-                )}
-              </form.AppField>
-
-              <form.AppField name="testimoner_photo">
-                {({ TextField }) => (
-                  <TextField
-                    label="URL Foto (Opsional)"
-                    placeholder="Masukkan URL foto"
-                    name="testimoner_photo"
-                  />
-                )}
-              </form.AppField>
-
-              <form.AppField name="gender">
-                {({ Select }) => (
-                  <Select
-                    label="Gender"
-                    values={[
-                      { label: 'Laki-laki (Man)', value: 'man' },
-                      { label: 'Perempuan (Woman)', value: 'woman' },
-                      { label: 'Keduanya (Man-Woman)', value: 'man-woman' },
-                    ]}
-                  />
-                )}
-              </form.AppField>
-
-              <form.AppField name="testimony_text">
-                {({ TextArea }) => (
-                  <TextArea label="Isi Testimonial" rows={6} />
-                )}
-              </form.AppField>
-
-              <div className="pt-2">
-                <form.AppField name="is_active">
-                  {({ Switch }) => <Switch label="Aktifkan Testimonial" />}
-                </form.AppField>
-              </div>
-
-              <div className="mt-8 flex justify-end gap-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="bg-white"
-                  onClick={() => setOpenForm(false)}
+    <BasePageLayout subtitle="Kelola testimoni yang ditampilkan di website.">
+      <div className="w-full">
+        <div className="bg-white rounded-lg border">
+          <Table
+            columns={columns}
+            data={testimonials}
+            isLoading={loadingData}
+            pagination={pagination}
+            totalItems={data?.meta?.total ?? 0}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            toolbar={
+              <FormSheet
+                open={openForm}
+                onOpenChange={handleOpenChange}
+                trigger={
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Tambah Testimonial
+                  </Button>
+                }
+                title={editingData ? 'Edit Testimonial' : 'Tambah Testimonial'}
+                description="Isi form di bawah ini untuk menyimpan data testimonial."
+                onSubmitForm={async () => {
+                  await form.handleSubmit()
+                }}
+              >
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    form.handleSubmit()
+                  }}
+                  className="space-y-4 px-4"
                 >
-                  Batal
-                </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button type="submit" disabled={!canSubmit}>
-                      {isSubmitting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : null}
-                      {editingData ? 'Simpan Perubahan' : 'Simpan Testimonial'}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </div>
-            </form>
-          </SheetContent>
-        </Sheet>
-      </div>
+                  <form.AppField name="testimoner_name">
+                    {({ TextField }) => (
+                      <TextField
+                        label="Nama"
+                        placeholder="Masukkan nama"
+                        name="testimoner_name"
+                      />
+                    )}
+                  </form.AppField>
 
-      <div className="bg-white rounded-lg border">
-        <Table
-          columns={columns}
-          data={testimonials || []}
-          isLoading={loadingData}
-        />
+                  <form.AppField name="testimoner_position">
+                    {({ TextField }) => (
+                      <TextField
+                        label="Posisi / Profesi"
+                        placeholder="Masukkan posisi"
+                        name="testimoner_position"
+                      />
+                    )}
+                  </form.AppField>
+
+                  <form.AppField name="testimoner_photo">
+                    {({ TextField }) => (
+                      <TextField
+                        label="URL Foto (Opsional)"
+                        placeholder="Masukkan URL foto"
+                        name="testimoner_photo"
+                      />
+                    )}
+                  </form.AppField>
+
+                  <form.AppField name="gender">
+                    {({ Select }) => (
+                      <Select
+                        label="Gender"
+                        values={[
+                          { label: 'Laki-laki (Man)', value: 'man' },
+                          { label: 'Perempuan (Woman)', value: 'woman' },
+                          {
+                            label: 'Keduanya (Man-Woman)',
+                            value: 'man-woman',
+                          },
+                        ]}
+                      />
+                    )}
+                  </form.AppField>
+
+                  <form.AppField name="testimony_text">
+                    {({ TextArea }) => (
+                      <TextArea label="Isi Testimonial" rows={6} />
+                    )}
+                  </form.AppField>
+
+                  <form.AppField name="is_active">
+                    {({ Switch }) => <Switch label="Aktifkan Testimonial" />}
+                  </form.AppField>
+                </form>
+              </FormSheet>
+            }
+          />
+        </div>
       </div>
-    </div>
+    </BasePageLayout>
   )
 }

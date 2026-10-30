@@ -75,26 +75,22 @@ export const UpdateMeetingSessionForm = forwardRef<
       throw new Error(`Form validation failed: ${JSON.stringify(errors)}`)
     },
     onSubmit: async ({ value }) => {
-      try {
-        const submitData = {
-          ...value,
-          description:
-            value.description && value.description.trim() !== ''
-              ? value.description.trim()
-              : undefined,
-        }
-
-        await updateMeetingSession({
-          id: session.id,
-          data: submitData,
-        })
-
-        await queryClient.refetchQueries({ queryKey: ['meeting-sessions'] })
-        form.reset()
-        onSuccess?.()
-      } catch (error) {
-        throw error
+      const submitData = {
+        ...value,
+        description:
+          value.description && value.description.trim() !== ''
+            ? value.description.trim()
+            : undefined,
       }
+
+      await updateMeetingSession({
+        id: session.id,
+        data: submitData,
+      })
+
+      await queryClient.refetchQueries({ queryKey: ['meeting-sessions'] })
+      form.reset()
+      onSuccess?.()
     },
   })
 

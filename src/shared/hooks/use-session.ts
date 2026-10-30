@@ -26,6 +26,11 @@ interface SessionActions {
   clearLocalSession: () => void
 }
 
+const ACCESS_TOKEN_FALLBACK_MS = 24 * 60 * 60 * 1000
+const REFRESH_TOKEN_FALLBACK_MS = 90 * 24 * 60 * 60 * 1000
+
+let renewPromise: Promise<UpdateSessionData> | null = null
+
 export const useSessionStore = create<SessionState & SessionActions>()(
   (set, get) => ({
     accessToken: Cookies.get('access_token') || null,
@@ -39,32 +44,45 @@ export const useSessionStore = create<SessionState & SessionActions>()(
 
         get().updateSession(response.data.data)
         toast.success('Login success')
-      } catch (error) {
+      } catch {
         toast.error('Failed to logged in')
         throw new Error('Authentication failed')
       }
     },
     renewSession: async () => {
-      try {
-        const { refreshToken, updateSession } = get()
+      if (renewPromise) return renewPromise
 
-        if (!refreshToken) {
-          throw new Error('No refresh token available')
+      const pending = (async () => {
+        try {
+          const { updateSession } = get()
+          const refreshToken =
+            Cookies.get('refresh_token') || get().refreshToken
+
+          if (!refreshToken) {
+            throw new Error('No refresh token available')
+          }
+
+          const response = await http.put('/auth/refresh', {
+            token: refreshToken,
+          })
+
+          updateSession(response.data.data)
+          return response.data.data as UpdateSessionData
+        } catch (error) {
+          Cookies.remove('access_token')
+          Cookies.remove('refresh_token')
+          set({ accessToken: null, refreshToken: null })
+          useUserStore.getState().clearUser()
+          throw error
         }
+      })()
 
-        const response = await http.put('/auth/refresh', {
-          token: refreshToken,
-        })
+      renewPromise = pending
 
-        updateSession(response.data.data)
-        return response.data.data
-      } catch (error) {
-        Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-        // ponytail: also clear Zustand state to avoid stale session store
-        set({ accessToken: null, refreshToken: null })
-        useUserStore.getState().clearUser()
-        throw error
+      try {
+        return await pending
+      } finally {
+        renewPromise = null
       }
     },
     updateSession: ({
@@ -76,7 +94,7 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       if (access_token) {
         Cookies.set('access_token', access_token, {
           expires: new Date(
-            access_token_expiry || Date.now() + 7 * 24 * 60 * 60 * 1000,
+            access_token_expiry || Date.now() + ACCESS_TOKEN_FALLBACK_MS,
           ),
         })
         set({ accessToken: access_token })
@@ -85,18 +103,22 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       if (refresh_token) {
         Cookies.set('refresh_token', refresh_token, {
           expires: new Date(
-            refresh_token_expiry || Date.now() + 7 * 24 * 60 * 60 * 1000,
+            refresh_token_expiry || Date.now() + REFRESH_TOKEN_FALLBACK_MS,
           ),
         })
         set({ refreshToken: refresh_token })
       }
     },
     setAccessToken: (token: string) => {
-      Cookies.set('access_token', token, { expires: 7 })
+      Cookies.set('access_token', token, {
+        expires: new Date(Date.now() + ACCESS_TOKEN_FALLBACK_MS),
+      })
       set({ accessToken: token })
     },
     setRefreshToken: (token: string) => {
-      Cookies.set('refresh_token', token, { expires: 7 })
+      Cookies.set('refresh_token', token, {
+        expires: new Date(Date.now() + REFRESH_TOKEN_FALLBACK_MS),
+      })
       set({ refreshToken: token })
     },
     clearSession: async () => {

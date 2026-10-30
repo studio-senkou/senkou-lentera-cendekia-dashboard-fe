@@ -35,7 +35,7 @@ export const ClassForm = forwardRef<ClassFormRef, ClassFormProps>(
       validators: {
         onSubmit: schema,
       },
-      onSubmitInvalid: (_) => {
+      onSubmitInvalid: () => {
         throw new Error('Invalid form submission')
       },
       onSubmit: async (values) => {
@@ -57,11 +57,7 @@ export const ClassForm = forwardRef<ClassFormRef, ClassFormProps>(
 
     useImperativeHandle(ref, () => ({
       submit: async () => {
-        try {
-          await form.handleSubmit()
-        } catch (error) {
-          throw error
-        }
+        await form.handleSubmit()
       },
     }))
 

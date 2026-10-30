@@ -13,11 +13,18 @@ export function getFileUrl(path?: string | null): string | undefined {
     return path
   }
 
+  const normalized = path.replace(/^\/+/, '')
+  const imageBase = env.VITE_IMAGE_BASE_URL?.replace(/\/+$/, '')
+
+  if (imageBase) {
+    return `${imageBase}/${normalized}`
+  }
+
   try {
     const baseUrl = env.VITE_API_BASE_URL || ''
     const host = new URL(baseUrl).origin
-    return `${host}/api/v1/files/${path}`
-  } catch (e) {
-    return `/files/${path}`
+    return `${host}/api/v1/files/${normalized}`
+  } catch {
+    return `/files/${normalized}`
   }
 }

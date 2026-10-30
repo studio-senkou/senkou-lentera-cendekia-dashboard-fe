@@ -228,7 +228,7 @@ const CustomFloatingMenu = ({ editor }: { editor: any }) => {
 
             setPosition({ top, left })
             setShow(true)
-          } catch (error) {
+          } catch {
             setShow(false)
           }
         } else {
@@ -321,7 +321,7 @@ const CustomBubbleMenu = ({ editor }: { editor: any }) => {
 
             setPosition({ top, left })
             setShow(true)
-          } catch (error) {
+          } catch {
             setShow(false)
           }
         } else {

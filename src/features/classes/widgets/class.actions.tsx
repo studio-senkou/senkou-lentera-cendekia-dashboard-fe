@@ -1,12 +1,8 @@
-import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Edit3, Trash2 } from 'lucide-react'
+
 import EditClassSheet from './edit-class.sheet'
-import { Button } from '@/shared/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/shared/ui/tooltip'
+import { RowActions } from '@/widgets/table'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +12,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 
 interface ClassActionsProps {
@@ -32,46 +27,63 @@ export function ClassActions({
   onEditSuccess,
   onDelete,
 }: ClassActionsProps) {
-  return (
-    <div className="flex items-center justify-end gap-2">
-      <EditClassSheet id={id} classname={classname} onSuccess={onEditSuccess} />
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
-      <TooltipProvider>
-        <Tooltip>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  aria-label="Hapus Kelas"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tindakan ini tidak dapat dibatalkan. Ini akan menghapus kelas{' '}
-                  <strong>{classname}</strong> secara permanen dari server.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete?.(id)}>
-                  Hapus
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <TooltipContent>
-            <p>Hapus Kelas</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+  return (
+    <>
+      <RowActions
+        actions={[
+          {
+            key: 'edit',
+            node: null,
+            alwaysOverflow: true,
+            overflow: {
+              icon: <Edit3 className="h-4 w-4" />,
+              label: 'Edit Kelas',
+              onSelect: () => setEditOpen(true),
+            },
+          },
+          {
+            key: 'delete',
+            node: null,
+            alwaysOverflow: true,
+            overflow: {
+              icon: <Trash2 className="h-4 w-4" />,
+              label: 'Hapus Kelas',
+              variant: 'destructive',
+              onSelect: () => setDeleteOpen(true),
+            },
+          },
+        ]}
+      />
+
+      <EditClassSheet
+        id={id}
+        classname={classname}
+        onSuccess={onEditSuccess}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus kelas{' '}
+              <strong>{classname}</strong> secara permanen dari server.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={() => onDelete?.(id)}>
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 

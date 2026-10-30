@@ -1,27 +1,9 @@
 import { useStore } from '@tanstack/react-form'
-import { useFieldContext } from '../hooks/form-context'
-import { Textarea as ShadcnTextarea } from '@/shared/ui/textarea'
-import { Label } from '@/shared/ui/label'
-import { cn } from '@/shared/lib/utils'
 
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
+import { useFieldContext } from '../hooks/form-context'
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
+import { Textarea as ShadcnTextarea } from '@/shared/ui/textarea'
+import { cn } from '@/shared/lib/utils'
 
 export function TextArea({
   label,
@@ -36,15 +18,17 @@ export function TextArea({
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
 
   return (
-    <div>
-      <Label htmlFor={label} className="mb-2 text-sm">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={field.name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+    >
       <ShadcnTextarea
-        id={label}
+        id={field.name}
         value={field.state.value}
         onBlur={field.handleBlur}
         className={cn('resize-vertical w-full break-words', className)}
@@ -57,7 +41,6 @@ export function TextArea({
         onChange={(e) => field.handleChange(e.target.value)}
         required={required}
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

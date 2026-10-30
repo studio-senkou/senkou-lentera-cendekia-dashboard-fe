@@ -1,21 +1,23 @@
-import { TableFooter as TableFooterComponent, TableRow, TableCell } from '@/shared/ui/table'
-import { type Table } from '@tanstack/react-table'
 import { Pagination } from './pagination'
+import type { Table as TanstackTable } from '@tanstack/react-table'
 
 interface TableFooterProps<T> {
-  table: Table<T>
+  table: TanstackTable<T>
   isLoading?: boolean
-  columnCount: number
 }
 
-export function TableFooter<T>({ table, isLoading, columnCount }: TableFooterProps<T>) {
+export function TableFooter<T>({ table, isLoading }: TableFooterProps<T>) {
+  const { pageIndex, pageSize } = table.getState().pagination
+  const totalItems = table.getPrePaginationRowModel().rows.length
+
   return (
-    <TableFooterComponent>
-      <TableRow>
-        <TableCell colSpan={columnCount + 1}>
-          <Pagination table={table} isLoading={isLoading} />
-        </TableCell>
-      </TableRow>
-    </TableFooterComponent>
+    <Pagination
+      currentPage={pageIndex + 1}
+      pageSize={pageSize}
+      totalItems={totalItems}
+      isLoading={isLoading}
+      onPageChange={(page) => table.setPageIndex(page - 1)}
+      onPageSizeChange={(size) => table.setPageSize(size)}
+    />
   )
 }

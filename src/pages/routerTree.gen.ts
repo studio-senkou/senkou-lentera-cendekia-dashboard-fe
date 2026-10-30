@@ -14,7 +14,11 @@ import { Route as UauthenticatedLayoutRouteImport } from './_uauthenticatedLayou
 import { Route as AuthenticatedLayoutRouteImport } from './_authenticatedLayout'
 import { Route as AuthenticatedLayoutIndexRouteImport } from './_authenticatedLayout/index'
 import { Route as ReportUserRouteImport } from './report/$user'
+import { Route as AuthCallbackRouteImport } from './auth/callback'
+import { Route as UauthenticatedLayoutVerifyIndexRouteImport } from './_uauthenticatedLayout/verify/index'
+import { Route as UauthenticatedLayoutResetPasswordIndexRouteImport } from './_uauthenticatedLayout/reset-password/index'
 import { Route as UauthenticatedLayoutLoginIndexRouteImport } from './_uauthenticatedLayout/login/index'
+import { Route as UauthenticatedLayoutForgotPasswordIndexRouteImport } from './_uauthenticatedLayout/forgot-password/index'
 import { Route as AuthenticatedLayoutTestimonialsIndexRouteImport } from './_authenticatedLayout/testimonials/index'
 import { Route as AuthenticatedLayoutQuizzesIndexRouteImport } from './_authenticatedLayout/quizzes/index'
 import { Route as AuthenticatedLayoutProgramsIndexRouteImport } from './_authenticatedLayout/programs/index'
@@ -25,6 +29,7 @@ import { Route as AuthenticatedLayoutArticlesIndexRouteImport } from './_authent
 import { Route as AuthenticatedLayoutUsersStudentsRouteImport } from './_authenticatedLayout/users/students'
 import { Route as AuthenticatedLayoutUsersMentorsRouteImport } from './_authenticatedLayout/users/mentors'
 import { Route as AuthenticatedLayoutUsersDeletedRouteImport } from './_authenticatedLayout/users/deleted'
+import { Route as AuthenticatedLayoutUsersAdminsRouteImport } from './_authenticatedLayout/users/admins'
 import { Route as AuthenticatedLayoutQuizzesQuizIdRouteImport } from './_authenticatedLayout/quizzes/$quizId'
 import { Route as AuthenticatedLayoutMeetingSessionsUserRouteImport } from './_authenticatedLayout/meeting-sessions/$user'
 
@@ -51,10 +56,33 @@ const ReportUserRoute = ReportUserRouteImport.update({
   path: '/report/$user',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UauthenticatedLayoutVerifyIndexRoute =
+  UauthenticatedLayoutVerifyIndexRouteImport.update({
+    id: '/verify/',
+    path: '/verify/',
+    getParentRoute: () => UauthenticatedLayoutRoute,
+  } as any)
+const UauthenticatedLayoutResetPasswordIndexRoute =
+  UauthenticatedLayoutResetPasswordIndexRouteImport.update({
+    id: '/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => UauthenticatedLayoutRoute,
+  } as any)
 const UauthenticatedLayoutLoginIndexRoute =
   UauthenticatedLayoutLoginIndexRouteImport.update({
     id: '/login/',
     path: '/login/',
+    getParentRoute: () => UauthenticatedLayoutRoute,
+  } as any)
+const UauthenticatedLayoutForgotPasswordIndexRoute =
+  UauthenticatedLayoutForgotPasswordIndexRouteImport.update({
+    id: '/forgot-password/',
+    path: '/forgot-password/',
     getParentRoute: () => UauthenticatedLayoutRoute,
   } as any)
 const AuthenticatedLayoutTestimonialsIndexRoute =
@@ -117,6 +145,12 @@ const AuthenticatedLayoutUsersDeletedRoute =
     path: '/users/deleted',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
+const AuthenticatedLayoutUsersAdminsRoute =
+  AuthenticatedLayoutUsersAdminsRouteImport.update({
+    id: '/users/admins',
+    path: '/users/admins',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
 const AuthenticatedLayoutQuizzesQuizIdRoute =
   AuthenticatedLayoutQuizzesQuizIdRouteImport.update({
     id: '/quizzes/$quizId',
@@ -131,11 +165,13 @@ const AuthenticatedLayoutMeetingSessionsUserRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/auth/callback': typeof AuthCallbackRoute
   '/report/$user': typeof ReportUserRoute
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/users/admins': typeof AuthenticatedLayoutUsersAdminsRoute
   '/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
   '/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
   '/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
@@ -146,14 +182,19 @@ export interface FileRoutesByFullPath {
   '/programs': typeof AuthenticatedLayoutProgramsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/testimonials': typeof AuthenticatedLayoutTestimonialsIndexRoute
+  '/forgot-password': typeof UauthenticatedLayoutForgotPasswordIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
+  '/reset-password': typeof UauthenticatedLayoutResetPasswordIndexRoute
+  '/verify': typeof UauthenticatedLayoutVerifyIndexRoute
 }
 export interface FileRoutesByTo {
+  '/auth/callback': typeof AuthCallbackRoute
   '/report/$user': typeof ReportUserRoute
   '/routes': typeof Routes_rootRoute
   '/': typeof AuthenticatedLayoutIndexRoute
   '/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/users/admins': typeof AuthenticatedLayoutUsersAdminsRoute
   '/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
   '/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
   '/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
@@ -164,17 +205,22 @@ export interface FileRoutesByTo {
   '/programs': typeof AuthenticatedLayoutProgramsIndexRoute
   '/quizzes': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/testimonials': typeof AuthenticatedLayoutTestimonialsIndexRoute
+  '/forgot-password': typeof UauthenticatedLayoutForgotPasswordIndexRoute
   '/login': typeof UauthenticatedLayoutLoginIndexRoute
+  '/reset-password': typeof UauthenticatedLayoutResetPasswordIndexRoute
+  '/verify': typeof UauthenticatedLayoutVerifyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticatedLayout': typeof AuthenticatedLayoutRouteWithChildren
   '/_uauthenticatedLayout': typeof UauthenticatedLayoutRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
   '/report/$user': typeof ReportUserRoute
   '/routes/__root': typeof Routes_rootRoute
   '/_authenticatedLayout/': typeof AuthenticatedLayoutIndexRoute
   '/_authenticatedLayout/meeting-sessions/$user': typeof AuthenticatedLayoutMeetingSessionsUserRoute
   '/_authenticatedLayout/quizzes/$quizId': typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  '/_authenticatedLayout/users/admins': typeof AuthenticatedLayoutUsersAdminsRoute
   '/_authenticatedLayout/users/deleted': typeof AuthenticatedLayoutUsersDeletedRoute
   '/_authenticatedLayout/users/mentors': typeof AuthenticatedLayoutUsersMentorsRoute
   '/_authenticatedLayout/users/students': typeof AuthenticatedLayoutUsersStudentsRoute
@@ -185,16 +231,21 @@ export interface FileRoutesById {
   '/_authenticatedLayout/programs/': typeof AuthenticatedLayoutProgramsIndexRoute
   '/_authenticatedLayout/quizzes/': typeof AuthenticatedLayoutQuizzesIndexRoute
   '/_authenticatedLayout/testimonials/': typeof AuthenticatedLayoutTestimonialsIndexRoute
+  '/_uauthenticatedLayout/forgot-password/': typeof UauthenticatedLayoutForgotPasswordIndexRoute
   '/_uauthenticatedLayout/login/': typeof UauthenticatedLayoutLoginIndexRoute
+  '/_uauthenticatedLayout/reset-password/': typeof UauthenticatedLayoutResetPasswordIndexRoute
+  '/_uauthenticatedLayout/verify/': typeof UauthenticatedLayoutVerifyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/auth/callback'
     | '/report/$user'
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
     | '/quizzes/$quizId'
+    | '/users/admins'
     | '/users/deleted'
     | '/users/mentors'
     | '/users/students'
@@ -205,14 +256,19 @@ export interface FileRouteTypes {
     | '/programs'
     | '/quizzes'
     | '/testimonials'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
+    | '/verify'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth/callback'
     | '/report/$user'
     | '/routes'
     | '/'
     | '/meeting-sessions/$user'
     | '/quizzes/$quizId'
+    | '/users/admins'
     | '/users/deleted'
     | '/users/mentors'
     | '/users/students'
@@ -223,16 +279,21 @@ export interface FileRouteTypes {
     | '/programs'
     | '/quizzes'
     | '/testimonials'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
+    | '/verify'
   id:
     | '__root__'
     | '/_authenticatedLayout'
     | '/_uauthenticatedLayout'
+    | '/auth/callback'
     | '/report/$user'
     | '/routes/__root'
     | '/_authenticatedLayout/'
     | '/_authenticatedLayout/meeting-sessions/$user'
     | '/_authenticatedLayout/quizzes/$quizId'
+    | '/_authenticatedLayout/users/admins'
     | '/_authenticatedLayout/users/deleted'
     | '/_authenticatedLayout/users/mentors'
     | '/_authenticatedLayout/users/students'
@@ -243,12 +304,16 @@ export interface FileRouteTypes {
     | '/_authenticatedLayout/programs/'
     | '/_authenticatedLayout/quizzes/'
     | '/_authenticatedLayout/testimonials/'
+    | '/_uauthenticatedLayout/forgot-password/'
     | '/_uauthenticatedLayout/login/'
+    | '/_uauthenticatedLayout/reset-password/'
+    | '/_uauthenticatedLayout/verify/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedLayoutRoute: typeof AuthenticatedLayoutRouteWithChildren
   UauthenticatedLayoutRoute: typeof UauthenticatedLayoutRouteWithChildren
+  AuthCallbackRoute: typeof AuthCallbackRoute
   ReportUserRoute: typeof ReportUserRoute
   Routes_rootRoute: typeof Routes_rootRoute
 }
@@ -290,11 +355,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportUserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_uauthenticatedLayout/verify/': {
+      id: '/_uauthenticatedLayout/verify/'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof UauthenticatedLayoutVerifyIndexRouteImport
+      parentRoute: typeof UauthenticatedLayoutRoute
+    }
+    '/_uauthenticatedLayout/reset-password/': {
+      id: '/_uauthenticatedLayout/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof UauthenticatedLayoutResetPasswordIndexRouteImport
+      parentRoute: typeof UauthenticatedLayoutRoute
+    }
     '/_uauthenticatedLayout/login/': {
       id: '/_uauthenticatedLayout/login/'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof UauthenticatedLayoutLoginIndexRouteImport
+      parentRoute: typeof UauthenticatedLayoutRoute
+    }
+    '/_uauthenticatedLayout/forgot-password/': {
+      id: '/_uauthenticatedLayout/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof UauthenticatedLayoutForgotPasswordIndexRouteImport
       parentRoute: typeof UauthenticatedLayoutRoute
     }
     '/_authenticatedLayout/testimonials/': {
@@ -367,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutUsersDeletedRouteImport
       parentRoute: typeof AuthenticatedLayoutRoute
     }
+    '/_authenticatedLayout/users/admins': {
+      id: '/_authenticatedLayout/users/admins'
+      path: '/users/admins'
+      fullPath: '/users/admins'
+      preLoaderRoute: typeof AuthenticatedLayoutUsersAdminsRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
+    }
     '/_authenticatedLayout/quizzes/$quizId': {
       id: '/_authenticatedLayout/quizzes/$quizId'
       path: '/quizzes/$quizId'
@@ -388,6 +488,7 @@ interface AuthenticatedLayoutRouteChildren {
   AuthenticatedLayoutIndexRoute: typeof AuthenticatedLayoutIndexRoute
   AuthenticatedLayoutMeetingSessionsUserRoute: typeof AuthenticatedLayoutMeetingSessionsUserRoute
   AuthenticatedLayoutQuizzesQuizIdRoute: typeof AuthenticatedLayoutQuizzesQuizIdRoute
+  AuthenticatedLayoutUsersAdminsRoute: typeof AuthenticatedLayoutUsersAdminsRoute
   AuthenticatedLayoutUsersDeletedRoute: typeof AuthenticatedLayoutUsersDeletedRoute
   AuthenticatedLayoutUsersMentorsRoute: typeof AuthenticatedLayoutUsersMentorsRoute
   AuthenticatedLayoutUsersStudentsRoute: typeof AuthenticatedLayoutUsersStudentsRoute
@@ -405,6 +506,7 @@ const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
   AuthenticatedLayoutMeetingSessionsUserRoute:
     AuthenticatedLayoutMeetingSessionsUserRoute,
   AuthenticatedLayoutQuizzesQuizIdRoute: AuthenticatedLayoutQuizzesQuizIdRoute,
+  AuthenticatedLayoutUsersAdminsRoute: AuthenticatedLayoutUsersAdminsRoute,
   AuthenticatedLayoutUsersDeletedRoute: AuthenticatedLayoutUsersDeletedRoute,
   AuthenticatedLayoutUsersMentorsRoute: AuthenticatedLayoutUsersMentorsRoute,
   AuthenticatedLayoutUsersStudentsRoute: AuthenticatedLayoutUsersStudentsRoute,
@@ -424,11 +526,19 @@ const AuthenticatedLayoutRouteWithChildren =
   AuthenticatedLayoutRoute._addFileChildren(AuthenticatedLayoutRouteChildren)
 
 interface UauthenticatedLayoutRouteChildren {
+  UauthenticatedLayoutForgotPasswordIndexRoute: typeof UauthenticatedLayoutForgotPasswordIndexRoute
   UauthenticatedLayoutLoginIndexRoute: typeof UauthenticatedLayoutLoginIndexRoute
+  UauthenticatedLayoutResetPasswordIndexRoute: typeof UauthenticatedLayoutResetPasswordIndexRoute
+  UauthenticatedLayoutVerifyIndexRoute: typeof UauthenticatedLayoutVerifyIndexRoute
 }
 
 const UauthenticatedLayoutRouteChildren: UauthenticatedLayoutRouteChildren = {
+  UauthenticatedLayoutForgotPasswordIndexRoute:
+    UauthenticatedLayoutForgotPasswordIndexRoute,
   UauthenticatedLayoutLoginIndexRoute: UauthenticatedLayoutLoginIndexRoute,
+  UauthenticatedLayoutResetPasswordIndexRoute:
+    UauthenticatedLayoutResetPasswordIndexRoute,
+  UauthenticatedLayoutVerifyIndexRoute: UauthenticatedLayoutVerifyIndexRoute,
 }
 
 const UauthenticatedLayoutRouteWithChildren =
@@ -437,6 +547,7 @@ const UauthenticatedLayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedLayoutRoute: AuthenticatedLayoutRouteWithChildren,
   UauthenticatedLayoutRoute: UauthenticatedLayoutRouteWithChildren,
+  AuthCallbackRoute: AuthCallbackRoute,
   ReportUserRoute: ReportUserRoute,
   Routes_rootRoute: Routes_rootRoute,
 }

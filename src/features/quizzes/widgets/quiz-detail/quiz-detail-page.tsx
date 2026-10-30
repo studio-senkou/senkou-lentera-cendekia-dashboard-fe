@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { ChevronLeft, Edit2, Plus } from 'lucide-react'
+import { ChevronLeft, Edit2, Loader2, Plus } from 'lucide-react'
 import { useRef } from 'react'
 
 import { CreateQuestionSheet } from './create-question-sheet'
@@ -12,12 +12,28 @@ import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { QuizAttemptsTable } from '@/features/quizzes/widgets/quiz-attempts.table'
 import { QuizForm } from '@/features/quizzes/widgets/quiz.form'
-import { getQuizAttempts, getQuizById } from '@/entities/quizzes'
+import { useServerTable } from '@/shared/hooks/use-server-table'
+import {
+  getQuizAttempts,
+  getQuizById,
+  getQuizQuestions,
+} from '@/entities/quizzes'
+
+const QUESTION_PAGE_SIZE = 10
 
 export function QuizDetailPage() {
   const navigate = useNavigate()
   const params = useParams({ from: '/_authenticatedLayout/quizzes/$quizId' })
   const quizId = Number(params.quizId)
+  const {
+    pagination,
+    params: attemptParams,
+    search,
+    searchInput,
+    setSearchInput,
+    setPage,
+    setPageSize,
+  } = useServerTable()
 
   const { data: quizDetail, isLoading: loadingQuiz } = useQuery({
     queryKey: ['quiz', quizId],
@@ -25,9 +41,35 @@ export function QuizDetailPage() {
     enabled: Number.isFinite(quizId),
   })
 
-  const { data: attempts, isLoading: loadingAttempts } = useQuery({
-    queryKey: ['quiz', quizId, 'attempts'],
-    queryFn: () => getQuizAttempts(quizId),
+  const {
+    data: questionsData,
+    isLoading: loadingQuestions,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['quiz', quizId, 'questions'],
+    queryFn: ({ pageParam }) =>
+      getQuizQuestions(quizId, {
+        limit: QUESTION_PAGE_SIZE,
+        cursor: pageParam,
+      }),
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.meta?.has_more ? lastPage.meta.next_cursor : null,
+    enabled: Number.isFinite(quizId),
+  })
+
+  const { data: attemptsData, isLoading: loadingAttempts } = useQuery({
+    queryKey: [
+      'quiz',
+      quizId,
+      'attempts',
+      pagination.currentPage,
+      pagination.pageSize,
+      search,
+    ],
+    queryFn: () => getQuizAttempts(quizId, attemptParams),
     enabled: Number.isFinite(quizId),
   })
 
@@ -42,9 +84,12 @@ export function QuizDetailPage() {
   }
 
   const quiz = quizDetail?.quiz
-  const sortedQuestions = [...(quizDetail?.questions ?? [])].sort(
+  const questions = questionsData?.pages.flatMap((page) => page.questions) ?? []
+  const sortedQuestions = [...questions].sort(
     (left, right) => left.order_number - right.order_number,
   )
+  const questionsTotal = questionsData?.pages[0]?.meta?.total ?? 0
+  const attempts = attemptsData?.attempts ?? []
 
   if (!Number.isFinite(quizId)) {
     return (
@@ -57,28 +102,22 @@ export function QuizDetailPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <Button
-            variant="outline"
-            className="p-4 rounded-xl mb-5 bg-white"
-            onClick={() => navigate({ to: '/quizzes' })}
-          >
-            <ChevronLeft />
-            Kembali ke daftar
-          </Button>
-          <h1 className="text-2xl font-semibold">Detail Kuis</h1>
-          <p className="text-sm text-muted-foreground">
-            Kelola metadata kuis, soal, pilihan jawaban, dan attempt user.
-          </p>
-        </div>
+        <Button
+          variant="outline"
+          className="p-4 rounded-xl bg-white"
+          onClick={() => navigate({ to: '/quizzes' })}
+        >
+          <ChevronLeft />
+          Kembali ke daftar
+        </Button>
       </div>
 
       <QuizSummaryHeader
         quiz={quiz}
-        questionCount={sortedQuestions.length}
-        attemptCount={attempts?.length ?? 0}
+        questionCount={questionsTotal}
+        attemptCount={attemptsData?.meta?.total ?? 0}
         isLoading={loadingQuiz}
         editAction={
           quiz ? (
@@ -132,7 +171,7 @@ export function QuizDetailPage() {
           </div>
         </div>
 
-        {loadingQuiz ? (
+        {loadingQuestions ? (
           <div className="space-y-3">
             <div className="h-24 animate-pulse rounded bg-muted" />
             <div className="h-24 animate-pulse rounded bg-muted" />
@@ -150,6 +189,28 @@ export function QuizDetailPage() {
                 question={question}
               />
             ))}
+
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                Menampilkan {sortedQuestions.length} dari {questionsTotal} soal
+              </p>
+              {hasNextPage && (
+                <Button
+                  variant="outline"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Memuat…
+                    </>
+                  ) : (
+                    'Muat soal berikutnya'
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         )}
       </section>
@@ -164,8 +225,14 @@ export function QuizDetailPage() {
 
         <QuizAttemptsTable
           quizId={quizId}
-          attempts={attempts ?? []}
+          attempts={attempts}
           isLoading={loadingAttempts}
+          pagination={pagination}
+          totalItems={attemptsData?.meta?.total ?? 0}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+          searchValue={searchInput}
+          onSearchChange={setSearchInput}
         />
       </section>
     </div>

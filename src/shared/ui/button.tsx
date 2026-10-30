@@ -1,35 +1,36 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/shared/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-[6px] text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-lg text-sm font-medium outline-none transition-[background-color,box-shadow,color] select-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-xs hover:bg-[#E55400] active:bg-[#CC4900]',
+          'button-emphasis [--btn-emphasis:var(--primary)] text-white ring-1 ring-[var(--button-emphasis-ring)] focus-visible:ring-2 focus-visible:ring-[var(--button-emphasis-ring)] active:ring-[var(--button-emphasis-ring)]',
         destructive:
-          'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+          'bg-card text-destructive shadow-xs ring-1 ring-border hover:bg-destructive/10 hover:text-destructive hover:ring-destructive/25 active:bg-destructive/15',
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+          'bg-transparent text-foreground shadow-none ring-1 ring-border hover:bg-accent hover:text-accent-foreground',
         secondary:
-          'bg-secondary text-secondary-foreground border border-border/80 shadow-xs hover:bg-accent active:bg-accent/80',
+          'bg-card text-foreground shadow-xs ring-1 ring-border hover:bg-muted active:bg-muted/80',
         ghost:
-          'text-muted-foreground bg-transparent hover:bg-accent/50 hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'bg-transparent text-muted-foreground shadow-none hover:bg-accent hover:text-foreground active:bg-accent',
+        link: 'text-primary shadow-none underline-offset-4 hover:underline',
         success:
-          'bg-green-500 text-white shadow-xs hover:bg-green-600 focus-visible:ring-green-200 dark:focus-visible:ring-green-400 disabled:bg-green-300 disabled:text-green-700',
+          'border border-emerald-600/20 bg-emerald-50 text-emerald-700 shadow-xs hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-950/60',
         warning:
-          'bg-orange-300 text-orange-foreground shadow-xs hover:bg-orange-300/90',
+          'border border-amber-600/20 bg-amber-50 text-amber-700 shadow-xs hover:bg-amber-100 hover:text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60',
       },
       size: {
-        default: 'h-[44px] px-6 py-3 has-[>svg]:px-4',
-        sm: 'h-9 rounded-[6px] gap-1.5 px-4 has-[>svg]:px-3',
-        lg: 'h-[52px] rounded-[6px] px-8 has-[>svg]:px-6',
-        icon: 'size-[44px]',
+        default: 'h-9 rounded-lg px-3 pb-0.5 text-sm',
+        sm: 'h-8 rounded-md px-2.5 text-xs',
+        lg: 'h-10 rounded-lg px-4 pb-0.5 text-sm',
+        icon: 'size-9 rounded-lg p-0',
       },
     },
     defaultVariants: {

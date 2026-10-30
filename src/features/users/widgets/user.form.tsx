@@ -10,7 +10,7 @@ import { fetchClassesForDropdown } from '@/entities/classes'
 interface RegisterUserFormProps {
   className?: string
   onSuccess?: () => void
-  fixedRole?: 'user' | 'mentor'
+  fixedRole?: 'user' | 'mentor' | 'admin'
 }
 
 export interface RegisterUserFormRef {
@@ -23,7 +23,7 @@ const registerSchema = z.object({
     .string()
     .email('Alamat email tidak valid')
     .min(1, 'Email diperlukan'),
-  role: z.enum(['user', 'mentor']),
+  role: z.enum(['user', 'mentor', 'admin']),
   minimal_sessions: z.number(),
   classes: z.array(z.string()),
 })
@@ -34,6 +34,9 @@ const validateForm = (
   if (values.role === 'user') {
     if (!values.minimal_sessions || values.minimal_sessions < 1) {
       throw new Error('Sesi minimal harus lebih besar dari 0')
+    }
+    if (values.classes.length === 0) {
+      throw new Error('Kelas harus dipilih')
     }
   }
 }
@@ -53,7 +56,7 @@ export const RegisterUserForm = forwardRef<
     defaultValues: {
       name: '',
       email: '',
-      role: fixedRole || ('user' as 'user' | 'mentor'),
+      role: fixedRole || ('user' as 'user' | 'mentor' | 'admin'),
       minimal_sessions: 1,
       classes: [] as Array<string>,
     },
@@ -90,7 +93,7 @@ export const RegisterUserForm = forwardRef<
   const { AppField } = form
 
   // Track role to trigger re-render when it changes
-  const [currentRole, setCurrentRole] = useState<'user' | 'mentor'>(
+  const [currentRole, setCurrentRole] = useState<'user' | 'mentor' | 'admin'>(
     fixedRole || 'user',
   )
 
@@ -129,11 +132,12 @@ export const RegisterUserForm = forwardRef<
 
         {currentRole === 'user' && (
           <AppField name="classes">
-            {({ Select }) => (
-              <Select
+            {({ MultiComboboxField }) => (
+              <MultiComboboxField
                 label="Kelas"
                 placeholder="Pilih kelas"
-                values={classesDropdown ?? []}
+                options={classesDropdown ?? []}
+                maxSelected={1}
                 required
               />
             )}
@@ -157,7 +161,9 @@ export const RegisterUserForm = forwardRef<
                   { value: 'user', label: 'Murid' },
                   { value: 'mentor', label: 'Mentor' },
                 ]}
-                onChange={(value) => setCurrentRole(value as 'user' | 'mentor')}
+                onChange={(value) =>
+                  setCurrentRole(value as 'user' | 'mentor' | 'admin')
+                }
               />
             )}
           </AppField>

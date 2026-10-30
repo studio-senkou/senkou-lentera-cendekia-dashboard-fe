@@ -1,15 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYREGULAR.OTF')
+    format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYMEDIUM.OTF')
+    format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYBOLD.OTF')
+    format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYLIGHTITALIC.OTF')
+    format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYSEMIBOLDITALIC.OTF')
+    format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYHEAVYITALIC.OTF')
+    format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYBLACKITALIC.OTF')
+    format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYTHINITALIC.OTF')
+    format('opentype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('../assets/fonts/sf-pro-display/SFPRODISPLAYULTRALIGHTITALIC.OTF')
+    format('opentype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
 body {
   @apply m-0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -20,74 +98,77 @@ code {
 }
 
 :root {
-  --background: #FFF8EE;
-  --foreground: #0B0B0B;
-  --card: #FFFFFF;
-  --card-foreground: #0B0B0B;
-  --popover: #FFFFFF;
-  --popover-foreground: #0B0B0B;
-  --primary: #FF5C06;
-  --primary-foreground: #FFFFFF;
-  --secondary: #FFFFFF;
-  --secondary-foreground: #101828;
-  --muted: #F8F9FA;
-  --muted-foreground: #98A2B3;
-  --accent: #F3F4F6;
-  --accent-foreground: #101828;
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --border: #E6E8EA;
-  --input: #E6E8EA;
-  --ring: #155DEE;
-  --chart-1: #FF5C06;
-  --chart-2: #155DEE;
-  --chart-3: #16A34A;
-  --chart-4: #F59E0B;
-  --chart-5: #101828;
-  --radius: 0.375rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0B0B0B;
-  --sidebar-primary: #101828;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F3F4F6;
-  --sidebar-accent-foreground: #101828;
-  --sidebar-border: #E6E8EA;
-  --sidebar-ring: #155DEE;
+  /* Kumo / Cloudflare dashboard palette */
+  --background: oklch(0.9875 0 0);
+  --foreground: oklch(0.205 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.5772 0.2324 260);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(1 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.637 0.237 25.331);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.145 0 0 / 10%);
+  --input: oklch(0.145 0 0 / 12%);
+  --ring: var(--primary);
+  --chart-1: var(--primary);
+  --chart-2: oklch(0.68 0.16 195);
+  --chart-3: oklch(0.696 0.17 162.48);
+  --chart-4: oklch(0.769 0.188 70.08);
+  --chart-5: oklch(0.606 0.25 292.717);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.9875 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.96 0 0);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.935 0 0);
+  --sidebar-ring: var(--primary);
+  --grey-custom: #f4f7fb;
 }
 
 .dark {
-  --background: #101828;
-  --foreground: #FFF8EE;
-  --card: #1D2939;
-  --card-foreground: #FFF8EE;
-  --popover: #1D2939;
-  --popover-foreground: #FFF8EE;
-  --primary: #FF5C06;
-  --primary-foreground: #FFFFFF;
-  --secondary: #1D2939;
-  --secondary-foreground: #FFF8EE;
-  --muted: #344054;
-  --muted-foreground: #98A2B3;
-  --accent: #344054;
-  --accent-foreground: #FFF8EE;
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --border: #344054;
-  --input: #344054;
-  --ring: #155DEE;
-  --chart-1: #FF5C06;
-  --chart-2: #155DEE;
-  --chart-3: #16A34A;
-  --chart-4: #F59E0B;
-  --chart-5: #101828;
-  --sidebar: #101828;
-  --sidebar-foreground: #FFF8EE;
-  --sidebar-primary: #1D2939;
-  --sidebar-primary-foreground: #FFF8EE;
-  --sidebar-accent: #344054;
-  --sidebar-accent-foreground: #FFF8EE;
-  --sidebar-border: #344054;
-  --sidebar-ring: #155DEE;
+  --background: oklch(0.13 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.17 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: color-mix(in oklch, oklch(0.5772 0.2324 260), black 10%);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.21 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--primary);
+  --chart-1: var(--primary);
+  --chart-2: oklch(0.75 0.14 195);
+  --chart-3: oklch(0.75 0.15 162.48);
+  --chart-4: oklch(0.82 0.16 70.08);
+  --chart-5: oklch(0.7 0.2 292.717);
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.2 0 0);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: var(--primary);
+  --grey-custom: #1f2229;
 }
 
 @theme inline {
@@ -127,11 +208,14 @@ code {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-grey-custom: var(--grey-custom);
 
   --font-sans:
-    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: 'EB Garamond', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  --font-serif:
+    'EB Garamond', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-mono:
     ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo,
     monospace;
@@ -149,9 +233,71 @@ code {
   }
 }
 
+@layer components {
+  /*
+   * Kumo-style emphasis button. The gradient lives on a pseudo-element so the
+   * inset highlight and gradient never fight the Tailwind focus ring/shadow.
+   */
+  .button-emphasis {
+    --btn-emphasis: var(--primary);
+    --button-emphasis-ring: color-mix(in oklch, var(--btn-emphasis), black 10%);
+    --button-emphasis-bg: color-mix(in oklch, var(--btn-emphasis), white 30%);
+    --button-emphasis-gradient-start: color-mix(
+      in oklch,
+      var(--btn-emphasis),
+      white 15%
+    );
+    position: relative;
+    background-color: var(--button-emphasis-bg);
+    background-image: linear-gradient(
+      to bottom,
+      var(--button-emphasis-gradient-start),
+      var(--btn-emphasis)
+    );
+  }
+
+  .button-emphasis:hover:not(:disabled) {
+    background-image: linear-gradient(
+      to bottom,
+      var(--button-emphasis-bg),
+      var(--btn-emphasis)
+    );
+  }
+
+  .button-emphasis::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 1px 0 0 var(--button-emphasis-bg);
+    pointer-events: none;
+  }
+}
+
+/*
+ * Blur + fade strip hanging below a drawer header; content scrolls under it.
+ */
+.blur-fade-dialog {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 1.5rem;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: linear-gradient(
+    to bottom,
+    var(--blur-fade-bg, var(--background)),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
 .data-grid-container {
   @apply overflow-hidden border border-border w-full;
-  border-radius: 4px;
+  border-radius: var(--radius);
   width: 100% !important;
   block-size: auto !important;
 
@@ -180,16 +326,24 @@ code {
 
 .data-grid-container .rdg-header-row {
   @apply font-medium border-b border-border;
-  --rdg-header-background-color: #F8F9FA;
-  --rdg-header-selected-background-color: #E6E8EA;
+  --rdg-header-background-color: var(--muted);
+  --rdg-header-selected-background-color: var(--accent);
   color: var(--foreground);
 }
 
 .data-grid-container .rdg-cell {
   @apply w-full text-foreground;
   --rdg-cell-background-color: var(--card);
-  --rdg-cell-selected-background-color: #E3F2FD;
-  --rdg-cell-copied-background-color: #BBDEFB;
+  --rdg-cell-selected-background-color: color-mix(
+    in oklch,
+    var(--primary),
+    white 90%
+  );
+  --rdg-cell-copied-background-color: color-mix(
+    in oklch,
+    var(--primary),
+    white 82%
+  );
   border-inline-end: 1px solid var(--border);
   border-block-end: 1px solid var(--border);
   padding-inline: 8px;
@@ -202,7 +356,7 @@ code {
 }
 
 .data-grid-container .rdg-row:hover .rdg-cell {
-  background-color: #F8F9FA;
+  background-color: var(--muted);
 }
 
 .data-grid-container select {

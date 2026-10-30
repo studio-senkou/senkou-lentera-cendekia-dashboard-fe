@@ -31,7 +31,10 @@ export const useDataGrid = <TData>({
 
   const columnKeys = useMemo(() => {
     return columns
-      .filter((col): col is any => typeof col === 'object' && col !== null && 'key' in col)
+      .filter(
+        (col): col is any =>
+          typeof col === 'object' && col !== null && 'key' in col,
+      )
       .map((col) => col.key as keyof TData)
   }, [columns])
 
@@ -80,7 +83,7 @@ export const useDataGrid = <TData>({
 
       return { changedRows, changes }
     },
-    [],
+    [columnKeys],
   )
 
   return { data, handleRowsChange }

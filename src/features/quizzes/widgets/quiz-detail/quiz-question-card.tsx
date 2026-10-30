@@ -48,6 +48,9 @@ export function QuizQuestionCard({ quizId, question }: QuizQuestionCardProps) {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['quiz', quizId] })
+      await queryClient.invalidateQueries({
+        queryKey: ['quiz', quizId, 'questions'],
+      })
       await queryClient.invalidateQueries({ queryKey: ['quizzes'] })
     },
   })

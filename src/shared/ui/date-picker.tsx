@@ -1,31 +1,12 @@
 import { useStore } from '@tanstack/react-form'
-import { useFieldContext } from '../hooks/form-context'
-import { Button } from '@/shared/ui/button'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-import { Calendar } from '@/shared/ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
-
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
+import { useFieldContext } from '../hooks/form-context'
+import { Button } from '@/shared/ui/button'
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
+import { Input } from '@/shared/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
+import { Calendar } from '@/shared/ui/calendar'
 
 export function DatePicker({
   label,
@@ -38,6 +19,7 @@ export function DatePicker({
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
   const [open, setOpen] = useState(false)
   const [month, setMonth] = useState<Date | undefined>(undefined)
 
@@ -66,11 +48,12 @@ export function DatePicker({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+    >
       <div className="relative flex gap-2">
         <Input
           id={name}
@@ -78,7 +61,7 @@ export function DatePicker({
           type="date"
           value={field.state.value}
           placeholder="YYYY-MM-DD"
-          className="bg-white pr-10 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
+          className="pr-10 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
           onChange={(e) => {
             field.handleChange(e.target.value)
             const d = parseLocalDate(e.target.value)
@@ -129,7 +112,6 @@ export function DatePicker({
           </PopoverContent>
         </Popover>
       </div>
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

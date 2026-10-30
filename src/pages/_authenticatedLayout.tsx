@@ -1,9 +1,17 @@
 import { useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router'
 import Header from '@/widgets/header'
 import { AppSidebar } from '@/widgets/sidebar'
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar'
 import { useSessionStore } from '@/shared/hooks/use-session'
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router'
+import { useUserStore } from '@/shared/hooks/use-user'
+import { getUserDetails } from '@/entities/users'
 
 export const Route = createFileRoute('/_authenticatedLayout')({
   loader: () => {
@@ -17,6 +25,14 @@ export const Route = createFileRoute('/_authenticatedLayout')({
 function RouteComponent() {
   const navigate = useNavigate()
   const refreshToken = useSessionStore((state) => state.refreshToken)
+  const setUser = useUserStore((state) => state.setUser)
+
+  const { data: currentUser } = useQuery({
+    queryKey: ['auth', 'me', refreshToken],
+    queryFn: getUserDetails,
+    enabled: Boolean(refreshToken),
+    staleTime: 60_000,
+  })
 
   useEffect(() => {
     if (!refreshToken) {
@@ -24,20 +40,17 @@ function RouteComponent() {
     }
   }, [refreshToken, navigate])
 
+  useEffect(() => {
+    if (currentUser) setUser(currentUser)
+  }, [currentUser, setUser])
+
   return (
-    <SidebarProvider
-      style={
-        {
-          '--sidebar-width': 'calc(var(--spacing) * 72)',
-          '--header-height': 'calc(var(--spacing) * 12)',
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset className="min-w-0">
         <Header />
-        <div className="flex flex-1 flex-col items-center">
-          <div className="@container/main flex flex-1 flex-col w-full px-6 sm:px-12 lg:px-16 py-6 md:py-8 gap-2">
+        <div className="bg-grey-custom flex flex-1 flex-col items-center">
+          <div className="@container/main flex w-full flex-1 flex-col px-6 py-6 sm:px-12 md:py-8 lg:px-16">
             <Outlet />
           </div>
         </div>

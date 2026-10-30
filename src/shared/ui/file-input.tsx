@@ -1,28 +1,10 @@
 import { useStore } from '@tanstack/react-form'
+import { File, Upload, X } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useFieldContext } from '../hooks/form-context'
 import { Button } from '@/shared/ui/button'
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
 import { Label } from '@/shared/ui/label'
-import { Upload, X, File } from 'lucide-react'
-import { useRef, useState } from 'react'
-
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
 
 export function FileInput({
   label,
@@ -41,8 +23,9 @@ export function FileInput({
   maxSize?: number // in bytes
   placeholder?: string
 }) {
-  const field = useFieldContext<File | File[] | null>()
+  const field = useFieldContext<File | Array<File> | null>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -80,7 +63,7 @@ export function FileInput({
     }
 
     if (multiple) {
-      const currentFiles = (field.state.value as File[]) || []
+      const currentFiles = (field.state.value as Array<File>) || []
       field.handleChange([...currentFiles, ...fileArray])
     } else {
       field.handleChange(fileArray[0])
@@ -109,7 +92,7 @@ export function FileInput({
 
   const removeFile = (indexToRemove: number) => {
     if (multiple) {
-      const currentFiles = (field.state.value as File[]) || []
+      const currentFiles = (field.state.value as Array<File>) || []
       const newFiles = currentFiles.filter(
         (_, index) => index !== indexToRemove,
       )
@@ -124,23 +107,25 @@ export function FileInput({
   }
 
   const currentFiles = multiple
-    ? (field.state.value as File[]) || []
+    ? (field.state.value as Array<File>) || []
     : field.state.value
       ? [field.state.value as File]
       : []
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-        {maxSize && (
+    <FormField
+      label={label}
+      htmlFor={name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+      secondaryLabel={
+        maxSize ? (
           <span className="text-sm text-muted-foreground ml-2">
             (Max: {formatFileSize(maxSize)})
           </span>
-        )}
-      </Label>
-
+        ) : undefined
+      }
+    >
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -215,8 +200,6 @@ export function FileInput({
           ))}
         </div>
       )}
-
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

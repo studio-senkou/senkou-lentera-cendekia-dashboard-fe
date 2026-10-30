@@ -65,32 +65,24 @@ export const UpdateTestimonyForm = forwardRef<
       },
     },
     onSubmit: async (values) => {
-      try {
-        const submitValues = {
-          ...values.value,
-          testimony_id: testimony.id,
-          ...(values.value.testimoner_photo && {
-            testimoner_photo: values.value.testimoner_photo,
-          }),
-        }
-
-        await updateTestimony(submitValues)
-        await queryClient.refetchQueries({ queryKey: ['testimonies'] })
-
-        form.reset()
-      } catch (error) {
-        throw error
+      const submitValues = {
+        ...values.value,
+        testimony_id: testimony.id,
+        ...(values.value.testimoner_photo && {
+          testimoner_photo: values.value.testimoner_photo,
+        }),
       }
+
+      await updateTestimony(submitValues)
+      await queryClient.refetchQueries({ queryKey: ['testimonies'] })
+
+      form.reset()
     },
   })
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
-      try {
-        await form.handleSubmit()
-      } catch (error) {
-        throw error
-      }
+      await form.handleSubmit()
     },
   }))
 

@@ -47,7 +47,9 @@ describe('Meeting Sessions Entity API', () => {
 
       expect(http.get).toHaveBeenCalledWith('/public/meeting-sessions/1')
       expect(result).toBeUndefined()
-      expect(toast.error).toHaveBeenCalledWith('Gagal mengambil data sesi meeting publik')
+      expect(toast.error).toHaveBeenCalledWith(
+        'Gagal mengambil data sesi meeting publik',
+      )
     })
   })
 })

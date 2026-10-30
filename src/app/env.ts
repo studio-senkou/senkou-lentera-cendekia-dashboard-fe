@@ -18,6 +18,8 @@ export const env = createEnv({
     VITE_IMAGE_BASE_URL: z.string().url().optional(),
     VITE_SUPABASE_URL: z.string().url(),
     VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+    VITE_DEFAULT_TENANT_SLUG: z.string().min(1).optional(),
+    VITE_ROOT_DOMAIN: z.string().min(1).optional(),
   },
 
   /**

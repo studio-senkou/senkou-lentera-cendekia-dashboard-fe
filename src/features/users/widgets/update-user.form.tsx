@@ -36,36 +36,30 @@ export const UpdateUserForm = forwardRef<
     onSubmit: async ({ value }) => {
       console.log(value)
 
-      try {
-        // await updateUser({
-        //   name: value.name,
-        //   email: value.email,
-        //   role: value.role as 'user' | 'mentor',
-        // })
+      // await updateUser({
+      //   name: value.name,
+      //   email: value.email,
+      //   role: value.role as 'user' | 'mentor',
+      // })
 
-        await queryClient.refetchQueries({ queryKey: ['users'] })
-        form.reset()
-        onSuccess?.()
-      } catch (error) {
-        throw error
-      }
+      await queryClient.refetchQueries({ queryKey: ['users'] })
+      form.reset()
+      onSuccess?.()
     },
   })
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
-      try {
-        await form.handleSubmit()
-      } catch (error) {
-        throw error
-      }
+      await form.handleSubmit()
     },
   }))
 
   return (
-    <form 
-    // ref={form.ref} 
-    className={className} onSubmit={form.handleSubmit}>
+    <form
+      // ref={form.ref}
+      className={className}
+      onSubmit={form.handleSubmit}
+    >
       {/* Form fields go here */}
     </form>
   )

@@ -52,6 +52,9 @@ export const OptionForm = forwardRef<OptionFormRef, OptionFormProps>(
         }
 
         await queryClient.invalidateQueries({ queryKey: ['quiz', quizId] })
+        await queryClient.invalidateQueries({
+          queryKey: ['quiz', quizId, 'questions'],
+        })
         await queryClient.invalidateQueries({ queryKey: ['quizzes'] })
         form.reset()
         onSuccess?.()

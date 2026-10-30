@@ -4,6 +4,7 @@ export interface User {
   email: string
   email_verified_at: string
   is_active: boolean
+  is_owner: boolean
   role: 'admin' | 'user' | 'mentor'
   created_at: string
   updated_at: string

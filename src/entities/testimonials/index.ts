@@ -1,5 +1,9 @@
 import { toast } from 'sonner'
 import type { Testimonial } from '@/shared/types/response'
+import type {
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 import { supabase } from '@/shared/api/supabase'
 
 export interface CreateTestimonialRequest {
@@ -34,27 +38,59 @@ export const createTestimonial = async (
     toast.success('Testimonial created successfully')
     return result as Testimonial
   } catch (error: any) {
-    toast.error(error?.message || 'Failed to create testimonial. Please try again.')
+    toast.error(
+      error?.message || 'Failed to create testimonial. Please try again.',
+    )
     console.error(error)
     throw error
   }
 }
 
-export const getTestimonials = async (): Promise<Array<Testimonial>> => {
+export const getTestimonials = async (
+  pagination?: PaginationParams,
+): Promise<{ testimonials: Array<Testimonial>; meta?: PaginationMeta }> => {
   try {
-    const { data: result, error } = await supabase
+    let query = supabase
       .from('testimonials')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
+
+    const term = pagination?.search?.replace(/[%,()]/g, ' ').trim()
+
+    if (term) {
+      query = query.or(
+        `testimoner_name.ilike.%${term}%,testimoner_position.ilike.%${term}%,testimony_text.ilike.%${term}%`,
+      )
+    }
+
+    if (pagination) {
+      query = query.range(
+        pagination.offset,
+        pagination.offset + pagination.limit - 1,
+      )
+    }
+
+    const { data: result, error, count } = await query
 
     if (error) {
       throw error
     }
 
-    return result as Array<Testimonial>
+    return {
+      testimonials: (result ?? []) as Array<Testimonial>,
+      ...(pagination
+        ? {
+            meta: {
+              total: count ?? 0,
+              limit: pagination.limit,
+              offset: pagination.offset,
+            },
+          }
+        : {}),
+    }
   } catch (error) {
     console.error(error)
-    return []
+    return { testimonials: [] }
   }
 }
 
@@ -82,7 +118,9 @@ export const updateTestimonial = async (
     toast.success('Testimonial updated successfully')
     return result as Testimonial
   } catch (error: any) {
-    toast.error(error?.message || 'Failed to update testimonial. Please try again.')
+    toast.error(
+      error?.message || 'Failed to update testimonial. Please try again.',
+    )
     throw error
   }
 }
@@ -97,7 +135,9 @@ export const deleteTestimonial = async (id: number): Promise<void> => {
 
     toast.success('Testimonial deleted successfully')
   } catch (error: any) {
-    toast.error(error?.message || 'Failed to delete testimonial, please try again.')
+    toast.error(
+      error?.message || 'Failed to delete testimonial, please try again.',
+    )
     throw error
   }
 }

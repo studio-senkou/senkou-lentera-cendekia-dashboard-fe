@@ -57,10 +57,16 @@ export const useEditor = <TData>() => {
       renderTimeEditor,
       renderDurationEditor,
     }
-  }, [])
+  }, [
+    renderTextEditor,
+    renderNumberEditor,
+    renderSelectEditor,
+    renderDateEditor,
+    renderTimeEditor,
+    renderDurationEditor,
+  ])
 
   return {
     editor,
   }
 }
-

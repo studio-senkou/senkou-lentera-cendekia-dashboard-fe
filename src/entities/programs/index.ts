@@ -1,5 +1,9 @@
 import { toast } from 'sonner'
 import type { Program } from '@/shared/types/response'
+import type {
+  PaginationMeta,
+  PaginationParams,
+} from '@/shared/types/pagination'
 import { supabase } from '@/shared/api/supabase'
 
 export interface CreateProgramRequest {
@@ -39,21 +43,49 @@ export const createProgram = async (
   }
 }
 
-export const getPrograms = async (): Promise<Array<Program>> => {
+export const getPrograms = async (
+  pagination?: PaginationParams,
+): Promise<{ programs: Array<Program>; meta?: PaginationMeta }> => {
   try {
-    const { data: result, error } = await supabase
+    let query = supabase
       .from('programs')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
+
+    const term = pagination?.search?.replace(/[%,()]/g, ' ').trim()
+
+    if (term) {
+      query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`)
+    }
+
+    if (pagination) {
+      query = query.range(
+        pagination.offset,
+        pagination.offset + pagination.limit - 1,
+      )
+    }
+
+    const { data: result, error, count } = await query
 
     if (error) {
       throw error
     }
 
-    return result as Array<Program>
+    return {
+      programs: (result ?? []) as Array<Program>,
+      ...(pagination
+        ? {
+            meta: {
+              total: count ?? 0,
+              limit: pagination.limit,
+              offset: pagination.offset,
+            },
+          }
+        : {}),
+    }
   } catch (error) {
     console.error(error)
-    return []
+    return { programs: [] }
   }
 }
 
@@ -67,7 +99,7 @@ export const updateProgram = async (
       description: data.description,
       updated_at: new Date().toISOString(),
     }
-    
+
     if (data.image_url !== undefined) {
       updateData.image_url = data.image_url
     }

@@ -67,11 +67,7 @@ export const TestimonyForm = forwardRef<TestimonyFormRef, TestimonyFormProps>(
 
     useImperativeHandle(ref, () => ({
       submit: async () => {
-        try {
-          await form.handleSubmit()
-        } catch (error) {
-          throw error
-        }
+        await form.handleSubmit()
       },
     }))
 

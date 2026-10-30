@@ -1,27 +1,9 @@
 import { useStore } from '@tanstack/react-form'
 import { useFieldContext } from '../hooks/form-context'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-function ErrorMessages({
-  errors,
-}: {
-  errors: Array<string | { message: string }>
-}) {
-  return (
-    <>
-      {errors.map((error) => (
-        <div
-          key={typeof error === 'string' ? error : error.message}
-          className="text-red-500 mt-1 text-sm"
-        >
-          {typeof error === 'string' ? error : error.message}
-        </div>
-      ))}
-    </>
-  )
-}
+import { FormField, fieldErrorMessage } from '@/shared/ui/form-field'
+import { Input } from '@/shared/ui/input'
 
 interface TextFieldProps {
   name: string
@@ -42,14 +24,16 @@ export function TextField({
 }: TextFieldProps) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
+  const error = fieldErrorMessage(errors)
 
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={name} className="px-1">
-        {required && <span className="text-red-500 mr-1">*</span>}
-        {label}
-        {secondaryLabel && <span className="ml-auto">{secondaryLabel}</span>}
-      </Label>
+    <FormField
+      label={label}
+      htmlFor={name}
+      required={required}
+      error={field.state.meta.isTouched ? error : undefined}
+      secondaryLabel={secondaryLabel}
+    >
       <Input
         id={name}
         name={name}
@@ -59,9 +43,7 @@ export function TextField({
         onChange={(e) => field.handleChange(e.target.value)}
         onBlur={field.handleBlur}
         required={required}
-        className="bg-white"
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
-    </div>
+    </FormField>
   )
 }

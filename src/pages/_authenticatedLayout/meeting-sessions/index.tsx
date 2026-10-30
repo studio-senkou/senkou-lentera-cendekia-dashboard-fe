@@ -8,6 +8,7 @@ import { getMeetingSessions } from '@/entities/meeting-sessions'
 
 import { MeetingDataSkeleton } from '@/features/meeting-sessions/widgets/meeting-data-skeleton'
 import { MeetingSessionsDataGrid } from '@/features/meeting-sessions/widgets/meeting-sessions.data-grid'
+import BasePageLayout from '@/widgets/base-page-layout'
 
 export const Route = createFileRoute('/_authenticatedLayout/meeting-sessions/')(
   {
@@ -24,7 +25,7 @@ function RouteComponent() {
     queryKey: ['meeting-sessions'],
     queryFn: getMeetingSessions,
     select: (datas) => {
-      const emptyRows = Array.from({length: datas.length + 10}).map((_) => ({
+      const emptyRows = Array.from({ length: datas.length + 10 }).map(() => ({
         mentor_id: undefined,
         student_id: undefined,
         session_date: undefined,
@@ -44,20 +45,13 @@ function RouteComponent() {
   })
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-medium">List Pertemuan</h1>
-          <p className="text-sm text-gray-500">
-            Daftar sesi pertemuan yang telah dijadwalkan
-          </p>
+    <BasePageLayout subtitle="Daftar sesi pertemuan yang telah dijadwalkan.">
+      <div className="flex flex-col gap-4">
+        <div className="w-full">
+          {isLoading && <MeetingDataSkeleton />}
+          {!isLoading && <MeetingSessionsDataGrid data={data ?? []} />}
         </div>
       </div>
-
-      <div className="w-full">
-        {isLoading && <MeetingDataSkeleton />}
-        {!isLoading && <MeetingSessionsDataGrid data={data ?? []} />}
-      </div>
-    </div>
+    </BasePageLayout>
   )
 }
