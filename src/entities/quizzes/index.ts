@@ -24,10 +24,16 @@ export interface CreateQuizRequest {
 
 export interface UpdateQuizRequest extends CreateQuizRequest {}
 
+export interface CreateQuestionAnswer {
+  option_text: string
+  is_correct: boolean
+}
+
 export interface CreateQuestionRequest {
   question_text: string
   order_number?: number
   image_url?: File | null
+  answers?: Array<CreateQuestionAnswer>
 }
 
 export interface UpdateQuestionRequest extends CreateQuestionRequest {}
@@ -133,6 +139,9 @@ export const createQuestion = async (
     if (data.image_url instanceof File) {
       formData.append('image', data.image_url)
     }
+    if (data.answers && data.answers.length > 0) {
+      formData.append('answers', JSON.stringify(data.answers))
+    }
     const response = await http.post(
       `/admin/quizzes/${quizId}/questions`,
       formData,
@@ -142,6 +151,26 @@ export const createQuestion = async (
     return response.data.data as QuizQuestion
   } catch (error) {
     toast.error('Failed to create question')
+    throw error
+  }
+}
+
+export const importQuizQuestions = async (
+  quizId: number,
+  file: File,
+) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await http.post(
+      `/admin/quizzes/${quizId}/questions/import`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    toast.success('Questions imported successfully')
+    return response.data
+  } catch (error) {
+    toast.error('Failed to import questions')
     throw error
   }
 }

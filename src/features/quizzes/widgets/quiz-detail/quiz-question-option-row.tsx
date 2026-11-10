@@ -25,12 +25,14 @@ interface QuizQuestionOptionRowProps {
   quizId: number
   questionId: number
   option: QuizOption
+  letter?: string
 }
 
 export function QuizQuestionOptionRow({
   quizId,
   questionId,
   option,
+  letter,
 }: QuizQuestionOptionRowProps) {
   const queryClient = useQueryClient()
   const [deletingOptionId, setDeletingOptionId] = useState<number | null>(null)
@@ -69,10 +71,22 @@ export function QuizQuestionOptionRow({
       )}
     >
       <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{option.option_text}</span>
+        <div className="flex items-center gap-2.5">
+          {letter && (
+            <span
+              className={cn(
+                'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                option.is_correct
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-slate-200 text-slate-700',
+              )}
+            >
+              {letter}
+            </span>
+          )}
+          <span className="font-medium text-slate-900">{option.option_text}</span>
           {option.is_correct && (
-            <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-medium text-white">
+            <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[11px] font-semibold text-white">
               Jawaban benar
             </span>
           )}

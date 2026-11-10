@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Plus } from 'lucide-react'
 import { useRef } from 'react'
 
@@ -8,9 +9,10 @@ import { QuestionForm } from '@/features/quizzes/widgets/question.form'
 
 export interface CreateQuestionSheetProps {
   quizId: number
+  trigger?: ReactNode
 }
 
-export function CreateQuestionSheet({ quizId }: CreateQuestionSheetProps) {
+export function CreateQuestionSheet({ quizId, trigger }: CreateQuestionSheetProps) {
   const questionRef = useRef<QuestionFormRef>(null)
 
   const handleSubmitForm = async () => {
@@ -24,14 +26,16 @@ export function CreateQuestionSheet({ quizId }: CreateQuestionSheetProps) {
   return (
     <FormSheet
       trigger={
-        <Button
-          className="w-full max-w-96 justify-center rounded-full p-6"
-          variant="default"
-          size="sm"
-        >
-          <Plus className="h-4 w-4" />
-          Soal Baru
-        </Button>
+        trigger ?? (
+          <Button
+            className="w-full max-w-96 justify-center rounded-full p-6"
+            variant="default"
+            size="sm"
+          >
+            <Plus className="h-4 w-4" />
+            Soal Baru
+          </Button>
+        )
       }
       title="Buat Soal Baru"
       description="Tambahkan pertanyaan baru ke kuis ini."

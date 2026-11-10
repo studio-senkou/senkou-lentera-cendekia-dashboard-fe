@@ -167,14 +167,18 @@ export function QuizQuestionCard({ quizId, question }: QuizQuestionCardProps) {
               Belum ada pilihan jawaban untuk soal ini.
             </div>
           ) : (
-            sortedOptions.map((option) => (
-              <QuizQuestionOptionRow
-                key={option.id}
-                quizId={quizId}
-                questionId={question.id}
-                option={option}
-              />
-            ))
+            sortedOptions.map((option, idx) => {
+              const letter = String.fromCharCode(65 + idx)
+              return (
+                <QuizQuestionOptionRow
+                  key={option.id}
+                  quizId={quizId}
+                  questionId={question.id}
+                  option={option}
+                  letter={letter}
+                />
+              )
+            })
           )}
         </div>
       </div>
