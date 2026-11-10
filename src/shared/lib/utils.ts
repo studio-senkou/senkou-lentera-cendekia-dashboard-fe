@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { ClassValue } from 'clsx'
 import { env } from '@/app/env'
+import { getTenantSlug } from '@/shared/lib/tenant'
 
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
@@ -14,17 +15,13 @@ export function getFileUrl(path?: string | null): string | undefined {
   }
 
   const normalized = path.replace(/^\/+/, '')
-  const imageBase = env.VITE_IMAGE_BASE_URL?.replace(/\/+$/, '')
-
-  if (imageBase) {
-    return `${imageBase}/${normalized}`
-  }
+  const tenant = `?tenant=${encodeURIComponent(getTenantSlug())}`
 
   try {
     const baseUrl = env.VITE_API_BASE_URL || ''
     const host = new URL(baseUrl).origin
-    return `${host}/api/v1/files/${normalized}`
+    return `${host}/api/v1/files/${normalized}${tenant}`
   } catch {
-    return `/files/${normalized}`
+    return `/api/v1/files/${normalized}${tenant}`
   }
 }

@@ -4,9 +4,12 @@ import { cn, getFileUrl } from './utils'
 
 vi.mock('@/app/env', () => ({
   env: {
-    VITE_IMAGE_BASE_URL: 'https://cdn.example.com',
     VITE_API_BASE_URL: 'https://api.example.com/api/v1',
   },
+}))
+
+vi.mock('@/shared/lib/tenant', () => ({
+  getTenantSlug: () => 'demo',
 }))
 
 describe('utils', () => {
@@ -30,12 +33,12 @@ describe('utils', () => {
       )
     })
 
-    it('resolves storage keys against the public image base', () => {
+    it('resolves storage keys against the backend file endpoint', () => {
       expect(getFileUrl('tenants/abc/quiz_questions/image.png')).toBe(
-        'https://cdn.example.com/tenants/abc/quiz_questions/image.png',
+        'https://api.example.com/api/v1/files/tenants/abc/quiz_questions/image.png?tenant=demo',
       )
       expect(getFileUrl('/tenants/abc/quiz_questions/image.png')).toBe(
-        'https://cdn.example.com/tenants/abc/quiz_questions/image.png',
+        'https://api.example.com/api/v1/files/tenants/abc/quiz_questions/image.png?tenant=demo',
       )
     })
   })

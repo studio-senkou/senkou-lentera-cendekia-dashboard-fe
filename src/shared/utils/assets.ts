@@ -1,5 +1,5 @@
-import { env } from '@/app/env'
+import { getFileUrl } from '@/shared/lib/utils'
 
 export const getAsset = (path: string): string => {
-  return `${env.VITE_IMAGE_BASE_URL}/${path}`
+  return getFileUrl(path) ?? ''
 }
