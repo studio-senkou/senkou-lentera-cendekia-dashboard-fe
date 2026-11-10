@@ -1,172 +1,165 @@
 # Testing React
 
-## Basic Component Test
+Vitest + Testing Library. The full convention set (placement, wording, coverage, gotchas) lives in the `vitest-conventions` skill; load it when writing tests. This page is the React-specific quick guide.
+
+## Must-follow conventions
+
+- **Placement:** global code in `test/<dir>/<name>.test.ts(x)` mirroring `src/` (`src/hooks/use-debounce.ts` → `test/hooks/use-debounce.test.ts`); feature code in `src/features/<feature>/test/<name>.test.ts(x)`. Same base name; `.tsx` only when rendering JSX; import via `@/`.
+- **`describe` in plain words**, never an identifier: `describe('Debounce hook')`, `describe('Product card')`. Not `describe('useDebounce')`.
+- **Each `it` reads `Must <behavior> when <condition>`**: `it('Must emit the latest value only after the delay when input changes rapidly')`.
+- **Cover** the main path plus edges (empty, null, boundaries). Components: rendered text, loading/empty states, disabled states, callbacks with their arguments. **No snapshots.**
+- Explicit imports from `vitest` (`describe`, `expect`, `it`, `vi`), even with globals on.
+
+## Component test
 
 ```tsx
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
-test('renders greeting', () => {
-  render(<Greeting name="World" />)
-  expect(screen.getByText('Hello, World!')).toBeInTheDocument()
-})
+import '@/i18n/i18n'
+import { ProductCard } from '@/features/product/components/product-card'
 
-test('increments counter on click', async () => {
-  const user = userEvent.setup()
-  render(<Counter />)
+const product = { id: 1, name: 'Desk Lamp', price: 25, status: 'active' } as any
 
-  await user.click(screen.getByRole('button', { name: /increment/i }))
-
-  expect(screen.getByText('1')).toBeInTheDocument()
-})
-```
-
-## Query Priority
-
-```tsx
-// Preferred: Accessible queries (how users find elements)
-screen.getByRole('button', { name: /submit/i })
-screen.getByLabelText('Email')
-screen.getByPlaceholderText('Search...')
-screen.getByText('Welcome')
-
-// Fallback: Test IDs (when no accessible name)
-screen.getByTestId('custom-element')
-
-// Async queries (wait for element)
-await screen.findByText('Loading complete')
-```
-
-## Testing Forms
-
-```tsx
-test('submits form with user data', async () => {
-  const handleSubmit = vi.fn()
-  const user = userEvent.setup()
-
-  render(<ContactForm onSubmit={handleSubmit} />)
-
-  await user.type(screen.getByLabelText('Name'), 'John Doe')
-  await user.type(screen.getByLabelText('Email'), 'john@example.com')
-  await user.selectOptions(screen.getByLabelText('Topic'), 'support')
-  await user.click(screen.getByRole('button', { name: /submit/i }))
-
-  expect(handleSubmit).toHaveBeenCalledWith({
-    name: 'John Doe',
-    email: 'john@example.com',
-    topic: 'support',
-  })
-})
-```
-
-## Testing with Providers
-
-```tsx
-function renderWithProviders(
-  ui: React.ReactElement,
-  { initialState = {}, ...options } = {},
-) {
-  function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>{children}</ThemeProvider>
-      </QueryClientProvider>
+describe('Product card', () => {
+  it('Must display the name and formatted price when the product is active', () => {
+    render(
+      <ProductCard product={product} isSaving={false} onArchive={vi.fn()} />,
     )
-  }
 
-  return render(ui, { wrapper: Wrapper, ...options })
-}
-
-test('displays user data', async () => {
-  renderWithProviders(<UserProfile userId="123" />)
-
-  await screen.findByText('John Doe')
-})
-```
-
-## Mocking API Calls
-
-```tsx
-import { http, HttpResponse } from 'msw'
-import { setupServer } from 'msw/node'
-
-const server = setupServer(
-  http.get('/api/users/:id', ({ params }) => {
-    return HttpResponse.json({ id: params.id, name: 'John' })
-  }),
-)
-
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-test('fetches and displays user', async () => {
-  render(<UserProfile userId="123" />)
-
-  await screen.findByText('John')
-})
-
-test('handles error', async () => {
-  server.use(
-    http.get('/api/users/:id', () => {
-      return new HttpResponse(null, { status: 500 })
-    }),
-  )
-
-  render(<UserProfile userId="123" />)
-
-  await screen.findByText('Error loading user')
-})
-```
-
-## Testing Hooks
-
-```tsx
-import { renderHook, act } from '@testing-library/react'
-
-test('useCounter increments', () => {
-  const { result } = renderHook(() => useCounter())
-
-  act(() => {
-    result.current.increment()
+    expect(screen.getByText('Desk Lamp')).toBeTruthy()
+    expect(screen.getByText('$25.00')).toBeTruthy()
   })
 
-  expect(result.current.count).toBe(1)
-})
+  it('Must disable the archive button when saving is in progress', () => {
+    render(<ProductCard product={product} isSaving onArchive={vi.fn()} />)
 
-test('useDebounce delays value', async () => {
-  vi.useFakeTimers()
-
-  const { result, rerender } = renderHook(
-    ({ value }) => useDebounce(value, 500),
-    { initialProps: { value: 'initial' } },
-  )
-
-  rerender({ value: 'updated' })
-  expect(result.current).toBe('initial')
-
-  await act(async () => {
-    vi.advanceTimersByTime(500)
+    expect(
+      (screen.getByRole('button', { name: 'Archive' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true)
   })
 
-  expect(result.current).toBe('updated')
-  vi.useRealTimers()
+  it('Must call onArchive with the product when the archive button is clicked', () => {
+    const onArchive = vi.fn()
+    render(
+      <ProductCard product={product} isSaving={false} onArchive={onArchive} />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Archive' }))
+
+    expect(onArchive).toHaveBeenCalledWith(product)
+  })
 })
 ```
 
-## Quick Reference
+## Primitive hook test
 
-| Query            | Use When                 |
-| ---------------- | ------------------------ |
-| `getByRole`      | Buttons, links, headings |
-| `getByLabelText` | Form inputs              |
-| `getByText`      | Non-interactive text     |
-| `findByX`        | Async/loading content    |
-| `queryByX`       | Assert NOT present       |
+```ts
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useDebounce } from '@/hooks/use-debounce'
 
-| Pattern             | Use Case             |
-| ------------------- | -------------------- |
-| `userEvent.setup()` | User interactions    |
-| `renderHook()`      | Testing custom hooks |
-| `msw`               | Mocking API calls    |
-| Custom render       | Wrap with providers  |
+describe('Debounce hook', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('Must return the initial value immediately when first rendered', () => {
+    const { result } = renderHook(() => useDebounce('a'))
+
+    expect(result.current).toBe('a')
+  })
+
+  it('Must clear the pending timer when the component unmounts', () => {
+    const { rerender, unmount } = renderHook(
+      ({ value }) => useDebounce(value, 500),
+      { initialProps: { value: 'a' } },
+    )
+
+    rerender({ value: 'b' })
+    expect(vi.getTimerCount()).toBe(1)
+
+    unmount()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+})
+```
+
+## Composite hook test
+
+Test the combined behavior through the hook's public return, not the hooks it wraps.
+
+```ts
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { useAsyncAction } from '@/hooks/use-async-action'
+
+describe('Async action hook', () => {
+  it('Must call onSuccess with the result when the action resolves', async () => {
+    const onSuccess = vi.fn()
+    const { result } = renderHook(() =>
+      useAsyncAction({ action: async (id: number) => id * 2, onSuccess }),
+    )
+
+    await act(async () => {
+      await result.current.execute(2)
+    })
+
+    expect(onSuccess).toHaveBeenCalledWith(4, 2)
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  it('Must rethrow and call onError when the action rejects', async () => {
+    const onError = vi.fn()
+    const error = new Error('boom')
+    const { result } = renderHook(() =>
+      useAsyncAction({ action: async () => Promise.reject(error), onError }),
+    )
+
+    await act(async () => {
+      await expect(result.current.execute()).rejects.toBe(error)
+    })
+
+    expect(onError).toHaveBeenCalledWith(error)
+  })
+})
+```
+
+## Query priority
+
+```ts
+screen.getByRole('button', { name: 'Save' }) // preferred
+screen.getByLabelText('Email')
+screen.getByPlaceholderText('Search…')
+screen.getByText('Welcome')
+screen.getByTestId('confirm-x') // fallback when no accessible name
+await screen.findByText('Loaded') // async
+expect(screen.queryByText('Error')).toBeNull() // assert absence
+```
+
+## Mocking
+
+- **Services:** mock the feature service module, not HTTP.
+
+  ```ts
+  const getProduct = vi.hoisted(() => vi.fn())
+  vi.mock('@/features/product/services/product-action', () => ({ getProduct }))
+
+  beforeEach(() => {
+    getProduct.mockReset()
+  })
+  ```
+
+- **Env:** `const env = vi.hoisted(() => ({ VITE_APP_ENV: 'production' }))` + `vi.mock('@/env', () => ({ env }))`.
+- **Translations:** import `@/i18n/i18n` to render real text; mock `i18next` `t` as identity when asserting keys.
+- **Timers:** `vi.useFakeTimers()` in `beforeEach`, `vi.useRealTimers()` in `afterEach`.
+- `vi.restoreAllMocks()` does not reset `vi.mock` factories; reset them in `beforeEach`.
+
+## What not to test here
+
+Components that need the router or React Query are not required to have unit tests. Extract their logic into a hook, util or prop-driven child, and test that instead.

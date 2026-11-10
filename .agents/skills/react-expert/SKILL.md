@@ -1,155 +1,180 @@
 ---
 name: react-expert
-description: Use when building React 18+ applications in .jsx or .tsx files, Next.js App Router projects, or create-react-app setups. Creates components, implements custom hooks, debugs rendering issues, migrates class components to functional, and implements state management. Invoke for Server Components, Suspense boundaries, useActionState forms, performance optimization, or React 19 features.
+description: Use when building React 19 client components in .tsx files for a Vite single-page app — creating components, writing custom hooks (primitive, composite or feature hooks), debugging rendering issues, state management (local, Context, Zustand, TanStack Query), performance, and React 19 client features (use(), useActionState, useOptimistic, ref as prop). Client components only; no Server Components or Next.js. Triggers on React, JSX, hooks, useState, useEffect, custom hook, Suspense, TanStack Query, Zustand, component.
 license: MIT
 metadata:
   author: https://github.com/Jeffallan
-  version: '1.1.0'
+  version: '2.0.0'
   domain: frontend
-  triggers: React, JSX, hooks, useState, useEffect, useContext, Server Components, React 19, Suspense, TanStack Query, Redux, Zustand, component, frontend
+  triggers: React, JSX, hooks, custom hook, useState, useEffect, useContext, React 19, Suspense, TanStack Query, Zustand, component, frontend
   role: specialist
   scope: implementation
   output-format: code
-  related-skills: fullstack-guardian, playwright-expert, test-master
+  related-skills: react-bulletproof, typescript-oop, vitest-conventions, baseline-ui
 ---
 
 # React Expert
 
-Senior React specialist with deep expertise in React 19, Server Components, and production-grade application architecture.
+Senior React specialist for React 19 **client-side** applications (Vite SPA, TypeScript strict). No Server Components, no `'use client'` / `'use server'` directives, no class components.
 
 ## When to Use This Skill
 
 - Building new React components or features
-- Implementing state management (local, Context, Redux, Zustand)
-- Optimizing React performance
-- Setting up React project architecture
-- Working with React 19 Server Components
-- Implementing forms with React 19 actions
-- Data fetching patterns with TanStack Query or `use()`
+- Writing custom hooks, or extracting bulky component logic into hooks
+- State management (local, Context, Zustand, TanStack Query)
+- Performance work (memo, lazy, virtualization)
+- React 19 client features (`use()`, `useActionState`, `useOptimistic`, ref as prop)
+
+Where files go is the `react-bulletproof` skill; classes are `typescript-oop`; test conventions are `vitest-conventions`.
 
 ## Core Workflow
 
-1. **Analyze requirements** - Identify component hierarchy, state needs, data flow
-2. **Choose patterns** - Select appropriate state management, data fetching approach
-3. **Implement** - Write TypeScript components with proper types
-4. **Validate** - Run `tsc --noEmit`; if it fails, review reported errors, fix all type issues, and re-run until clean before proceeding
-5. **Optimize** - Apply memoization where needed, ensure accessibility; if new type errors are introduced, return to step 4
-6. **Test** - Write tests with React Testing Library; if any assertions fail, debug and fix before submitting
+1. **Analyze** — component hierarchy, state needs, data flow.
+2. **Reuse** — check `src/hooks` and `src/components` before writing anything new.
+3. **Choose patterns** — state location, data fetching (TanStack Query over a service fn), hook kind (see below).
+4. **Implement** — TypeScript components and hooks, one component per file.
+5. **Validate** — `tsc --noEmit` (or `npm run build`) until clean.
+6. **Test** — write the test per `references/testing-react.md` (`describe` in plain words, `it('Must <behavior> when <condition>')`); fix failures before submitting.
+7. **Format** — `npm run check` (prettier + oxlint).
 
 ## Reference Guide
 
-Load detailed guidance based on context:
+| Topic            | Reference                         | Load When                                         |
+| ---------------- | --------------------------------- | ------------------------------------------------- |
+| Hooks            | `references/hooks-patterns.md`    | Custom hooks, hook kinds, useEffect, useCallback  |
+| State Management | `references/state-management.md`  | Context, Zustand, TanStack Query                  |
+| React 19         | `references/react-19-features.md` | use(), useActionState, useOptimistic, ref as prop |
+| Performance      | `references/performance.md`       | memo, lazy, virtualization                        |
+| Testing          | `references/testing-react.md`     | Component and hook tests                          |
 
-| Topic             | Reference                                 | Load When                                |
-| ----------------- | ----------------------------------------- | ---------------------------------------- |
-| Server Components | `references/server-components.md`         | RSC patterns, Next.js App Router         |
-| React 19          | `references/react-19-features.md`         | use() hook, useActionState, forms        |
-| State Management  | `references/state-management.md`          | Context, Zustand, Redux, TanStack        |
-| Hooks             | `references/hooks-patterns.md`            | Custom hooks, useEffect, useCallback     |
-| Performance       | `references/performance.md`               | memo, lazy, virtualization               |
-| Testing           | `references/testing-react.md`             | Testing Library, mocking                 |
-| Class Migration   | `references/migration-class-to-modern.md` | Converting class components to hooks/RSC |
+## Hook kinds (decide before writing a hook)
+
+| Kind                      | Purpose                                                                                                                                      | Folder                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **Primitive shared hook** | Generic behavior any component can use (debounce, disclosure, media query, timer). Doesn't call other custom hooks.                          | `src/hooks/use-<thing>.ts`                  |
+| **Composite shared hook** | Combines other hooks (primitives, query, form, store) into one domain-free unit so components stay thin (table state, async action, search). | `src/hooks/use-<thing>.ts`                  |
+| **Feature hook**          | Composite hook tied to one feature's schema/types/services.                                                                                  | `src/features/<f>/hooks/use-<f>-<thing>.ts` |
+
+Extract a composite hook when a component has ≥3 related hook calls working together, or the same combination appears in 2+ components. Details and examples in `references/hooks-patterns.md`.
 
 ## Key Patterns
 
-### Server Component (Next.js App Router)
+### Primitive shared hook
+
+```ts
+// src/hooks/use-disclose.ts
+import { useCallback, useMemo, useState } from 'react'
+
+export const useDisclose = (defaultOpen = false) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+
+  const onOpen = useCallback(() => setIsOpen(true), [])
+  const onClose = useCallback(() => setIsOpen(false), [])
+  const onToggle = useCallback(() => setIsOpen((prev) => !prev), [])
+
+  return useMemo(
+    () => ({ isOpen, onOpen, onClose, onToggle }),
+    [isOpen, onOpen, onClose, onToggle],
+  )
+}
+```
+
+### Server data via TanStack Query over a service function
 
 ```tsx
-// app/users/page.tsx — Server Component, no "use client"
-import { db } from '@/lib/db'
+import { useQuery } from '@tanstack/react-query'
+import { getProducts } from '@/features/product/services/product-action'
 
-interface User {
-  id: string
-  name: string
-}
+export function ProductList() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getProducts,
+  })
 
-export default async function UsersPage() {
-  const users: User[] = await db.user.findMany()
+  if (isLoading) return <LoadingSpinner />
+  if (!data?.length) return <EmptyState />
 
   return (
     <ul>
-      {users.map((user) => (
-        <li key={user.id}>{user.name}</li>
+      {data.map((product) => (
+        <li key={product.id}>{product.name}</li>
       ))}
     </ul>
   )
 }
 ```
 
-### React 19 Form with `useActionState`
+### React 19 form with `useActionState` (client async action)
 
 ```tsx
-'use client'
 import { useActionState } from 'react'
+import { subscribe } from '@/features/newsletter/services/subscribe'
 
-async function submitForm(_prev: string, formData: FormData): Promise<string> {
-  const name = formData.get('name') as string
-  // perform server action or fetch
-  return `Hello, ${name}!`
+type FormState = { error?: string; success?: boolean }
+
+const submit = async (
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> => {
+  try {
+    await subscribe(String(formData.get('email')))
+    return { success: true }
+  } catch {
+    return { error: 'Failed to subscribe' }
+  }
 }
 
-export function GreetForm() {
-  const [message, action, isPending] = useActionState(submitForm, '')
+export function NewsletterForm() {
+  const [state, action, isPending] = useActionState(submit, {})
 
   return (
     <form action={action}>
-      <input name="name" required />
+      <input name="email" type="email" required disabled={isPending} />
       <button type="submit" disabled={isPending}>
-        {isPending ? 'Submitting…' : 'Submit'}
+        Subscribe
       </button>
-      {message && <p>{message}</p>}
+      {state.error && <p role="alert">{state.error}</p>}
     </form>
   )
 }
 ```
 
-### Custom Hook with Cleanup
-
-```tsx
-import { useState, useEffect } from 'react'
-
-function useWindowWidth(): number {
-  const [width, setWidth] = useState(() => window.innerWidth)
-
-  useEffect(() => {
-    const handler = () => setWidth(window.innerWidth)
-    window.addEventListener('resize', handler)
-    return () => window.removeEventListener('resize', handler) // cleanup
-  }, [])
-
-  return width
-}
-```
+Forms with validation use react-hook-form + Zod through a feature hook instead (`useProductForm`).
 
 ## Constraints
 
 ### MUST DO
 
-- Use TypeScript with strict mode
-- Implement error boundaries for graceful failures
-- Use `key` props correctly (stable, unique identifiers)
-- Clean up effects (return cleanup function)
-- Use semantic HTML and ARIA for accessibility
-- Memoize when passing callbacks/objects to memoized children
-- Use Suspense boundaries for async operations
+- TypeScript strict; typed props (`<Component>Props`) and typed hook options/returns
+- Client components only; no Server Components, directives, or server actions
+- Server data through TanStack Query over a service function; no axios/fetch in components
+- One component per file; one hook per file, in the folder its kind dictates
+- Error boundaries around routes / risky subtrees
+- Stable, unique `key` props
+- Clean up effects (return the cleanup)
+- Semantic HTML and ARIA (see `fixing-accessibility`)
+- Every shared hook and prop-driven component ships with its test
+- Prettier style: no semicolons, single quotes, trailing commas, 80 cols
 
 ### MUST NOT DO
 
 - Mutate state directly
 - Use array index as key for dynamic lists
-- Create functions inside JSX (causes re-renders)
-- Forget useEffect cleanup (memory leaks)
+- Leave bulky multi-hook logic inline in a component when a composite or feature hook fits
+- Put feature imports (schema, types, services) in a `src/hooks` hook
+- Return JSX from a hook (except a hook whose job is rendering, e.g. a portal)
+- Forget useEffect cleanup
 - Ignore React strict mode warnings
-- Skip error boundaries in production
 
 ## Output Templates
 
 When implementing React features, provide:
 
-1. Component file with TypeScript types
-2. Test file if non-trivial logic
-3. Brief explanation of key decisions
+1. Component file(s) with TypeScript types
+2. Hook file(s) in the right folder when logic was extracted
+3. Test file(s) following `vitest-conventions`
+4. Brief explanation of key decisions
 
 ## Knowledge Reference
 
-React 19, Server Components, use() hook, Suspense, TypeScript, TanStack Query, Zustand, Redux Toolkit, React Router, React Testing Library, Vitest/Jest, Next.js App Router, accessibility (WCAG)
+React 19 (client), use() hook, Suspense, TypeScript, TanStack Query, Zustand, react-hook-form + Zod, TanStack Router, React Testing Library, Vitest, accessibility (WCAG)

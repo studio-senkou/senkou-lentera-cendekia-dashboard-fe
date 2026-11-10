@@ -1,4 +1,6 @@
-# React 19 Features
+# React 19 Features (client components)
+
+This stack is a client-only SPA (Vite). No Server Components, no `'use client'` / `'use server'` directives, no server actions.
 
 ## use() Hook
 
@@ -21,7 +23,9 @@ function Comments({
   )
 }
 
-// Parent creates promise, child reads it
+// Parent creates promise, child reads it.
+// For server data prefer TanStack Query (useQuery/useSuspenseQuery); use(promise) only for
+// one-off promises created outside render (e.g. a lazily loaded module or cached request).
 function Post({ postId }: { postId: string }) {
   const commentsPromise = fetchComments(postId)
 
@@ -48,7 +52,6 @@ function Theme({ children }: { children: React.ReactNode }) {
 ## useActionState
 
 ```tsx
-'use client'
 import { useActionState } from 'react'
 
 interface FormState {
@@ -56,11 +59,11 @@ interface FormState {
   success?: boolean
 }
 
+// Client-side async action: calls a feature service fn (no server actions in this stack)
 async function submitAction(
-  prevState: FormState,
+  _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  'use server'
   const email = formData.get('email') as string
 
   try {
@@ -90,7 +93,6 @@ function NewsletterForm() {
 ## useFormStatus
 
 ```tsx
-'use client'
 import { useFormStatus } from 'react-dom'
 
 function SubmitButton() {
@@ -117,7 +119,6 @@ function ContactForm() {
 ## useOptimistic
 
 ```tsx
-'use client'
 import { useOptimistic } from 'react'
 
 function TodoList({ todos }: { todos: Todo[] }) {
@@ -176,8 +177,8 @@ function Form() {
 | `useFormStatus()`  | Form pending state (child)     |
 | `useOptimistic()`  | Optimistic UI updates          |
 
-| Pattern          | When                      |
-| ---------------- | ------------------------- |
-| `use(promise)`   | Suspense data fetching    |
-| `use(context)`   | Conditional context read  |
-| `useActionState` | Server Actions with state |
+| Pattern          | When                                     |
+| ---------------- | ---------------------------------------- |
+| `use(promise)`   | Suspense data fetching                   |
+| `use(context)`   | Conditional context read                 |
+| `useActionState` | Client async action with state + pending |
