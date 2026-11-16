@@ -40,6 +40,8 @@ const quizSchema = z.object({
     },
     { message: 'Batas waktu harus berupa angka minimal 1 menit' },
   ),
+  scoring_method: z.enum(['standard', 'tka_irt_2pl']),
+  reporting_scale: z.enum(['sd_smp', 'sma_smk']),
   is_active: z.boolean(),
 })
 
@@ -53,6 +55,8 @@ export const QuizForm = forwardRef<QuizFormRef, QuizFormProps>(
         description: quiz?.description ?? '',
         passing_score: quiz?.passing_score.toString() ?? '70',
         time_limit_minutes: quiz?.time_limit_minutes?.toString() ?? '',
+        scoring_method: quiz?.scoring_method ?? 'standard',
+        reporting_scale: quiz?.reporting_scale ?? 'sd_smp',
         is_active: quiz?.is_active ?? false,
       },
       validators: {
@@ -71,6 +75,8 @@ export const QuizForm = forwardRef<QuizFormRef, QuizFormProps>(
             value.time_limit_minutes.trim() === ''
               ? null
               : Number(value.time_limit_minutes),
+          scoring_method: value.scoring_method,
+          reporting_scale: value.reporting_scale,
           is_active: value.is_active,
         }
 
@@ -120,6 +126,32 @@ export const QuizForm = forwardRef<QuizFormRef, QuizFormProps>(
         <AppField name="description">
           {({ TextArea }) => <TextArea label="Deskripsi" />}
         </AppField>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <AppField name="scoring_method">
+            {({ Select }) => (
+              <Select
+                label="Scoring Method"
+                values={[
+                  { label: 'Standard Scoring (Default)', value: 'standard' },
+                  { label: 'TKA Scoring (IRT 2PL)', value: 'tka_irt_2pl' },
+                ]}
+              />
+            )}
+          </AppField>
+
+          <AppField name="reporting_scale">
+            {({ Select }) => (
+              <Select
+                label="Reporting Scale"
+                values={[
+                  { label: 'SD / SMP (0 - 100)', value: 'sd_smp' },
+                  { label: 'SMA / SMK (200 - 800)', value: 'sma_smk' },
+                ]}
+              />
+            )}
+          </AppField>
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <AppField name="passing_score">

@@ -2,8 +2,9 @@ import type { ReactNode } from 'react'
 import { Plus } from 'lucide-react'
 import { useRef } from 'react'
 
-import type { QuestionFormRef } from '@/features/quizzes/widgets/question.form'
+import type { QuestionFormRef } from '@/features/quizzes/types'
 import { Button } from '@/shared/ui/button'
+import { DrawerSize } from '@/shared/ui/drawer'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { QuestionForm } from '@/features/quizzes/widgets/question.form'
 
@@ -12,7 +13,10 @@ export interface CreateQuestionSheetProps {
   trigger?: ReactNode
 }
 
-export function CreateQuestionSheet({ quizId, trigger }: CreateQuestionSheetProps) {
+export function CreateQuestionSheet({
+  quizId,
+  trigger,
+}: CreateQuestionSheetProps) {
   const questionRef = useRef<QuestionFormRef>(null)
 
   const handleSubmitForm = async () => {
@@ -39,6 +43,7 @@ export function CreateQuestionSheet({ quizId, trigger }: CreateQuestionSheetProp
       }
       title="Buat Soal Baru"
       description="Tambahkan pertanyaan baru ke kuis ini."
+      size={DrawerSize.XXL}
       onSubmitForm={handleSubmitForm}
     >
       <QuestionForm ref={questionRef} quizId={quizId} />

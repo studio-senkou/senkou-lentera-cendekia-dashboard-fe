@@ -73,6 +73,8 @@ export interface Quiz {
   passing_score: number
   time_limit_minutes: number | null
   is_active: boolean
+  scoring_method?: 'standard' | 'tka_irt_2pl'
+  reporting_scale?: 'sd_smp' | 'sma_smk'
   created_at: string
   updated_at: string
 }
@@ -81,6 +83,7 @@ export interface QuizOption {
   id: number
   question_id: number
   option_text: string
+  image_url?: string | null
   is_correct: boolean
   order_number: number
   created_at: string
@@ -94,6 +97,10 @@ export interface QuizQuestion {
   image_url?: string | null
   order_number: number
   options: Array<QuizOption>
+  discrimination?: number | null
+  difficulty?: number | null
+  calibration_status?: 'calibrated' | 'uncalibrated' | 'simulated'
+  calibration_version?: string | null
   created_at: string
   updated_at: string
 }
@@ -109,6 +116,11 @@ export interface QuizAttempt {
   user_id: number
   status: 'in_progress' | 'completed' | 'reset'
   score: number | null
+  scoring_method?: 'standard' | 'tka_irt_2pl'
+  estimated_theta?: number | null
+  transformed_score?: number | null
+  achievement_category?: string | null
+  calibration_version?: string | null
   started_at: string
   submitted_at: string | null
   reset_at: string | null

@@ -133,7 +133,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     //
     // fe_origin: the backend binds this into the signed OAuth state
     // and honors it at the callback ONLY for allowlisted origins.
-    const apiBase = (env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '')
+    const apiBase = env.VITE_API_BASE_URL
     const feOrigin = encodeURIComponent(window.location.origin)
     const url = `${apiBase}/auth/google?fe_origin=${feOrigin}`
 

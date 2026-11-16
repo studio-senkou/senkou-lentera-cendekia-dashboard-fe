@@ -20,6 +20,7 @@ import { Button } from '@/shared/ui/button'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { cn } from '@/shared/lib/utils'
 import { OptionForm } from '@/features/quizzes/widgets/option.form'
+import { OptionImageDialog } from './option-image-dialog'
 
 interface QuizQuestionOptionRowProps {
   quizId: number
@@ -71,6 +72,14 @@ export function QuizQuestionOptionRow({
       )}
     >
       <div className="space-y-1">
+        {option.image_url && (
+          <OptionImageDialog
+            imagePath={option.image_url}
+            letter={letter}
+            optionText={option.option_text}
+            thumbnailClassName="max-h-24 object-contain"
+          />
+        )}
         <div className="flex items-center gap-2.5">
           {letter && (
             <span
@@ -84,7 +93,10 @@ export function QuizQuestionOptionRow({
               {letter}
             </span>
           )}
-          <span className="font-medium text-slate-900">{option.option_text}</span>
+          <span className="font-medium text-slate-900">
+            {option.option_text ||
+              (option.image_url ? 'Jawaban berupa gambar' : '—')}
+          </span>
           {option.is_correct && (
             <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[11px] font-semibold text-white">
               Jawaban benar

@@ -160,10 +160,46 @@ export function QuizAttemptsTable({
         },
         {
           accessorKey: 'score',
-          header: 'Score',
-          meta: { minWidth: '6rem' },
-          cell: ({ row }) =>
-            row.original.score === null ? '-' : row.original.score.toFixed(2),
+          header: 'Hasil / Nilai',
+          meta: { minWidth: '12rem' },
+          cell: ({ row }) => {
+            const isIrt = row.original.scoring_method === 'tka_irt_2pl'
+            if (row.original.status !== 'completed') return '-'
+
+            if (isIrt) {
+              const theta =
+                row.original.estimated_theta !== null &&
+                row.original.estimated_theta !== undefined
+                  ? row.original.estimated_theta.toFixed(2)
+                  : '-'
+              const tkaScore =
+                row.original.transformed_score !== null &&
+                row.original.transformed_score !== undefined
+                  ? row.original.transformed_score.toFixed(2)
+                  : '-'
+              const cat = row.original.achievement_category
+
+              return (
+                <div className="flex flex-col gap-0.5 text-xs">
+                  <span className="font-semibold text-foreground">
+                    TKA: {tkaScore}{' '}
+                    <span className="text-muted-foreground font-normal">
+                      (θ: {theta})
+                    </span>
+                  </span>
+                  {cat && (
+                    <span className="inline-block text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                      {cat}
+                    </span>
+                  )}
+                </div>
+              )
+            }
+
+            return row.original.score === null
+              ? '-'
+              : `${row.original.score.toFixed(2)}%`
+          },
         },
         {
           accessorKey: 'started_at',

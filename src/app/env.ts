@@ -14,7 +14,13 @@ export const env = createEnv({
 
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
-    VITE_API_BASE_URL: z.string().url().optional(),
+    // Absolute backend origin, including the API prefix (e.g.
+    // https://staging-api.lbblenteracendekia.com/api/v1). Required so the app
+    // calls the API directly and never relies on a same-origin proxy.
+    VITE_API_BASE_URL: z
+      .string()
+      .url()
+      .transform((value) => value.replace(/\/+$/, '')),
     VITE_SUPABASE_URL: z.string().url(),
     VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
     VITE_DEFAULT_TENANT_SLUG: z.string().min(1).optional(),

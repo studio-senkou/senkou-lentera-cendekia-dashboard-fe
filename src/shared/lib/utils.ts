@@ -17,11 +17,5 @@ export function getFileUrl(path?: string | null): string | undefined {
   const normalized = path.replace(/^\/+/, '')
   const tenant = `?tenant=${encodeURIComponent(getTenantSlug())}`
 
-  try {
-    const baseUrl = env.VITE_API_BASE_URL || ''
-    const host = new URL(baseUrl).origin
-    return `${host}/api/v1/files/${normalized}${tenant}`
-  } catch {
-    return `/api/v1/files/${normalized}${tenant}`
-  }
+  return `${env.VITE_API_BASE_URL}/files/${normalized}${tenant}`
 }

@@ -1,4 +1,5 @@
 import { ArrowUpRight, TrendingUp } from 'lucide-react'
+import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { cn } from '@/shared/lib/utils'
 
@@ -43,21 +44,17 @@ export const StatCard = ({
             )}
           </div>
         </div>
-        <button
+        <Button
           type="button"
-          className={cn(
-            'flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors',
-            solid
-              ? 'bg-primary/10 text-primary hover:bg-primary/15'
-              : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
-            onClick ? 'cursor-pointer' : 'cursor-default',
-          )}
+          variant={solid ? 'default' : 'secondary'}
+          size="icon"
+          className="size-8"
           onClick={onClick}
           aria-label={`Buka ${title}`}
           tabIndex={onClick ? 0 : -1}
         >
-          <ArrowUpRight size={16} />
-        </button>
+          <ArrowUpRight className="size-4" />
+        </Button>
       </div>
       {note && (
         <div className="mt-6">

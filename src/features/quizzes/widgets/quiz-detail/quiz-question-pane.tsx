@@ -1,16 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Check,
-  Edit2,
-  Loader2,
-  Plus,
-  Trash2,
-} from 'lucide-react'
+import { Check, Edit2, Loader2, Plus, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import type { QuizQuestion } from '@/shared/types/response'
 import type { OptionFormRef } from '@/features/quizzes/widgets/option.form'
-import type { QuestionFormRef } from '@/features/quizzes/widgets/question.form'
+import type { QuestionFormRef } from '@/features/quizzes/types'
 import { deleteQuestion, deleteQuestionOption } from '@/entities/quizzes'
 import { cn, getFileUrl } from '@/shared/lib/utils'
 import {
@@ -25,9 +19,11 @@ import {
   AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
+import { DrawerSize } from '@/shared/ui/drawer'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { OptionForm } from '@/features/quizzes/widgets/option.form'
 import { QuestionForm } from '@/features/quizzes/widgets/question.form'
+import { OptionImageDialog } from './option-image-dialog'
 
 interface QuizQuestionPaneProps {
   quizId: number
@@ -118,6 +114,7 @@ export function QuizQuestionPane({
             }
             title="Edit Pertanyaan"
             description="Perbarui teks pertanyaan atau gambar pendukung."
+            size={DrawerSize.XXL}
             onSubmitForm={handleEditSubmit}
           >
             <QuestionForm ref={editRef} quizId={quizId} question={question} />
@@ -253,6 +250,15 @@ export function QuizQuestionPane({
                       )}
                     </span>
 
+                    {option.image_url && (
+                      <OptionImageDialog
+                        imagePath={option.image_url}
+                        letter={letter}
+                        optionText={option.option_text}
+                        thumbnailClassName="h-10 w-10 object-cover"
+                      />
+                    )}
+
                     <span
                       className={cn(
                         'text-sm font-medium',
@@ -261,7 +267,8 @@ export function QuizQuestionPane({
                           : 'text-slate-800',
                       )}
                     >
-                      {option.option_text}
+                      {option.option_text ||
+                        (option.image_url ? 'Jawaban berupa gambar' : '—')}
                     </span>
                   </div>
 
@@ -289,7 +296,9 @@ export function QuizQuestionPane({
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus pilihan ini?</AlertDialogTitle>
+                          <AlertDialogTitle>
+                            Hapus pilihan ini?
+                          </AlertDialogTitle>
                           <AlertDialogDescription>
                             Pilihan jawaban akan dihapus secara permanen.
                           </AlertDialogDescription>

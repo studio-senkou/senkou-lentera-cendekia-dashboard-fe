@@ -16,6 +16,7 @@ import {
 
 import { CreateQuestionSheet } from './create-question-sheet'
 import { ImportQuestionsDialog } from './import-questions-dialog'
+import { ImportCalibrationDialog } from './import-calibration-dialog'
 import { QuizOutlineSidebar } from './quiz-outline-sidebar'
 import { QuizQuestionPane } from './quiz-question-pane'
 
@@ -151,14 +152,16 @@ export function QuizDetailPage() {
       {/* Top Bar / Breadcrumb / Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-3">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => navigate({ to: '/quizzes' })}
-            className="flex items-center gap-1 border border-neutral-200 px-4 py-2 rounded-full hover:text-slate-900 hover:bg-neutral-100 transition-colors cursor-pointer"
+            className="gap-1.5"
           >
-            <ChevronLeft className="w-4" />
+            <ChevronLeft className="size-4" />
             <span>Daftar Kuis</span>
-          </button>
+          </Button>
 
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-medium tracking-tight text-slate-900">
@@ -202,6 +205,20 @@ export function QuizDetailPage() {
                     : 'Tanpa batas waktu'}
                 </span>
               </span>
+              <span className="flex items-center gap-1 font-medium text-slate-600">
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
+                    quiz.scoring_method === 'tka_irt_2pl'
+                      ? 'bg-purple-100 text-purple-700'
+                      : 'bg-slate-200 text-slate-700',
+                  )}
+                >
+                  {quiz.scoring_method === 'tka_irt_2pl'
+                    ? 'TKA IRT 2PL'
+                    : 'Standard'}
+                </span>
+              </span>
             </div>
           )}
         </div>
@@ -209,11 +226,7 @@ export function QuizDetailPage() {
         {/* Global Action buttons */}
         <div className="flex items-center gap-2">
           {activeTab === 'settings' ? (
-            <Button
-              onClick={handleSaveSettings}
-              disabled={isSavingSettings}
-              className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-semibold px-5"
-            >
+            <Button onClick={handleSaveSettings} disabled={isSavingSettings}>
               {isSavingSettings ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -223,13 +236,14 @@ export function QuizDetailPage() {
             </Button>
           ) : (
             <>
+              <ImportCalibrationDialog quizId={quizId} />
               <ImportQuestionsDialog
                 quizId={quizId}
                 trigger={
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-1.5 rounded-xl border-emerald-600/30 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"
+                    className="gap-1.5 border-emerald-600/30 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"
                   >
                     <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
                     Import XLSX
@@ -241,7 +255,7 @@ export function QuizDetailPage() {
                 trigger={
                   <Button
                     size="sm"
-                    className="gap-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold"
+                    className="gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     Soal Baru
@@ -253,68 +267,59 @@ export function QuizDetailPage() {
         </div>
       </div>
 
-      {/* Tabs Navigation (Coursewell UI Style) */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
-        <button
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-2 border-b border-border pb-3">
+        <Button
           type="button"
+          variant={activeTab === 'questions' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('questions')}
-          className={cn(
-            'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all',
-            activeTab === 'questions'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-          )}
+          className="gap-2"
         >
           <span>Questions</span>
           <span
             className={cn(
-              'rounded-full px-2 py-0.5 text-[10px] font-bold',
+              'rounded-xs px-1.5 py-0.5 text-[10px] font-bold',
               activeTab === 'questions'
                 ? 'bg-white/20 text-white'
-                : 'bg-slate-200 text-slate-700',
+                : 'bg-muted text-muted-foreground',
             )}
           >
             {questionsTotal}
           </span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'settings' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('settings')}
-          className={cn(
-            'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all',
-            activeTab === 'settings'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-          )}
+          className="gap-2"
         >
-          <SettingsIcon className="h-3.5 w-3.5" />
+          <SettingsIcon className="size-3.5" />
           <span>Settings</span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'results' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('results')}
-          className={cn(
-            'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all',
-            activeTab === 'results'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-          )}
+          className="gap-2"
         >
-          <Users className="h-3.5 w-3.5" />
+          <Users className="size-3.5" />
           <span>Results</span>
           <span
             className={cn(
-              'rounded-full px-2 py-0.5 text-[10px] font-bold',
+              'rounded-xs px-1.5 py-0.5 text-[10px] font-bold',
               activeTab === 'results'
                 ? 'bg-white/20 text-white'
-                : 'bg-slate-200 text-slate-700',
+                : 'bg-muted text-muted-foreground',
             )}
           >
             {attemptsTotal}
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Tab 1: Questions (Coursewell 2-Column Quiz Builder) */}
@@ -337,10 +342,6 @@ export function QuizDetailPage() {
                 Mulai bangun kuis dengan menambahkan pertanyaan manual atau
                 import sekaligus menggunakan file Excel.
               </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                <CreateQuestionSheet quizId={quizId} />
-                <ImportQuestionsDialog quizId={quizId} />
-              </div>
             </div>
           ) : (
             <div className="grid gap-6 lg:grid-cols-[320px_1fr] items-start">
@@ -407,7 +408,6 @@ export function QuizDetailPage() {
                 <Button
                   onClick={handleSaveSettings}
                   disabled={isSavingSettings}
-                  className="gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6"
                 >
                   {isSavingSettings ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,11 +1,14 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import z from 'zod'
 
 import type { QuizOption } from '@/shared/types/response'
 import { createQuestionOption, updateQuestionOption } from '@/entities/quizzes'
 import { useAppForm } from '@/shared/hooks/form'
-import { cn } from '@/shared/lib/utils'
+import { cn, getFileUrl } from '@/shared/lib/utils'
+import { QuestionImageField } from './question-form/question-image-field'
+
+const MAX_SIZE_BYTES = 2 * 1024 * 1024 // 2 MB
 
 export interface OptionFormProps {
   quizId: number
@@ -20,13 +23,41 @@ export interface OptionFormRef {
 }
 
 const optionSchema = z.object({
-  option_text: z.string().min(1, 'Teks pilihan jawaban wajib diisi'),
+  option_text: z.string(),
   is_correct: z.boolean(),
 })
 
 export const OptionForm = forwardRef<OptionFormRef, OptionFormProps>(
   ({ quizId, questionId, option, className, onSuccess }, ref) => {
     const queryClient = useQueryClient()
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [imagePreview, setImagePreview] = useState<string | null>(
+      option?.image_url ? getFileUrl(option.image_url) || null : null,
+    )
+    const [imageError, setImageError] = useState<string | null>(null)
+    const [textError, setTextError] = useState<string | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      if (file.size > MAX_SIZE_BYTES) {
+        setImageError('Ukuran gambar maksimal 2 MB')
+        e.target.value = ''
+        return
+      }
+
+      setImageError(null)
+      setTextError(null)
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+
+    const clearImage = () => {
+      setImageFile(null)
+      setImagePreview(null)
+      setImageError(null)
+    }
 
     const form = useAppForm({
       defaultValues: {
@@ -40,9 +71,20 @@ export const OptionForm = forwardRef<OptionFormRef, OptionFormProps>(
         throw new Error('Invalid option form submission')
       },
       onSubmit: async ({ value }) => {
+        if (imageError) throw new Error(imageError)
+
+        const optionText = value.option_text.trim()
+        if (!optionText && !imagePreview) {
+          setTextError('Isi teks pilihan atau unggah gambar')
+          throw new Error('Teks pilihan atau gambar wajib diisi')
+        }
+
+        setTextError(null)
+
         const payload = {
-          option_text: value.option_text.trim(),
+          option_text: optionText,
           is_correct: value.is_correct,
+          image_url: imageFile ?? undefined,
         }
 
         if (option) {
@@ -57,6 +99,7 @@ export const OptionForm = forwardRef<OptionFormRef, OptionFormProps>(
         })
         await queryClient.invalidateQueries({ queryKey: ['quizzes'] })
         form.reset()
+        clearImage()
         onSuccess?.()
       },
     })
@@ -85,11 +128,26 @@ export const OptionForm = forwardRef<OptionFormRef, OptionFormProps>(
               type="text"
               label="Teks Pilihan"
               name="option_text"
-              required
-              placeholder="Masukkan teks pilihan jawaban"
+              required={!imagePreview}
+              error={textError ?? undefined}
+              onChange={() => setTextError(null)}
+              placeholder={
+                imagePreview
+                  ? 'Teks opsional (gambar sudah diunggah)'
+                  : 'Masukkan teks pilihan jawaban'
+              }
             />
           )}
         </AppField>
+
+        <QuestionImageField
+          imagePreview={imagePreview}
+          imageError={imageError}
+          onFileChange={handleFileChange}
+          onClear={clearImage}
+          label="Gambar Pilihan"
+          alt="Preview gambar pilihan jawaban"
+        />
 
         <AppField name="is_correct">
           {({ Switch }) => <Switch label="Jawaban benar" />}

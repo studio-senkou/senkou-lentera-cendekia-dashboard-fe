@@ -159,7 +159,7 @@ export function TopbarSearch() {
                 onMouseEnter={() => setFocusedIndex(index)}
                 data-focused={focusedIndex === index}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-md px-3 py-3 text-left transition-colors',
+                  'flex w-full items-center gap-3 rounded-sm px-3 py-3 text-left transition-colors',
                   'hover:bg-muted data-[focused=true]:bg-muted',
                 )}
               >

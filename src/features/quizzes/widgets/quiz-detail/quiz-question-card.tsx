@@ -6,9 +6,9 @@ import { QuizQuestionOptionRow } from './quiz-question-option-row'
 
 import type { QuizQuestion } from '@/shared/types/response'
 import type { OptionFormRef } from '@/features/quizzes/widgets/option.form'
-import type { QuestionFormRef } from '@/features/quizzes/widgets/question.form'
+import type { QuestionFormRef } from '@/features/quizzes/types'
 import { deleteQuestion } from '@/entities/quizzes'
-import { getFileUrl } from '@/shared/lib/utils'
+import { cn, getFileUrl } from '@/shared/lib/utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from '@/shared/ui/alert-dialog'
 import { Button } from '@/shared/ui/button'
+import { DrawerSize } from '@/shared/ui/drawer'
 import { FormSheet } from '@/shared/ui/form-sheet'
 import { OptionForm } from '@/features/quizzes/widgets/option.form'
 import { QuestionForm } from '@/features/quizzes/widgets/question.form'
@@ -75,10 +76,34 @@ export function QuizQuestionCard({ quizId, question }: QuizQuestionCardProps) {
     (left, right) => left.order_number - right.order_number,
   )
 
+  const correctCount = question.options.filter((o) => o.is_correct).length
+  const questionTypeLabel =
+    correctCount > 1
+      ? 'Kotak Centang (Checkbox)'
+      : correctCount === 1
+        ? 'Pilihan Ganda'
+        : question.options.length === 0
+          ? 'Esai / Terbuka'
+          : 'Jajak Pendapat'
+
   return (
     <div className="rounded-xl border p-4 bg-white">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold',
+                correctCount > 1
+                  ? 'bg-purple-100 text-purple-800'
+                  : correctCount === 1
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-slate-100 text-slate-700',
+              )}
+            >
+              {questionTypeLabel}
+            </span>
+          </div>
           <h3 className="text-base font-semibold">{question.question_text}</h3>
           {question.image_url && (
             <div className="mt-2 overflow-hidden rounded-lg border border-border">
@@ -100,6 +125,7 @@ export function QuizQuestionCard({ quizId, question }: QuizQuestionCardProps) {
             }
             title="Edit Soal"
             description="Perbarui isi soal."
+            size={DrawerSize.XXL}
             onSubmitForm={handleEditSubmit}
           >
             <QuestionForm ref={editRef} quizId={quizId} question={question} />

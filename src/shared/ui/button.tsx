@@ -5,8 +5,9 @@ import type { VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/shared/lib/utils'
 
+// ponytail: small rounding rounded-sm (4px) matches Cloudflare Kumo dashboard buttons; upgrade to variable radii if theme supports dynamic curves.
 const buttonVariants = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-lg text-sm font-medium outline-none transition-[background-color,box-shadow,color] select-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap rounded-sm text-sm font-medium outline-none transition-[background-color,box-shadow,color] select-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   {
     variants: {
       variant: {
@@ -27,10 +28,10 @@ const buttonVariants = cva(
           'border border-amber-600/20 bg-amber-50 text-amber-700 shadow-xs hover:bg-amber-100 hover:text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60',
       },
       size: {
-        default: 'h-9 rounded-lg px-3 pb-0.5 text-sm',
-        sm: 'h-8 rounded-md px-2.5 text-xs',
-        lg: 'h-10 rounded-lg px-4 pb-0.5 text-sm',
-        icon: 'size-9 rounded-lg p-0',
+        default: 'h-9 rounded-sm px-3 pb-0.5 text-sm',
+        sm: 'h-8 rounded-sm px-2.5 text-xs',
+        lg: 'h-10 rounded-sm px-4 pb-0.5 text-sm',
+        icon: 'size-9 rounded-sm p-0',
       },
     },
     defaultVariants: {

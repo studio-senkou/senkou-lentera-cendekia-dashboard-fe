@@ -20,6 +20,8 @@ export interface CreateQuizRequest {
   passing_score: number
   time_limit_minutes?: number | null
   is_active?: boolean
+  scoring_method?: 'standard' | 'tka_irt_2pl'
+  reporting_scale?: 'sd_smp' | 'sma_smk'
 }
 
 export interface UpdateQuizRequest extends CreateQuizRequest {}
@@ -27,19 +29,27 @@ export interface UpdateQuizRequest extends CreateQuizRequest {}
 export interface CreateQuestionAnswer {
   option_text: string
   is_correct: boolean
+  image_index?: number
 }
 
 export interface CreateQuestionRequest {
   question_text: string
+  question_type?: string
   order_number?: number
   image_url?: File | null
+  discrimination?: number | null
+  difficulty?: number | null
+  calibration_status?: 'calibrated' | 'uncalibrated' | 'simulated'
+  calibration_version?: string | null
   answers?: Array<CreateQuestionAnswer>
+  answer_images?: Array<File>
 }
 
 export interface UpdateQuestionRequest extends CreateQuestionRequest {}
 
 export interface CreateOptionRequest {
   option_text: string
+  image_url?: File | null
   is_correct?: boolean
   order_number?: number
 }
@@ -133,14 +143,32 @@ export const createQuestion = async (
   try {
     const formData = new FormData()
     formData.append('question_text', data.question_text)
+    if (data.question_type) {
+      formData.append('question_type', data.question_type)
+    }
     if (data.order_number != null) {
       formData.append('order_number', String(data.order_number))
     }
     if (data.image_url instanceof File) {
       formData.append('image', data.image_url)
     }
+    if (data.discrimination !== undefined && data.discrimination !== null) {
+      formData.append('discrimination', String(data.discrimination))
+    }
+    if (data.difficulty !== undefined && data.difficulty !== null) {
+      formData.append('difficulty', String(data.difficulty))
+    }
+    if (data.calibration_status) {
+      formData.append('calibration_status', data.calibration_status)
+    }
+    if (data.calibration_version) {
+      formData.append('calibration_version', data.calibration_version)
+    }
     if (data.answers && data.answers.length > 0) {
       formData.append('answers', JSON.stringify(data.answers))
+    }
+    for (const file of data.answer_images ?? []) {
+      formData.append('answer_images', file)
     }
     const response = await http.post(
       `/admin/quizzes/${quizId}/questions`,
@@ -155,10 +183,7 @@ export const createQuestion = async (
   }
 }
 
-export const importQuizQuestions = async (
-  quizId: number,
-  file: File,
-) => {
+export const importQuizQuestions = async (quizId: number, file: File) => {
   try {
     const formData = new FormData()
     formData.append('file', file)
@@ -183,11 +208,26 @@ export const updateQuestion = async (
   try {
     const formData = new FormData()
     formData.append('question_text', data.question_text)
+    if (data.question_type) {
+      formData.append('question_type', data.question_type)
+    }
     if (data.order_number != null) {
       formData.append('order_number', String(data.order_number))
     }
     if (data.image_url instanceof File) {
       formData.append('image', data.image_url)
+    }
+    if (data.discrimination !== undefined && data.discrimination !== null) {
+      formData.append('discrimination', String(data.discrimination))
+    }
+    if (data.difficulty !== undefined && data.difficulty !== null) {
+      formData.append('difficulty', String(data.difficulty))
+    }
+    if (data.calibration_status) {
+      formData.append('calibration_status', data.calibration_status)
+    }
+    if (data.calibration_version) {
+      formData.append('calibration_version', data.calibration_version)
     }
     const response = await http.put(
       `/admin/quizzes/${quizId}/questions/${questionId}`,
@@ -221,9 +261,16 @@ export const createQuestionOption = async (
   data: CreateOptionRequest,
 ) => {
   try {
+    const formData = new FormData()
+    formData.append('option_text', data.option_text)
+    formData.append('is_correct', String(data.is_correct ?? false))
+    if (data.image_url instanceof File) {
+      formData.append('image', data.image_url)
+    }
     const response = await http.post(
       `/admin/quizzes/${quizId}/questions/${questionId}/options`,
-      data,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     toast.success('Option created successfully')
     return response.data.data as QuizOption
@@ -240,9 +287,16 @@ export const updateQuestionOption = async (
   data: UpdateOptionRequest,
 ) => {
   try {
+    const formData = new FormData()
+    formData.append('option_text', data.option_text)
+    formData.append('is_correct', String(data.is_correct ?? false))
+    if (data.image_url instanceof File) {
+      formData.append('image', data.image_url)
+    }
     const response = await http.put(
       `/admin/quizzes/${quizId}/questions/${questionId}/options/${optionId}`,
-      data,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     toast.success('Option updated successfully')
     return response.data.data as QuizOption
@@ -296,6 +350,51 @@ export const resetQuizAttempt = async (quizId: number, userId: number) => {
     return response.data
   } catch (error) {
     toast.error('Failed to reset quiz attempt')
+    throw error
+  }
+}
+
+export interface CalibrationItemInput {
+  question_id: number
+  discrimination: number
+  difficulty: number
+  calibration_version?: string
+}
+
+export const importQuizCalibration = async (
+  quizId: number,
+  payload: {
+    calibration_version?: string
+    items?: Array<CalibrationItemInput>
+    file?: File
+  },
+) => {
+  try {
+    if (payload.file) {
+      const formData = new FormData()
+      formData.append('file', payload.file)
+      if (payload.calibration_version) {
+        formData.append('calibration_version', payload.calibration_version)
+      }
+      const response = await http.post(
+        `/admin/quizzes/${quizId}/calibration/import`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      )
+      toast.success('Kalibrasi IRT berhasil diimpor')
+      return response.data
+    }
+
+    const response = await http.post(
+      `/admin/quizzes/${quizId}/calibration/import`,
+      payload,
+    )
+    toast.success('Kalibrasi IRT berhasil diimpor')
+    return response.data
+  } catch (error) {
+    toast.error('Gagal mengimpor kalibrasi IRT')
     throw error
   }
 }

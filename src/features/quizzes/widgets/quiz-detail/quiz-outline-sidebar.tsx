@@ -50,7 +50,7 @@ export function QuizOutlineSidebar({
                 type="button"
                 onClick={() => onSelect(q.id)}
                 className={cn(
-                  'flex items-start gap-3 rounded-md border p-3 text-left transition-all',
+                  'flex items-start gap-3 rounded-sm border p-3 text-left transition-all cursor-pointer',
                   isSelected
                     ? 'border-amber-500 bg-amber-50/30 ring-1 ring-amber-500/30 shadow-2xs'
                     : 'border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/50',
@@ -59,7 +59,7 @@ export function QuizOutlineSidebar({
                 {/* Number Badge */}
                 <span
                   className={cn(
-                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-all',
+                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-xs font-bold transition-all',
                     isSelected
                       ? 'bg-amber-500 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700',
